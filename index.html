@@ -1,0 +1,350 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StormWatch ChaseDesk</title>
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #080e17;
+  color: #e7edf5;
+  font-family: Arial, sans-serif;
+}
+
+header {
+  height: 65px;
+  background: #101b29;
+  border-bottom: 1px solid #26394d;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.logo {
+  font-size: 19px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.logo span {
+  color: #45aaff;
+}
+
+.status {
+  color: #53d68a;
+  font-size: 12px;
+}
+
+main {
+  padding: 16px;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+  align-items: center;
+}
+
+button {
+  background: #17283b;
+  border: 1px solid #304963;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #23415e;
+}
+
+button.active {
+  border-color: #39aaff;
+  background: #173b59;
+}
+
+.dashboard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 245px;
+  gap: 14px;
+}
+
+.panel {
+  background: #101b29;
+  border: 1px solid #26394d;
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.panel-title {
+  padding: 13px;
+  border-bottom: 1px solid #26394d;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+#map {
+  height: 650px;
+  width: 100%;
+  background: #182432;
+}
+
+.sidebar {
+  padding: 14px;
+}
+
+.data-label {
+  color: #91a7bd;
+  font-size: 11px;
+  margin-top: 18px;
+}
+
+.data-value {
+  font-size: 16px;
+  margin-top: 5px;
+}
+
+select {
+  background: #17283b;
+  color: white;
+  border: 1px solid #304963;
+  padding: 9px;
+  width: 100%;
+  border-radius: 4px;
+}
+
+input[type="range"] {
+  width: 100%;
+}
+
+.source {
+  color: #8297ab;
+  font-size: 11px;
+  line-height: 1.6;
+  margin-top: 22px;
+}
+
+footer {
+  padding: 15px;
+  color: #758ba1;
+  font-size: 11px;
+  text-align: center;
+}
+
+@media (max-width: 800px) {
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  #map {
+    height: 55vh;
+    min-height: 350px;
+  }
+
+  header {
+    padding: 0 12px;
+  }
+
+  main {
+    padding: 9px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    STORMWATCH <span>CHASEDESK</span>
+  </div>
+  <div class="status">● RADAR SYSTEM ONLINE</div>
+</header>
+
+<main>
+
+  <div class="toolbar">
+    <button id="radarButton" class="active">
+      Radar: ON
+    </button>
+
+    <button id="refreshButton">
+      ↻ Refresh Radar
+    </button>
+
+    <button id="resetButton">
+      Reset Map
+    </button>
+  </div>
+
+  <div class="dashboard">
+
+    <section class="panel">
+      <div class="panel-title">
+        LIVE NEXRAD RADAR — BASE REFLECTIVITY
+      </div>
+      <div id="map"></div>
+    </section>
+
+    <aside class="panel">
+      <div class="panel-title">
+        RADAR CONTROL CENTER
+      </div>
+
+      <div class="sidebar">
+
+        <div class="data-label">RADAR PRODUCT</div>
+        <select id="product">
+          <option value="nexrad-n0r">Base Reflectivity (N0R)</option>
+        </select>
+
+        <div class="data-label">RADAR OPACITY</div>
+        <input id="opacity" type="range"
+          min="0" max="100" value="75">
+
+        <div class="data-label">RADAR STATUS</div>
+        <div class="data-value" id="radarStatus">
+          Initializing...
+        </div>
+
+        <div class="data-label">LAST REFRESH</div>
+        <div class="data-value" id="lastRefresh">
+          Waiting...
+        </div>
+
+        <div class="data-label">MAP CENTER</div>
+        <div class="data-value" id="mapCenter">
+          Loading...
+        </div>
+
+        <div class="source">
+          DATA SOURCE<br>
+          Iowa Environmental Mesonet<br>
+          NWS WSR-88D NEXRAD mosaic<br><br>
+
+          Radar mosaic is updated approximately
+          every five minutes. Refresh requests
+          the latest available image.
+        </div>
+
+      </div>
+    </aside>
+
+  </div>
+
+</main>
+
+<footer>
+  STORMWATCH CHASEDESK · SEVERE WEATHER ANALYSIS
+  <br>
+  Radar imagery courtesy of Iowa Environmental Mesonet.
+  Not an official warning service.
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+const map = L.map("map").setView([32.5, -90], 5);
+
+const baseMap = L.tileLayer(
+  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {
+    maxZoom: 19,
+    attribution: "&copy; OpenStreetMap contributors"
+  }
+).addTo(map);
+
+const radarURL =
+  "https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi";
+
+let radarLayer = L.tileLayer.wms(radarURL, {
+  layers: "nexrad-n0r",
+  format: "image/png",
+  transparent: true,
+  version: "1.1.1",
+  opacity: 0.75,
+  attribution: "Radar: Iowa Environmental Mesonet"
+}).addTo(map);
+
+let radarEnabled = true;
+
+function updateTime() {
+  document.getElementById("lastRefresh").textContent =
+    new Date().toLocaleTimeString();
+}
+
+function updateCenter() {
+  const center = map.getCenter();
+
+  document.getElementById("mapCenter").textContent =
+    center.lat.toFixed(2) + ", " +
+    center.lng.toFixed(2);
+}
+
+function refreshRadar() {
+  if (radarEnabled) {
+    radarLayer.setParams({
+      _refresh: Date.now()
+    });
+  }
+
+  updateTime();
+}
+
+document.getElementById("radarButton")
+.addEventListener("click", function() {
+  radarEnabled = !radarEnabled;
+
+  if (radarEnabled) {
+    radarLayer.addTo(map);
+    this.textContent = "Radar: ON";
+    this.classList.add("active");
+    document.getElementById("radarStatus").textContent =
+      "Radar enabled";
+  } else {
+    map.removeLayer(radarLayer);
+    this.textContent = "Radar: OFF";
+    this.classList.remove("active");
+    document.getElementById("radarStatus").textContent =
+      "Radar hidden";
+  }
+});
+
+document.getElementById("refreshButton")
+.addEventListener("click", refreshRadar);
+
+document.getElementById("resetButton")
+.addEventListener("click", function() {
+  map.setView([32.5, -90], 5);
+});
+
+document.getElementById("opacity")
+.addEventListener("input", function() {
+  radarLayer.setOpacity(this.value / 100);
+});
+
+map.on("moveend", updateCenter);
+
+document.getElementById("radarStatus").textContent =
+  "Radar enabled";
+
+updateCenter();
+updateTime();
+</script>
+
+</body>
+</html>
