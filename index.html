@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -45,11 +46,7 @@ header {
   background:#091625;
 }
 
-.brand {
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
+.brand { display:flex; align-items:center; gap:12px; }
 
 .brand-icon {
   width:42px;
@@ -63,11 +60,7 @@ header {
   font-size:23px;
 }
 
-.brand h1 {
-  font-size:17px;
-  margin:0;
-  letter-spacing:1.5px;
-}
+.brand h1 { font-size:17px; margin:0; letter-spacing:1.5px; }
 
 .brand small {
   display:block;
@@ -83,11 +76,7 @@ header {
   letter-spacing:1px;
 }
 
-main {
-  width:min(1450px,100%);
-  margin:auto;
-  padding:22px;
-}
+main { width:min(1450px,100%); margin:auto; padding:22px; }
 
 .section-heading {
   display:flex;
@@ -97,17 +86,8 @@ main {
   margin:28px 0 13px;
 }
 
-.section-heading h2 {
-  font-size:17px;
-  margin:0;
-  letter-spacing:.5px;
-}
-
-.section-heading p {
-  margin:4px 0 0;
-  font-size:12px;
-  color:var(--muted);
-}
+.section-heading h2 { font-size:17px; margin:0; letter-spacing:.5px; }
+.section-heading p { margin:4px 0 0; font-size:12px; color:var(--muted); }
 
 .eyebrow {
   color:var(--cyan);
@@ -116,7 +96,7 @@ main {
   margin-bottom:6px;
 }
 
-.panel {
+.panel,.animation-card {
   background:var(--panel);
   border:1px solid var(--line);
   border-radius:13px;
@@ -125,18 +105,17 @@ main {
 
 .panel-inner { padding:16px; }
 
-.toolbar {
+.toolbar,.controls {
   display:flex;
   flex-wrap:wrap;
   align-items:center;
   gap:9px;
   padding:12px;
-  border-bottom:1px solid var(--line);
 }
 
-button,select,input {
-  font:inherit;
-}
+.toolbar { border-bottom:1px solid var(--line); }
+
+button,select,input { font:inherit; }
 
 button,select {
   color:var(--text);
@@ -153,35 +132,13 @@ button {
   transition:.2s;
 }
 
-button:hover {
-  border-color:var(--cyan);
-  background:#19364e;
-}
+button:hover { border-color:var(--cyan); background:#19364e; }
+button.primary { background:#124357; border-color:#287b91; color:#dffaff; }
+button:disabled { opacity:.45; cursor:not-allowed; }
+select { cursor:pointer; font-size:12px; }
+input[type="range"] { accent-color:var(--cyan); width:110px; }
 
-button.primary {
-  background:#124357;
-  border-color:#287b91;
-  color:#dffaff;
-}
-
-button:disabled {
-  opacity:.45;
-  cursor:not-allowed;
-}
-
-select {
-  cursor:pointer;
-  font-size:12px;
-}
-
-input[type="range"] {
-  accent-color:var(--cyan);
-  width:110px;
-}
-
-.mono {
-  font-family:"DM Mono",monospace;
-}
+.mono { font-family:"DM Mono",monospace; }
 
 .small-label {
   color:var(--muted);
@@ -189,11 +146,7 @@ input[type="range"] {
   letter-spacing:1px;
 }
 
-#map {
-  height:480px;
-  width:100%;
-  background:#101f2e;
-}
+#map { height:480px; width:100%; background:#101f2e; }
 
 .map-footer {
   display:flex;
@@ -235,12 +188,7 @@ input[type="range"] {
   overflow-wrap:anywhere;
 }
 
-.data-card small {
-  display:block;
-  color:var(--muted);
-  font-size:10px;
-  margin-top:3px;
-}
+.data-card small { display:block; color:var(--muted); font-size:10px; margin-top:3px; }
 
 .notice {
   border-left:3px solid var(--yellow);
@@ -260,13 +208,6 @@ input[type="range"] {
   gap:14px;
 }
 
-.animation-card {
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:13px;
-  overflow:hidden;
-}
-
 .card-head {
   padding:15px 16px;
   border-bottom:1px solid var(--line);
@@ -276,30 +217,19 @@ input[type="range"] {
   align-items:center;
 }
 
-.card-head h3 {
-  margin:0;
-  font-size:14px;
-}
-
-.card-head span {
-  color:var(--cyan);
-  font:10px "DM Mono",monospace;
-}
+.card-head h3 { margin:0; font-size:14px; }
+.card-head span { color:var(--cyan); font:10px "DM Mono",monospace; }
 
 .scene {
   position:relative;
-  min-height:310px;
+  min-height:340px;
   background:
     radial-gradient(ellipse at 50% 80%,#18334b 0%,transparent 55%),
     linear-gradient(#0a1727,#10253a);
   overflow:hidden;
 }
 
-.scene svg {
-  width:100%;
-  height:310px;
-  display:block;
-}
+.scene svg { width:100%; height:340px; display:block; }
 
 .scene-caption {
   padding:12px 15px;
@@ -309,15 +239,7 @@ input[type="range"] {
   min-height:62px;
 }
 
-.controls {
-  padding:13px 15px;
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:9px;
-  border-top:1px solid var(--line);
-}
-
+.controls { border-top:1px solid var(--line); }
 .controls .spacer { flex:1; }
 
 .stage-readout {
@@ -331,40 +253,40 @@ input[type="range"] {
   color:var(--cyan);
 }
 
-.stage-readout span:last-child {
-  color:var(--muted);
-  text-align:right;
-}
+.stage-readout span:last-child { color:var(--muted); text-align:right; }
+
+/* ==========================================
+   TORNADO FORMATION ANIMATION
+========================================== */
 
 #formationSvg .stage-part {
   opacity:0;
-  transition:opacity 1s ease,transform 1.3s ease;
+  transition:opacity 1s ease,transform 1.2s ease;
 }
 
 #formationSvg .meso { opacity:1; }
 
 #formationSvg .wall {
-  transform:translateY(-28px);
+  transform:translateY(-15px);
 }
 
-#formationSvg .funnel {
-  transform:scaleY(.05);
-  transform-origin:50% 30%;
-}
-
+#formationSvg .funnel,
 #formationSvg .tornado {
-  transform:scaleY(.05);
-  transform-origin:50% 15%;
+  transform:scaleY(.04);
+  transform-origin:250px 145px;
 }
 
-#formationSvg.phase-1 .meso { opacity:1; }
-#formationSvg.phase-1 .wall { opacity:1; transform:translateY(0); }
+#formationSvg.phase-1 .meso,
+#formationSvg.phase-1 .wall {
+  opacity:1;
+  transform:translateY(0);
+}
 
 #formationSvg.phase-2 .meso,
-#formationSvg.phase-2 .wall { opacity:1; }
+#formationSvg.phase-2 .wall,
 #formationSvg.phase-2 .funnel {
   opacity:1;
-  transform:scaleY(1);
+  transform:translateY(0) scaleY(1);
 }
 
 #formationSvg.phase-3 .stage-part {
@@ -372,58 +294,85 @@ input[type="range"] {
   transform:translateY(0) scaleY(1);
 }
 
-#formationSvg.phase-3 .tornado {
-  animation:tornadoSway 2.4s ease-in-out infinite alternate;
+.cloud-rotation {
+  transform-origin:250px 122px;
+  animation:cloudRotation 15s linear infinite;
 }
 
-.cloud-swirl {
-  transform-origin:250px 104px;
-  animation:cloudRotate 13s linear infinite;
-}
-
-.cloud-swirl.reverse {
-  animation-direction:reverse;
-  animation-duration:18s;
-}
-
-.funnel-spin {
-  transform-origin:250px 160px;
-  animation:funnelPulse 2.8s ease-in-out infinite;
-}
-
-.ground-dust {
-  transform-origin:250px 268px;
-  animation:dustSpin 5s linear infinite;
-}
-
-@keyframes cloudRotate {
+@keyframes cloudRotation {
   to { transform:rotate(360deg); }
 }
 
-@keyframes funnelPulse {
-  0%,100% { opacity:.7; transform:scaleX(.96); }
-  50% { opacity:1; transform:scaleX(1.06); }
+/* These elliptical bands represent rotation around the funnel */
+.tornado-band {
+  fill:none;
+  stroke:#e0edf5;
+  stroke-width:var(--band-width,5px);
+  stroke-linecap:round;
+  stroke-dasharray:17 10;
+  animation:horizontalOrbit 1.2s linear infinite;
 }
 
-@keyframes dustSpin {
+.tornado-band:nth-child(2) { animation-duration:1.5s; animation-direction:reverse; }
+.tornado-band:nth-child(3) { animation-duration:1.7s; }
+.tornado-band:nth-child(4) { animation-duration:1.35s; animation-direction:reverse; }
+
+@keyframes horizontalOrbit {
+  to { stroke-dashoffset:-54; }
+}
+
+.airflow {
+  stroke-dasharray:10 8;
+  animation:airflowMove 1.5s linear infinite;
+}
+
+@keyframes airflowMove {
+  to { stroke-dashoffset:-36; }
+}
+
+.ground-circulation {
+  transform-origin:250px 274px;
+  animation:groundCirculation 3s linear infinite;
+}
+
+@keyframes groundCirculation {
   to { transform:rotate(360deg); }
 }
 
-@keyframes tornadoSway {
-  from { transform:translateX(-5px) scaleY(1); }
-  to { transform:translateX(5px) scaleY(1); }
+.dust-cloud {
+  transform-origin:250px 275px;
+  animation:dustPulse 2s ease-in-out infinite alternate;
 }
 
-.power-row {
-  display:flex;
-  flex-wrap:wrap;
-  gap:7px;
+@keyframes dustPulse {
+  from { transform:scaleX(.9); opacity:.5; }
+  to { transform:scaleX(1.12); opacity:.9; }
 }
 
-.power-button {
-  min-width:48px;
-  padding:9px 11px;
+#formationSvg .tornado-body {
+  transform-box:fill-box;
+  transform-origin:center;
+  transform:scaleX(var(--ef-width,1));
+  transition:transform .6s ease;
 }
+
+#formationSvg .tornado-bands {
+  opacity:var(--ef-band-opacity,.8);
+}
+
+#formationSvg.phase-1 .warm-air,
+#formationSvg.phase-1 .cool-air { opacity:.65; }
+
+#formationSvg.phase-2 .warm-air,
+#formationSvg.phase-2 .cool-air { opacity:.9; }
+
+#formationSvg.phase-3 .warm-air,
+#formationSvg.phase-3 .cool-air,
+#formationSvg.phase-3 .surface-air { opacity:1; }
+
+.power-row { display:flex; flex-wrap:wrap; gap:7px; }
+
+.power-button { min-width:48px; padding:9px 11px; }
 
 .power-button.active {
   border-color:var(--cyan);
@@ -432,6 +381,10 @@ input[type="range"] {
   box-shadow:0 0 0 1px #52d8e855,0 0 15px #52d8e822;
 }
 
+/* ==========================================
+   ORIGINAL EF DAMAGE SIMULATOR STYLES
+========================================== */
+
 .damage-scene {
   min-height:310px;
   background:linear-gradient(#10263b 0%,#172d40 70%,#283b42 70%,#1c2c31 100%);
@@ -439,11 +392,7 @@ input[type="range"] {
   overflow:hidden;
 }
 
-.damage-scene svg {
-  width:100%;
-  height:310px;
-  display:block;
-}
+.damage-scene svg { width:100%; height:310px; display:block; }
 
 .house-piece {
   transition:transform 1.1s cubic-bezier(.2,.8,.2,1),opacity .9s;
@@ -486,11 +435,7 @@ input[type="range"] {
   stroke-width:3;
 }
 
-.debris {
-  opacity:0;
-  transform-box:fill-box;
-  transform-origin:center;
-}
+.debris { opacity:0; transform-box:fill-box; transform-origin:center; }
 
 #damageScene.playing.damage-2 .debris,
 #damageScene.playing.damage-3 .debris,
@@ -523,10 +468,8 @@ input[type="range"] {
   transition:width .5s,background .5s;
 }
 
-.radar-lesson {
-  padding:15px;
-}
-
+/* Radar lesson */
+.radar-lesson { padding:15px; }
 .radar-visual {
   height:220px;
   border:1px solid var(--line);
@@ -535,40 +478,16 @@ input[type="range"] {
   background:#071522;
 }
 
-.radar-visual svg {
-  width:100%;
-  height:100%;
-}
+.radar-visual svg { width:100%; height:100%; }
+.radar-ring { fill:none; stroke:#29465d; stroke-width:1; }
+.radar-sweep { transform-origin:180px 110px; animation:radarSweep 5s linear infinite; }
 
-.radar-ring {
-  fill:none;
-  stroke:#29465d;
-  stroke-width:1;
-}
+@keyframes radarSweep { to { transform:rotate(360deg); } }
 
-.radar-sweep {
-  transform-origin:180px 110px;
-  animation:radarSweep 5s linear infinite;
-}
-
-@keyframes radarSweep {
-  to { transform:rotate(360deg); }
-}
-
-.hook {
-  opacity:0;
-  transition:opacity .7s;
-}
-
+.hook { opacity:0; transition:opacity .7s; }
 .radar-visual.show-hook .hook { opacity:1; }
 
-.velocity-demo {
-  display:flex;
-  gap:5px;
-  height:12px;
-  margin:13px 0 7px;
-}
-
+.velocity-demo { display:flex; gap:5px; height:12px; margin:13px 0 7px; }
 .velocity-demo span { flex:1; border-radius:3px; }
 .velocity-green { background:#39d68a; }
 .velocity-yellow { background:#f0e45b; }
@@ -591,8 +510,7 @@ input[type="range"] {
   line-height:1.7;
 }
 
-.leaflet-popup-content-wrapper,
-.leaflet-popup-tip {
+.leaflet-popup-content-wrapper,.leaflet-popup-tip {
   background:#10243a;
   color:var(--text);
 }
@@ -613,6 +531,11 @@ input[type="range"] {
   .toolbar { gap:7px; }
   .toolbar button,.toolbar select { font-size:10px; padding:8px; }
   #map { height:350px; }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .tornado-band,.cloud-rotation,.airflow,.ground-circulation,
+  .dust-cloud,.radar-sweep { animation:none !important; }
 }
 </style>
 </head>
@@ -668,9 +591,8 @@ input[type="range"] {
     <strong>Base Velocity is not loaded as a map overlay here.</strong>
     Velocity is a per-radar product, not the same as the national reflectivity mosaic.
     For real radar velocity products, use the
-    <a href="https://radar.weather.gov/" target="_blank" rel="noopener">National Weather Service radar</a>
-    and select an individual radar station's velocity product.
-    Green generally indicates motion toward the radar; red indicates motion away.
+    <a href="https://radar.weather.gov/" target="_blank" rel="noopener">National Weather Service radar</a>.
+    Green often indicates motion toward the radar; red often indicates motion away.
   </div>
 
   <div class="section-heading">
@@ -685,66 +607,18 @@ input[type="range"] {
     <div class="panel-inner">
       <div class="small-label" id="analysisLocation">WAITING FOR MAP LOCATION</div>
       <div class="data-grid" style="margin-top:13px">
-        <div class="data-card">
-          <span>CAPE</span>
-          <strong id="cape">--</strong>
-          <small>J/kg</small>
-        </div>
-        <div class="data-card">
-          <span>CIN</span>
-          <strong id="cin">--</strong>
-          <small>J/kg</small>
-        </div>
-        <div class="data-card">
-          <span>Lifted Index</span>
-          <strong id="lifted">--</strong>
-          <small>°C</small>
-        </div>
-        <div class="data-card">
-          <span>Dew Point</span>
-          <strong id="dewpoint">--</strong>
-          <small>°C</small>
-        </div>
-        <div class="data-card">
-          <span>Relative Humidity</span>
-          <strong id="humidity">--</strong>
-          <small>%</small>
-        </div>
-        <div class="data-card">
-          <span>Surface Wind</span>
-          <strong id="surfaceWind">--</strong>
-          <small>km/h</small>
-        </div>
-        <div class="data-card">
-          <span>Wind Gusts</span>
-          <strong id="gusts">--</strong>
-          <small>km/h</small>
-        </div>
-        <div class="data-card">
-          <span>Surface Pressure</span>
-          <strong id="pressure">--</strong>
-          <small>hPa</small>
-        </div>
-        <div class="data-card">
-          <span>850 hPa Wind</span>
-          <strong id="wind850">--</strong>
-          <small>km/h</small>
-        </div>
-        <div class="data-card">
-          <span>500 hPa Wind</span>
-          <strong id="wind500">--</strong>
-          <small>km/h</small>
-        </div>
-        <div class="data-card">
-          <span>Wind Direction</span>
-          <strong id="windDirection">--</strong>
-          <small>Degrees</small>
-        </div>
-        <div class="data-card">
-          <span>10m–500 hPa Difference</span>
-          <strong id="windDifference">--</strong>
-          <small>Approx. vector difference km/h</small>
-        </div>
+        <div class="data-card"><span>CAPE</span><strong id="cape">--</strong><small>J/kg</small></div>
+        <div class="data-card"><span>CIN</span><strong id="cin">--</strong><small>J/kg</small></div>
+        <div class="data-card"><span>Lifted Index</span><strong id="lifted">--</strong><small>°C</small></div>
+        <div class="data-card"><span>Dew Point</span><strong id="dewpoint">--</strong><small>°C</small></div>
+        <div class="data-card"><span>Relative Humidity</span><strong id="humidity">--</strong><small>%</small></div>
+        <div class="data-card"><span>Surface Wind</span><strong id="surfaceWind">--</strong><small>km/h</small></div>
+        <div class="data-card"><span>Wind Gusts</span><strong id="gusts">--</strong><small>km/h</small></div>
+        <div class="data-card"><span>Surface Pressure</span><strong id="pressure">--</strong><small>hPa</small></div>
+        <div class="data-card"><span>850 hPa Wind</span><strong id="wind850">--</strong><small>km/h</small></div>
+        <div class="data-card"><span>500 hPa Wind</span><strong id="wind500">--</strong><small>km/h</small></div>
+        <div class="data-card"><span>Wind Direction</span><strong id="windDirection">--</strong><small>Degrees</small></div>
+        <div class="data-card"><span>10m–500 hPa Difference</span><strong id="windDifference">--</strong><small>Approx. vector difference km/h</small></div>
       </div>
       <div class="notice" id="atmosphereStatus">
         Click anywhere on the map to load atmospheric model estimates for that location.
@@ -756,7 +630,7 @@ input[type="range"] {
     <div>
       <div class="eyebrow">03 / EDUCATIONAL WEATHER LAB</div>
       <h2>Tornado Formation Simulator</h2>
-      <p>Watch a simplified educational sequence of tornado development.</p>
+      <p>Explore the supercell, airflow, and development of a tornado.</p>
     </div>
   </div>
 
@@ -769,86 +643,163 @@ input[type="range"] {
       </div>
 
       <div class="scene">
-        <svg id="formationSvg" viewBox="0 0 500 310" role="img" aria-label="Animated tornado formation stages">
+        <svg id="formationSvg" viewBox="0 0 500 340" role="img" aria-label="Animated educational diagram of tornado formation">
+
           <defs>
-            <linearGradient id="cloudGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#c2d6e5"/>
-              <stop offset=".55" stop-color="#718da5"/>
-              <stop offset="1" stop-color="#405b72"/>
+            <linearGradient id="stormCloud" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#d7e4ed"/>
+              <stop offset="1" stop-color="#718da5"/>
             </linearGradient>
-            <linearGradient id="funnelGradient" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stop-color="#42596c"/>
-              <stop offset=".45" stop-color="#c5d0d9"/>
-              <stop offset="1" stop-color="#52697c"/>
+
+            <linearGradient id="tornadoFunnel" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#526a7d"/>
+              <stop offset=".45" stop-color="#d5e0e8"/>
+              <stop offset="1" stop-color="#536b7e"/>
             </linearGradient>
-            <radialGradient id="stormGlow">
-              <stop offset="0" stop-color="#52d8e8" stop-opacity=".22"/>
-              <stop offset="1" stop-color="#52d8e8" stop-opacity="0"/>
-            </radialGradient>
+
+            <marker id="warmArrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+              <path d="M0 0 L8 4 L0 8Z" fill="#ff626f"/>
+            </marker>
+
+            <marker id="coolArrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+              <path d="M0 0 L8 4 L0 8Z" fill="#55b8ff"/>
+            </marker>
+
+            <marker id="inflowArrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+              <path d="M0 0 L8 4 L0 8Z" fill="#52d8e8"/>
+            </marker>
           </defs>
 
-          <ellipse cx="250" cy="272" rx="190" ry="30" fill="url(#stormGlow)"/>
-          <path d="M0 278 Q90 260 170 278 T340 278 T500 274 L500 310 L0 310Z" fill="#1a3445"/>
-          <path d="M0 288 Q110 279 210 290 T500 284" fill="none" stroke="#36546a" stroke-width="2"/>
+          <!-- Ground -->
+          <path d="M0 294 Q120 282 250 295 T500 291 V340 H0Z" fill="#1a3445"/>
+          <path d="M0 301 Q120 291 250 302 T500 298" fill="none" stroke="#486477" stroke-width="2"/>
 
-          <!-- Cloud mass -->
+          <!-- Supercell -->
           <g class="stage-part meso">
-            <g class="cloud-swirl">
-              <path d="M118 112 C90 83 117 54 150 61 C160 24 208 21 228 54 C260 18 311 40 309 75 C355 58 387 93 361 122 C338 145 156 148 118 112Z"
-                fill="url(#cloudGradient)" stroke="#b7cad8" stroke-width="2"/>
-              <path d="M139 99 Q194 52 253 91 Q310 119 353 87" fill="none" stroke="#e2edf5" stroke-opacity=".55" stroke-width="4"/>
-              <path d="M157 117 Q215 80 270 110 Q312 130 342 109" fill="none" stroke="#314b62" stroke-width="5"/>
-            </g>
-            <g class="cloud-swirl reverse">
-              <path d="M165 83 Q220 42 278 76" fill="none" stroke="#e5f0f8" stroke-opacity=".55" stroke-width="3"/>
-            </g>
-          </g>
+            <path d="M25 112
+              Q35 75 91 79
+              Q104 34 159 48
+              Q190 5 239 40
+              Q277 5 319 43
+              Q370 27 389 75
+              Q456 68 475 111
+              Q449 143 382 139
+              L105 139 Q48 145 25 112Z"
+              fill="url(#stormCloud)" stroke="#c7d9e6" stroke-width="2"/>
 
-          <!-- Rotating mesocyclone -->
-          <g class="stage-part meso">
-            <ellipse cx="250" cy="125" rx="77" ry="19" fill="none" stroke="#52d8e8" stroke-width="2" stroke-dasharray="8 7" opacity=".9">
-              <animateTransform attributeName="transform" type="rotate" from="0 250 125" to="360 250 125" dur="9s" repeatCount="indefinite"/>
-            </ellipse>
-            <path d="M184 127 Q250 153 316 127" fill="none" stroke="#52d8e8" stroke-width="2" stroke-dasharray="4 5"/>
+            <path d="M60 102 Q130 61 202 93 Q277 120 350 82 Q405 67 447 105"
+              fill="none" stroke="#edf5ff" stroke-opacity=".55" stroke-width="5"/>
+
+            <g class="cloud-rotation">
+              <ellipse cx="250" cy="122" rx="150" ry="17"
+                fill="none" stroke="#52d8e8" stroke-width="2"
+                stroke-dasharray="12 9" opacity=".85"/>
+              <path d="M115 120 Q185 145 250 119 Q315 96 385 121"
+                fill="none" stroke="#46677f" stroke-width="5"/>
+            </g>
           </g>
 
           <!-- Wall cloud -->
           <g class="stage-part wall">
-            <path d="M194 126 Q206 143 220 137 Q236 157 251 143 Q273 154 285 136 Q301 143 309 126 Q300 162 280 165 L212 165 Q194 156 194 126Z"
-              fill="#40586e" stroke="#9db6c8" stroke-width="2"/>
-            <path d="M210 151 Q250 165 293 149" fill="none" stroke="#d2e0ea" stroke-opacity=".45" stroke-width="3"/>
+            <path d="M180 133
+              Q194 143 207 139
+              Q222 158 242 146
+              Q263 158 280 143
+              Q301 150 319 132
+              Q315 166 285 174
+              L211 174 Q183 164 180 133Z"
+              fill="#536d82" stroke="#a9c0d0" stroke-width="2"/>
+            <path d="M204 157 Q250 178 296 154"
+              fill="none" stroke="#dce8ef" stroke-width="3" opacity=".6"/>
           </g>
 
-          <!-- Funnel -->
+          <!-- Funnel cloud -->
           <g class="stage-part funnel">
-            <path class="funnel-spin" d="M235 151 Q250 145 265 151 L260 225 Q250 239 240 225Z"
-              fill="url(#funnelGradient)" stroke="#d1dde7" stroke-width="1.5"/>
-            <path d="M243 157 Q250 180 246 218" fill="none" stroke="#edf5ff" stroke-opacity=".55" stroke-width="3"/>
+            <path d="M211 158 Q250 145 289 158 L272 235 Q250 249 228 235Z"
+              fill="url(#tornadoFunnel)" stroke="#d6e3ec" stroke-width="2"/>
+            <path d="M238 164 Q254 193 242 231"
+              fill="none" stroke="#f1f7fb" stroke-width="4" opacity=".6"/>
           </g>
 
           <!-- Full tornado -->
           <g class="stage-part tornado">
-            <path d="M228 145 Q250 138 272 145 L267 181 Q260 221 281 270 Q250 283 219 270 Q240 218 233 181Z"
-              fill="url(#funnelGradient)" stroke="#d6e1e9" stroke-width="1.5"/>
-            <path d="M242 151 Q254 191 243 226 Q237 248 245 269" fill="none" stroke="#edf5ff" stroke-opacity=".6" stroke-width="3"/>
-            <g class="ground-dust">
-              <ellipse cx="250" cy="270" rx="43" ry="9" fill="none" stroke="#b8c8d5" stroke-width="3" stroke-dasharray="12 6"/>
-              <ellipse cx="250" cy="270" rx="30" ry="5" fill="none" stroke="#dbe5ed" stroke-width="2" stroke-dasharray="5 6"/>
+
+            <g class="tornado-body">
+              <path d="M207 151
+                Q250 139 293 151
+                Q276 184 270 218
+                Q266 247 260 286
+                Q250 294 240 286
+                Q234 247 230 218
+                Q224 183 207 151Z"
+                fill="url(#tornadoFunnel)" stroke="#dce7ef" stroke-width="2"/>
+
+              <path d="M237 157 Q253 195 242 237 Q240 263 247 286"
+                fill="none" stroke="#f4f8fb" stroke-width="4" opacity=".65"/>
             </g>
+
+            <!-- Horizontal elliptical circulation bands -->
+            <g class="tornado-bands">
+              <path class="tornado-band" d="M215 177 C225 164 275 164 285 177 C275 190 225 190 215 177Z"/>
+              <path class="tornado-band" d="M224 204 C235 192 265 192 276 204 C265 216 235 216 224 204Z"/>
+              <path class="tornado-band" d="M231 231 C239 220 261 220 269 231 C261 242 239 242 231 231Z"/>
+              <path class="tornado-band" d="M238 260 C244 250 256 250 262 260 C256 270 244 270 238 260Z"/>
+            </g>
+
+            <g class="ground-circulation">
+              <ellipse cx="250" cy="290" rx="48" ry="9"
+                fill="none" stroke="#c6d5df" stroke-width="3" stroke-dasharray="13 7"/>
+              <ellipse cx="250" cy="290" rx="31" ry="5"
+                fill="none" stroke="#edf5ff" stroke-width="2" stroke-dasharray="7 7"/>
+            </g>
+
+            <ellipse class="dust-cloud" cx="250" cy="291" rx="57" ry="8"
+              fill="#9fb2c0" opacity=".45"/>
           </g>
 
-          <text x="18" y="25" fill="#52d8e8" font-size="10" font-family="monospace" letter-spacing="2">FORMATION MODEL</text>
-          <text x="482" y="25" fill="#9db0c5" font-size="9" text-anchor="end" font-family="monospace">ILLUSTRATIVE</text>
+          <!-- Warm updraft -->
+          <g class="stage-part warm-air">
+            <path d="M190 282 Q205 250 222 225 Q237 197 242 169"
+              fill="none" stroke="#ff626f" stroke-width="8"
+              stroke-linecap="round" marker-end="url(#warmArrow)" class="airflow"/>
+            <path d="M155 282 Q183 263 197 240"
+              fill="none" stroke="#ff626f" stroke-width="4"
+              marker-end="url(#warmArrow)" class="airflow"/>
+          </g>
+
+          <!-- Cool downdraft -->
+          <g class="stage-part cool-air">
+            <path d="M310 142 Q315 177 300 207 Q289 240 280 263"
+              fill="none" stroke="#55b8ff" stroke-width="8"
+              stroke-linecap="round" marker-end="url(#coolArrow)" class="airflow"/>
+          </g>
+
+          <!-- Surface inflow -->
+          <g class="stage-part surface-air">
+            <path d="M20 266 Q105 266 174 274"
+              fill="none" stroke="#52d8e8" stroke-width="5"
+              marker-end="url(#inflowArrow)" class="airflow"/>
+            <path d="M480 266 Q395 266 326 274"
+              fill="none" stroke="#52d8e8" stroke-width="5"
+              marker-end="url(#inflowArrow)" class="airflow"/>
+          </g>
+
+          <text x="16" y="19" fill="#52d8e8" font-size="10" font-family="monospace" letter-spacing="2">SUPERCELL FORMATION MODEL</text>
+          <text x="484" y="19" fill="#9db0c5" font-size="9" text-anchor="end" font-family="monospace">EDUCATIONAL</text>
+
+          <text x="15" y="235" fill="#ff9299" font-size="9" font-family="monospace">WARM UPDRAFT</text>
+          <text x="485" y="184" fill="#79caff" font-size="9" text-anchor="end" font-family="monospace">COOL DOWNDRAFT</text>
+          <text x="250" y="326" fill="#52d8e8" font-size="9" text-anchor="middle" font-family="monospace">SURFACE INFLOW</text>
         </svg>
       </div>
 
       <div class="stage-readout">
         <span id="formationStageName">MESOCYCLONE</span>
-        <span id="formationStageDescription">Organized rotating updraft</span>
+        <span id="formationStageDescription">Rotating updraft develops</span>
       </div>
 
       <div class="scene-caption" id="formationCaption">
-        A supercell thunderstorm develops a rotating updraft called a mesocyclone. Rotation in a storm does not automatically mean a tornado will form.
+        A supercell develops an organized rotating updraft called a mesocyclone. Rotation does not automatically mean a tornado will form.
       </div>
 
       <div class="controls">
@@ -903,7 +854,7 @@ input[type="range"] {
             <g class="hook">
               <path d="M163 88 Q190 75 208 93 Q226 111 207 127 Q195 138 181 126"
                 fill="none" stroke="#ffbd57" stroke-width="13" stroke-linecap="round"/>
-              <path d="M164 88 Q190 75 208 93 Q226 111 207 127 Q195 138 181 126"
+              <path d="M163 88 Q190 75 208 93 Q226 111 207 127 Q195 138 181 126"
                 fill="none" stroke="#ed7953" stroke-width="7" stroke-linecap="round"/>
               <circle cx="181" cy="126" r="7" fill="#f5e15d"/>
             </g>
@@ -922,6 +873,7 @@ input[type="range"] {
           <span class="velocity-yellow"></span>
           <span class="velocity-red"></span>
         </div>
+
         <div class="legend" id="velocityLegend" hidden>
           <span>GREEN: TOWARD RADAR</span>
           <span>RED: AWAY FROM RADAR</span>
@@ -932,7 +884,6 @@ input[type="range"] {
         </div>
       </div>
     </section>
-
   </div>
 
   <div class="section-heading">
@@ -965,13 +916,11 @@ input[type="range"] {
         <path d="M0 245 Q120 230 250 245 T500 240 V310 H0Z" fill="#40544d"/>
         <path d="M0 260 Q140 246 250 260 T500 255" fill="none" stroke="#74816b" stroke-width="2"/>
 
-        <!-- Foundation remains at every level -->
         <g id="foundation">
           <rect x="135" y="231" width="230" height="24" rx="3" fill="#87959a" stroke="#c0cbd0" stroke-width="2"/>
           <path d="M150 240 H350 M150 248 H350" stroke="#66757c" stroke-width="2"/>
         </g>
 
-        <!-- House walls -->
         <g id="wallLeft" class="house-piece">
           <rect x="151" y="128" width="92" height="104" fill="url(#houseWall)" stroke="#536775" stroke-width="3"/>
         </g>
@@ -982,7 +931,6 @@ input[type="range"] {
           <path d="M151 128 L250 66 L349 128Z" fill="#9caeb5" stroke="#536775" stroke-width="3"/>
         </g>
 
-        <!-- Roof sections -->
         <g id="roofLeft" class="house-piece">
           <path d="M125 130 L250 52 L250 76 L151 143Z" fill="url(#roofColor)" stroke="#e39b83" stroke-width="2"/>
         </g>
@@ -996,12 +944,12 @@ input[type="range"] {
           <rect x="284" y="153" width="31" height="35" fill="#416d83" stroke="#e7eff2" stroke-width="3"/>
           <path d="M299 153 V188 M284 170 H315" stroke="#dce7e9" stroke-width="2"/>
         </g>
+
         <g id="doorGroup">
           <rect x="226" y="177" width="42" height="55" fill="#765b48" stroke="#d7c5a6" stroke-width="2"/>
           <circle cx="259" cy="205" r="2.5" fill="#f2d47d"/>
         </g>
 
-        <!-- Illustrative flying debris pieces -->
         <g fill="#c4d1d6">
           <rect class="debris" x="95" y="180" width="13" height="4" rx="1"/>
           <rect class="debris" x="370" y="170" width="17" height="4" rx="1"/>
@@ -1016,6 +964,7 @@ input[type="range"] {
 
     <div class="panel-inner">
       <div class="small-label">SELECT TORNADO RATING</div>
+
       <div class="power-row" style="margin-top:10px">
         <button class="power-button active" data-ef="1">EF1</button>
         <button class="power-button" data-ef="2">EF2</button>
@@ -1069,39 +1018,36 @@ input[type="range"] {
 
 const map = L.map("map").setView([32.5, -90], 5);
 
-const streetLayer = L.tileLayer(
-  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-  {
-    maxZoom: 18,
-    attribution: "&copy; OpenStreetMap"
-  }
-).addTo(map);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom:18,
+  attribution:"&copy; OpenStreetMap"
+}).addTo(map);
 
 const satelliteLayer = L.tileLayer(
   "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
   {
-    maxZoom: 18,
-    attribution: "Tiles &copy; Esri"
+    maxZoom:18,
+    attribution:"Tiles &copy; Esri"
   }
 );
 
 const radarLayer = L.tileLayer.wms(
   "https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi",
   {
-    layers: "nexrad-n0r",
-    format: "image/png",
-    transparent: true,
-    opacity: 0.8,
-    attribution: "Iowa Environmental Mesonet"
+    layers:"nexrad-n0r",
+    format:"image/png",
+    transparent:true,
+    opacity:.8,
+    attribution:"Iowa Environmental Mesonet"
   }
 ).addTo(map);
 
 let radarEnabled = true;
 let satelliteEnabled = false;
 let selectedMarker = null;
-let atmosphereTimer = null;
 let selectedLat = 32.5;
 let selectedLon = -90;
+let atmosphereRequest = 0;
 
 const radarToggle = document.getElementById("radarToggle");
 const satelliteToggle = document.getElementById("satelliteToggle");
@@ -1112,15 +1058,19 @@ function updateMapStatus(message) {
   document.getElementById("mapStatus").textContent = message;
 }
 
+function updateRadarLayer() {
+  const shouldShow = radarEnabled && radarProduct.value === "reflectivity";
+
+  if (shouldShow) radarLayer.addTo(map);
+  else map.removeLayer(radarLayer);
+
+  if (satelliteEnabled) satelliteLayer.bringToBack();
+  if (shouldShow) radarLayer.bringToFront();
+}
+
 radarToggle.addEventListener("click", () => {
   radarEnabled = !radarEnabled;
-
-  if (radarEnabled && radarProduct.value === "reflectivity") {
-    radarLayer.addTo(map);
-  } else {
-    map.removeLayer(radarLayer);
-  }
-
+  updateRadarLayer();
   radarToggle.textContent = radarEnabled ? "Radar: ON" : "Radar: OFF";
   updateMapStatus(radarEnabled ? "REFLECTIVITY ENABLED" : "RADAR HIDDEN");
 });
@@ -1128,27 +1078,22 @@ radarToggle.addEventListener("click", () => {
 satelliteToggle.addEventListener("click", () => {
   satelliteEnabled = !satelliteEnabled;
 
-  if (satelliteEnabled) {
-    satelliteLayer.addTo(map);
-    satelliteLayer.bringToBack();
-    if (radarEnabled) radarLayer.bringToFront();
-  } else {
-    map.removeLayer(satelliteLayer);
-  }
+  if (satelliteEnabled) satelliteLayer.addTo(map);
+  else map.removeLayer(satelliteLayer);
 
+  updateRadarLayer();
   satelliteToggle.textContent = satelliteEnabled ? "Satellite: ON" : "Satellite: OFF";
 });
 
 radarProduct.addEventListener("change", () => {
-  if (radarProduct.value === "velocity") {
-    map.removeLayer(radarLayer);
-    velocityNotice.hidden = false;
-    updateMapStatus("VELOCITY INFO — EXTERNAL RADAR REQUIRED");
-  } else {
-    velocityNotice.hidden = true;
-    if (radarEnabled) radarLayer.addTo(map);
-    updateMapStatus("BASE REFLECTIVITY");
-  }
+  velocityNotice.hidden = radarProduct.value !== "velocity";
+  updateRadarLayer();
+
+  updateMapStatus(
+    radarProduct.value === "velocity"
+      ? "VELOCITY INFO — EXTERNAL RADAR REQUIRED"
+      : "BASE REFLECTIVITY"
+  );
 });
 
 document.getElementById("opacity").addEventListener("input", event => {
@@ -1157,7 +1102,7 @@ document.getElementById("opacity").addEventListener("input", event => {
 
 document.getElementById("refreshRadar").addEventListener("click", () => {
   if (radarEnabled && radarProduct.value === "reflectivity") {
-    radarLayer.setParams({ _: Date.now() });
+    radarLayer.setParams({refresh:Date.now()});
   }
   loadAtmosphere(selectedLat, selectedLon);
   updateMapStatus("DATA REFRESH REQUESTED");
@@ -1167,6 +1112,7 @@ document.getElementById("resetMap").addEventListener("click", () => {
   map.setView([32.5, -90], 5);
   selectedLat = 32.5;
   selectedLon = -90;
+  document.getElementById("selectedCoordinates").textContent = "SELECT A MAP LOCATION";
   loadAtmosphere(selectedLat, selectedLon);
 });
 
@@ -1195,7 +1141,7 @@ map.on("click", event => {
 
 function displayValue(id, value, suffix = "") {
   document.getElementById(id).textContent =
-    value === null || value === undefined || Number.isNaN(Number(value))
+    value === null || value === undefined || !Number.isFinite(Number(value))
       ? "--"
       : Number(value).toFixed(1) + suffix;
 }
@@ -1203,27 +1149,26 @@ function displayValue(id, value, suffix = "") {
 function windComponents(speed, direction) {
   const radians = Number(direction) * Math.PI / 180;
   return {
-    x: -Number(speed) * Math.sin(radians),
-    y: -Number(speed) * Math.cos(radians)
+    x:-Number(speed) * Math.sin(radians),
+    y:-Number(speed) * Math.cos(radians)
   };
 }
 
 function vectorDifference(speedA, directionA, speedB, directionB) {
   const a = windComponents(speedA, directionA);
   const b = windComponents(speedB, directionB);
-  return Math.sqrt(
-    Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2)
-  );
+  return Math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2);
 }
 
 async function loadAtmosphere(lat, lon) {
+  const requestId = ++atmosphereRequest;
   const status = document.getElementById("atmosphereStatus");
 
   status.textContent = "Loading atmospheric model estimates...";
   document.getElementById("analysisLocation").textContent =
     "LAT " + lat.toFixed(3) + " / LON " + lon.toFixed(3);
 
-  const hourlyVariables = [
+  const variables = [
     "cape",
     "convective_inhibition",
     "lifted_index",
@@ -1243,20 +1188,19 @@ async function loadAtmosphere(lat, lon) {
     "https://api.open-meteo.com/v1/forecast" +
     "?latitude=" + encodeURIComponent(lat) +
     "&longitude=" + encodeURIComponent(lon) +
-    "&hourly=" + encodeURIComponent(hourlyVariables) +
+    "&hourly=" + encodeURIComponent(variables) +
     "&forecast_days=1&timezone=auto";
 
   try {
     const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error("Weather service returned " + response.status);
-    }
+    if (!response.ok) throw new Error("Weather service returned " + response.status);
 
     const data = await response.json();
 
+    if (requestId !== atmosphereRequest) return;
+
     if (!data.hourly || !data.hourly.time || !data.hourly.time.length) {
-      throw new Error("No hourly model data was returned.");
+      throw new Error("No hourly model data returned.");
     }
 
     const times = data.hourly.time;
@@ -1265,7 +1209,7 @@ async function loadAtmosphere(lat, lon) {
     let bestIndex = 0;
     let bestDifference = Infinity;
 
-    times.forEach((time, index) => {
+    times.forEach((time,index) => {
       const difference = Math.abs(new Date(time).getTime() - now);
       if (difference < bestDifference) {
         bestDifference = difference;
@@ -1299,14 +1243,14 @@ async function loadAtmosphere(lat, lon) {
 
     displayValue("windDifference", difference);
 
-    const modelTime = new Date(times[bestIndex]).toLocaleString();
-
     status.textContent =
-      "Model estimates loaded. Nearest forecast hour: " + modelTime +
+      "Model estimates loaded. Nearest forecast hour: " +
+      new Date(times[bestIndex]).toLocaleString() +
       ". These are grid-based estimates, not direct observations.";
 
     updateMapStatus("MODEL DATA UPDATED");
   } catch (error) {
+    if (requestId !== atmosphereRequest) return;
     console.error(error);
     status.textContent =
       "Atmospheric data could not be loaded. Check your connection and try refreshing.";
@@ -1314,7 +1258,6 @@ async function loadAtmosphere(lat, lon) {
   }
 }
 
-/* Load initial atmospheric data */
 loadAtmosphere(selectedLat, selectedLon);
 
 /* ==========================================
@@ -1327,27 +1270,27 @@ const formationSelect = document.getElementById("formationSelect");
 const formationStages = [
   {
     name:"MESOCYCLONE",
-    description:"Organized rotating updraft",
+    description:"Rotating updraft develops",
     tag:"STAGE 01 / 04",
-    caption:"A supercell thunderstorm develops a rotating updraft called a mesocyclone. Rotation in a storm does not automatically mean a tornado will form."
+    caption:"A supercell develops an organized rotating updraft called a mesocyclone. Wind shear helps organize the storm, but a mesocyclone does not guarantee tornado formation."
   },
   {
     name:"WALL CLOUD",
-    description:"Lowered cloud base develops",
+    description:"Lowered rotating cloud base",
     tag:"STAGE 02 / 04",
-    caption:"A lowered, rotating cloud base may develop beneath the storm. A wall cloud can be associated with a strong updraft, but not every wall cloud produces a tornado."
+    caption:"A lowered cloud base develops beneath the supercell. Rising warm air and descending cooler air are illustrated. Not every wall cloud produces a tornado."
   },
   {
     name:"FUNNEL CLOUD",
-    description:"Visible condensation funnel",
+    description:"Condensation funnel extends downward",
     tag:"STAGE 03 / 04",
-    caption:"A funnel-shaped cloud becomes visible as water droplets condense. A funnel cloud is not necessarily in contact with the ground."
+    caption:"A visible condensation funnel extends from the cloud base. The surrounding airflow rotates around the vertical funnel axis. A funnel cloud is not necessarily in contact with the ground."
   },
   {
     name:"TORNADO",
-    description:"Rotating column reaches the surface",
+    description:"Rotating circulation reaches the surface",
     tag:"STAGE 04 / 04",
-    caption:"In this simplified illustration, the rotating column extends to the surface. Real tornado formation is complex and does not always follow four neat stages."
+    caption:"The rotating circulation reaches the surface. Horizontal spiral bands show air rotating around the funnel, while warm surface air flows inward and rises. This is a simplified educational model."
   }
 ];
 
@@ -1439,7 +1382,7 @@ document.getElementById("velocityToggle").addEventListener("click", () => {
 
   radarCaption.textContent = showing
     ? "Velocity colors hidden. Select the lesson again to display them."
-    : "In a typical velocity color display, green shades indicate winds moving toward the radar and red shades indicate winds moving away. Always check the radar's color scale because palettes can vary.";
+    : "In a typical velocity display, green shades indicate winds moving toward the radar and red shades indicate winds moving away. Always check the radar's color scale because palettes can vary.";
 });
 
 /* ==========================================
@@ -1486,6 +1429,13 @@ let damageTimer = null;
 
 function selectEF(level) {
   selectedEF = Math.max(1, Math.min(5, level));
+
+  /* Match the formation illustration to the selected EF level */
+  const efWidths = {1:.78,2:.88,3:1,4:1.12,5:1.24};
+
+  formationSvg.style.setProperty("--ef-width", efWidths[selectedEF]);
+  formationSvg.style.setProperty("--band-width", (3 + selectedEF * 1.1) + "px");
+  formationSvg.style.setProperty("--ef-band-opacity", .45 + selectedEF * .1);
 
   document.querySelectorAll(".power-button").forEach(button => {
     button.classList.toggle(
@@ -1536,7 +1486,6 @@ document.getElementById("efPlay").addEventListener("click", () => {
   damageScene.classList.add("damage-" + selectedEF);
   document.getElementById("efStatus").textContent = "SIMULATION RUNNING";
 
-  /* Restart the CSS animation */
   void damageScene.offsetWidth;
   damageScene.classList.add("playing");
 
