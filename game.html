@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#07111f">
+<title>ChaseDesk — Tornado Run</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07111f;--panel:#0d1c2d;--line:#20344a;--text:#edf5ff;--muted:#9db0c5;--cyan:#52d8e8;--blue:#55b8ff;--green:#68e0ad;--yellow:#ffd166;--red:#ff626f}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Manrope,Arial,sans-serif}
+header{padding:14px 18px;background:#091625;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{display:flex;gap:11px;align-items:center}.brand-icon{width:39px;height:39px;border:1px solid #286078;border-radius:11px;display:grid;place-items:center;background:#102b3c;font-size:22px}
+h1{font-size:15px;letter-spacing:1.2px;margin:0}.sub{font:10px "DM Mono";color:var(--muted);letter-spacing:1.4px;margin-top:3px}
+a,button{font:inherit}a{color:var(--cyan);text-decoration:none;font-size:12px}
+main{max-width:1450px;margin:auto;padding:16px}.topline{display:flex;justify-content:space-between;gap:12px;align-items:end;margin:8px 0 13px}.eyebrow{font:10px "DM Mono";letter-spacing:2px;color:var(--cyan)}h2{font-size:19px;margin:5px 0}.desc{font-size:12px;color:var(--muted);margin:0}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 285px;gap:13px}.game-panel,.side-panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+#game{height:min(68vh,650px);min-height:390px;position:relative;background:#091827;touch-action:none}#game canvas{display:block;width:100%;height:100%}
+.hud{position:absolute;inset:12px 12px auto;display:flex;justify-content:space-between;gap:8px;pointer-events:none}.hud-group{display:flex;gap:7px;flex-wrap:wrap}.chip{background:#071522dc;border:1px solid #36536b;border-radius:7px;padding:7px 9px;font:10px "DM Mono";color:var(--muted);backdrop-filter:blur(5px)}.chip b{color:var(--text);font-size:12px}
+#message{position:absolute;left:50%;top:22%;transform:translateX(-50%);background:#071522e8;border:1px solid #36536b;border-radius:8px;padding:9px 13px;text-align:center;font:11px "DM Mono";color:var(--cyan);max-width:85%;pointer-events:none}
+#centerAim{position:absolute;left:50%;top:50%;width:8px;height:8px;border:1px solid #dffaff;border-radius:50%;opacity:.35;transform:translate(-50%,-50%);pointer-events:none}
+.panel-head{padding:13px 14px;border-bottom:1px solid var(--line);font-size:12px;font-weight:800;letter-spacing:.5px}.panel-body{padding:13px}
+.stat{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #20344a;font:10px "DM Mono";color:var(--muted)}.stat strong{color:var(--text);font-weight:500}
+button{background:#142a40;border:1px solid #2b4862;color:var(--text);padding:9px 11px;border-radius:7px;font-size:11px;font-weight:800;cursor:pointer}
+button:hover{border-color:var(--cyan)}button.primary{background:#124357;border-color:#287b91}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.actions button{width:100%}
+.help{font-size:10px;line-height:1.6;color:var(--muted);margin:10px 0 0}.bar{height:6px;border-radius:9px;background:#20364a;margin-top:6px;overflow:hidden}.bar span{display:block;height:100%;width:100%;background:var(--green)}
+.controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:11px;border-top:1px solid var(--line);background:#091827}.control{min-height:48px;touch-action:none;user-select:none}.control.active{background:#15506a;border-color:var(--cyan)}
+.drive-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.notice{margin-top:12px;padding:10px 12px;border-left:3px solid var(--yellow);background:#142234;color:var(--muted);font-size:10px;line-height:1.6}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.side-panel{display:grid;grid-template-columns:1fr 1fr}.side-panel .panel-head{grid-column:1/-1}.side-panel .panel-body+ .panel-body{border-left:1px solid var(--line)}}
+@media(max-width:560px){main{padding:10px}.topline{align-items:start;flex-direction:column}#game{height:55vh;min-height:340px}.side-panel{display:block}.side-panel .panel-body+ .panel-body{border-left:0;border-top:1px solid var(--line)}header{padding:12px}.chip{padding:6px 7px}.hud{inset:8px 8px auto}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="brand-icon">🌪</div><div><h1>STORMWATCH CHASEDESK</h1><div class="sub">TORNADO RUN / ARCADE SIMULATION</div></div></div>
+  <a href="index.html">← BACK TO CHASEDESK</a>
+</header>
+<main>
+  <div class="topline"><div><div class="eyebrow">05 / FIELD OPERATIONS GAME</div><h2>Tornado Run — 3D Prototype</h2><p class="desc">Drive the training course, collect research beacons, and earn credits for upgrades.</p></div><div class="eyebrow">SIMULATION BUILD 0.1</div></div>
+  <div class="layout">
+    <section class="game-panel">
+      <div id="game">
+        <div class="hud">
+          <div class="hud-group"><div class="chip">CREDITS<br><b id="money">0</b></div><div class="chip">RESEARCH<br><b id="research">0</b></div></div>
+          <div class="hud-group"><div class="chip">SPEED<br><b><span id="speed">0</span> KM/H</b></div><div class="chip">TORNADO WINDS<br><b><span id="windSpeed">125</span> MPH</b></div><div class="chip">VEHICLE<br><b id="vehicleName">FIELD PICKUP</b></div></div>
+        </div>
+        <div id="message">TRAINING COURSE READY — COLLECT THE CYAN BEACONS</div><div id="centerAim"></div>
+        <div id="gameOver" style="display:none;position:absolute;inset:0;background:#050b14e8;z-index:5;align-items:center;justify-content:center;text-align:center;padding:20px">
+          <div><div style="font:800 30px Manrope;color:#ff626f;letter-spacing:2px">GAME OVER</div><p id="gameOverReason" style="font:12px DM Mono;color:#edf5ff;line-height:1.7">VEHICLE FLIPPED</p><button class="primary" id="restartGame">RESTART RUN</button></div>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="control" data-hold="left">◀ STEER</button>
+        <button class="control" data-hold="throttle">▲ THROTTLE</button>
+        <button class="control" data-hold="right">STEER ▶</button>
+        <button class="control" data-hold="brake">▼ BRAKE</button>
+        <button class="control" data-hold="reverse">REVERSE</button>
+        <button class="control" data-hold="handbrake">HANDBRAKE</button>
+      </div>
+    </section>
+    <aside class="side-panel">
+      <div class="panel-head">VEHICLE TELEMETRY</div>
+      <div class="panel-body">
+        <div class="stat"><span>ENGINE</span><strong id="engine">STANDARD</strong></div>
+        <div class="stat"><span>HANDLING</span><strong id="handling">STANDARD</strong></div>
+        <div class="stat"><span>VEHICLE CONDITION</span><strong id="condition">100%</strong></div><div class="bar"><span id="conditionBar"></span></div>
+        <div class="stat"><span>WIND TOLERANCE</span><strong><span id="windTolerance">110</span> MPH</strong></div>
+        <div class="stat"><span>TORNADO WINDS</span><strong><span id="sideWind">125</span> MPH</strong></div>
+        <div class="stat"><span>BEACONS COLLECTED</span><strong id="beacons">0 / 6</strong></div>
+        <p class="help">Collect the glowing cyan research beacons scattered along the fictional course. Each one awards credits and research points.</p>
+        <div class="actions"><button class="primary" id="repair">Repair · 40 cr</button><button id="reset">Reset Vehicle</button></div>
+      </div>
+      <div class="panel-body">
+        <div class="small-label eyebrow">UPGRADE BAY</div>
+        <div class="stat"><span>Engine tune</span><strong>+ speed</strong></div><button id="engineUpgrade" style="width:100%">Upgrade · 100 cr</button>
+        <div class="stat"><span>Handling kit</span><strong>+ steering</strong></div><button id="handlingUpgrade" style="width:100%">Upgrade · 80 cr</button>
+        <div class="stat"><span>Reinforced body</span><strong>+ condition / wind tolerance</strong></div><button id="armorUpgrade" style="width:100%">Upgrade · 120 cr</button>
+        <p class="help">Upgrades are saved for this play session. More vehicles, probe types, and fictional storm-response systems will come in later builds.</p>
+      </div>
+    </aside>
+  </div>
+  <div class="notice"><strong>Arcade-only safety note:</strong> This is a fictional driving game, not a storm-chasing trainer. Its course, beacons, vehicle effects, and tornado visuals do not model real interception, probe deployment, or safe distances. Never approach a real storm or tornado.</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>
+(() => {
+"use strict";
+const host=document.getElementById("game");
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x91b6c9);scene.fog=new THREE.Fog(0x91b6c9,65,230);
+const camera=new THREE.PerspectiveCamera(65,1,.1,500);
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;host.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xdceeff,0x455344,2));
+const sun=new THREE.DirectionalLight(0xffffff,2.1);sun.position.set(-35,60,25);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);scene.add(sun);
+const mat=(color,roughness=.85)=>new THREE.MeshStandardMaterial({color,roughness});
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(600,600),mat(0x64765d));ground.rotation.x=-Math.PI/2;ground.position.y=-.12;ground.receiveShadow=true;scene.add(ground);
+const road=new THREE.Mesh(new THREE.PlaneGeometry(22,430),mat(0x343d43));road.rotation.x=-Math.PI/2;road.position.set(0,.005,-105);scene.add(road);
+for(let x of [-11.2,11.2]){let line=new THREE.Mesh(new THREE.PlaneGeometry(.25,430),mat(0xe6e1c9));line.rotation.x=-Math.PI/2;line.position.set(x,.02,-105);scene.add(line)}
+for(let z=90;z>-320;z-=18){let dash=new THREE.Mesh(new THREE.PlaneGeometry(.22,8),mat(0xe9e5d6));dash.rotation.x=-Math.PI/2;dash.position.set(0,.025,z);scene.add(dash)}
+for(let i=0;i<90;i++){let x=(Math.random()-.5)*260,z=-Math.random()*400;if(Math.abs(x)<17)continue;let h=2+Math.random()*6;let trunk=new THREE.Mesh(new THREE.CylinderGeometry(.18,.28,h*.45,6),mat(0x554632));trunk.position.set(x,h*.22,z);scene.add(trunk);let crown=new THREE.Mesh(new THREE.ConeGeometry(1.8+Math.random()*1.5,h,7),mat(0x385b45));crown.position.set(x,h*.8,z);crown.castShadow=true;scene.add(crown)}
+const tornado=new THREE.Group();tornado.position.set(42,0,-115);scene.add(tornado);
+const funnelMat=new THREE.MeshStandardMaterial({color:0x596b78,roughness:1,transparent:true,opacity:.86});
+for(let i=0;i<9;i++){let y=i*2.35+.8;let radius=7.5-i*.62;let ring=new THREE.Mesh(new THREE.CylinderGeometry(Math.max(.55,radius-.55),radius,2.8,24,1,true),funnelMat);ring.position.y=y;tornado.add(ring)}
+const cloud=new THREE.Mesh(new THREE.SphereGeometry(9,20,12),mat(0x677783));cloud.scale.set(1,.34,.65);cloud.position.y=23;tornado.add(cloud);
+const dust=new THREE.Mesh(new THREE.TorusGeometry(4.8,.7,8,48),new THREE.MeshStandardMaterial({color:0x9a927e,transparent:true,opacity:.65}));dust.rotation.x=Math.PI/2;dust.position.y=.5;tornado.add(dust);
+const car=new THREE.Group();scene.add(car);
+const bodyMat=mat(0x263f56,.45),glassMat=new THREE.MeshStandardMaterial({color:0x8ab6c8,metalness:.15,roughness:.25}),tireMat=mat(0x111820);
+const chassis=new THREE.Mesh(new THREE.BoxGeometry(2.25,.72,4.1),bodyMat);chassis.position.y=1.05;chassis.castShadow=true;car.add(chassis);
+const hood=new THREE.Mesh(new THREE.BoxGeometry(2.1,.32,1.2),mat(0x365d78,.45));hood.position.set(0,1.48,-1.35);hood.castShadow=true;car.add(hood);
+const cab=new THREE.Mesh(new THREE.BoxGeometry(1.85,1.05,1.75),bodyMat);cab.position.set(0,1.78,.25);cab.castShadow=true;car.add(cab);
+const windshield=new THREE.Mesh(new THREE.BoxGeometry(1.68,.68,.06),glassMat);windshield.position.set(0,1.85,-.64);car.add(windshield);
+const bumper=new THREE.Mesh(new THREE.BoxGeometry(2.35,.25,.22),mat(0x9ba8ae,.45));bumper.position.set(0,.78,-2.1);car.add(bumper);
+const wheels=[];for(let x of [-1.13,1.13])for(let z of [-1.35,1.35]){let w=new THREE.Mesh(new THREE.CylinderGeometry(.48,.48,.32,16),tireMat);w.rotation.z=Math.PI/2;w.position.set(x,.55,z);w.castShadow=true;car.add(w);wheels.push(w)}
+const beaconPositions=[[-7,-35],[6,-75],[-5,-120],[7,-170],[-6,-220],[5,-275]];
+const beacons=[];const beaconMat=new THREE.MeshStandardMaterial({color:0x52d8e8,emissive:0x087b91,emissiveIntensity:1.6});
+beaconPositions.forEach((p,i)=>{let g=new THREE.Group();g.position.set(p[0],1.15,p[1]);let orb=new THREE.Mesh(new THREE.IcosahedronGeometry(.65,1),beaconMat);g.add(orb);let ring=new THREE.Mesh(new THREE.TorusGeometry(1.1,.08,8,24),beaconMat);ring.rotation.x=Math.PI/2;g.add(ring);scene.add(g);beacons.push({group:g,active:true,phase:i})});
+const keys={};const held={left:false,right:false,throttle:false,brake:false,reverse:false,handbrake:false};
+let speed=0,steer=0,money=0,research=0,condition=100,engineLevel=0,handlingLevel=0,armorLevel=0,collected=0,messageTimer=0;
+let gameOver=false,flipping=false,flipTime=0,windSpeed=125,stormClock=0;
+const baseWindTolerance=110;
+function windTolerance(){return baseWindTolerance+armorLevel*18;}
+const $=id=>document.getElementById(id);
+function say(t){$("message").textContent=t;$("message").style.display="block";messageTimer=3.2}
+function refresh(){$("money").textContent=money;$("research").textContent=research;$("speed").textContent=Math.round(Math.abs(speed)*3.6);$("condition").textContent=Math.round(condition)+"%";$("conditionBar").style.width=condition+"%";$("conditionBar").style.background=condition>55?"#68e0ad":condition>25?"#ffd166":"#ff626f";$("beacons").textContent=collected+" / 6";$("engine").textContent=engineLevel?"TUNE "+engineLevel:"STANDARD";$("handling").textContent=handlingLevel?"KIT "+handlingLevel:"STANDARD";$("windTolerance").textContent=windTolerance();$("windSpeed").textContent=Math.round(windSpeed);$("sideWind").textContent=Math.round(windSpeed)}
+function resize(){const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}new ResizeObserver(resize).observe(host);resize();
+function setHold(k,v){held[k]=v}
+document.querySelectorAll("[data-hold]").forEach(b=>{const k=b.dataset.hold;b.addEventListener("pointerdown",e=>{e.preventDefault();b.setPointerCapture(e.pointerId);setHold(k,true);b.classList.add("active")});["pointerup","pointercancel","lostpointercapture"].forEach(ev=>b.addEventListener(ev,()=>{setHold(k,false);b.classList.remove("active")}))});
+window.addEventListener("keydown",e=>{keys[e.code]=true;if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].includes(e.code))e.preventDefault()});
+window.addEventListener("keyup",e=>keys[e.code]=false);window.addEventListener("blur",()=>{Object.keys(held).forEach(k=>held[k]=false);Object.keys(keys).forEach(k=>keys[k]=false)});
+function active(k){return held[k]||({left:keys.ArrowLeft||keys.KeyA,right:keys.ArrowRight||keys.KeyD,throttle:keys.ArrowUp||keys.KeyW,brake:keys.ArrowDown,reverse:keys.KeyS,handbrake:keys.Space}[k]||false)}
+function resetCar(){car.position.set(0,0,0);car.rotation.set(0,0,0);speed=0;steer=0;condition=100;gameOver=false;flipping=false;flipTime=0;$("gameOver").style.display="none";Object.keys(held).forEach(k=>held[k]=false);refresh();say("VEHICLE RESET — TRAINING COURSE READY")}
+function endRun(){if(gameOver)return;gameOver=true;flipping=true;flipTime=0;speed=0;$("gameOverReason").textContent="TORNADO WINDS EXCEEDED THIS VEHICLE’S "+windTolerance()+" MPH GAME TOLERANCE. RUN ENDED.";say("VEHICLE FLIPPED — RUN OVER")}
+$("restartGame").onclick=resetCar;
+function upgrade(type,cost){if(money<cost){say("NOT ENOUGH CREDITS");return false}money-=cost;if(type==="engine")engineLevel++;if(type==="handling")handlingLevel++;if(type==="armor"){armorLevel++;condition=100}refresh();say("UPGRADE INSTALLED");return true}
+$("engineUpgrade").onclick=()=>upgrade("engine",100);$("handlingUpgrade").onclick=()=>upgrade("handling",80);$("armorUpgrade").onclick=()=>upgrade("armor",120);
+$("repair").onclick=()=>{if(money<40){say("NOT ENOUGH CREDITS");return}money-=40;condition=100;refresh();say("VEHICLE REPAIRED")};$("reset").onclick=resetCar;
+let prev=performance.now();
+function animateFrame(now){
+ let dt=Math.min((now-prev)/1000,.04);prev=now;
+ stormClock+=dt;
+ windSpeed=125+Math.sin(stormClock*.22)*32+Math.sin(stormClock*.071)*22;
+ $("windSpeed").textContent=Math.round(windSpeed);
+ $("sideWind").textContent=Math.round(windSpeed);
+ if(!gameOver){
+  const stormDistance=car.position.distanceTo(tornado.position);
+  if(stormDistance<82&&windSpeed>windTolerance())endRun();
+ }
+ if(flipping){
+  flipTime+=dt;
+  car.rotation.z=Math.min(Math.PI*2,flipTime*5.2);
+  car.rotation.x=Math.sin(flipTime*8)*.18;
+  if(flipTime>1.25){flipping=false;$("gameOver").style.display="flex"}
+ }
+ if(!gameOver){
+  const throttle=active("throttle"),brake=active("brake"),reverse=active("reverse"),hand=active("handbrake");
+  const maxSpeed=24+engineLevel*5,accel=10+engineLevel*1.6;
+  if(throttle)speed=Math.min(maxSpeed,speed+accel*dt);
+  else if(reverse)speed=Math.max(-8,speed-accel*.7*dt);
+  else speed*=Math.pow(.965,dt*60);
+  if(brake)speed*=Math.pow(.86,dt*60);
+  if(hand)speed*=Math.pow(.78,dt*60);
+  const steerInput=(active("left")?-1:0)+(active("right")?1:0);
+  steer+=(steerInput-steer)*Math.min(1,dt*5);
+  car.rotation.y-=steer*speed*.018*(1+handlingLevel*.22)*dt;
+  const forward=new THREE.Vector3(0,0,-1).applyQuaternion(car.quaternion);
+  car.position.addScaledVector(forward,speed*dt);
+  car.position.x=THREE.MathUtils.clamp(car.position.x,-32,32);
+  wheels.forEach(w=>w.rotation.x+=speed*dt*1.8);
+  if(Math.abs(car.position.x)>10.7){condition=Math.max(0,condition-(Math.abs(speed)*.006*(1-armorLevel*.12)));if(condition<=0)speed*=.96}
+  for(const b of beacons){
+   if(b.active&&car.position.distanceTo(b.group.position)<4.4){
+    b.active=false;scene.remove(b.group);money+=50;research+=10;collected++;refresh();say("RESEARCH BEACON COLLECTED +50 CREDITS / +10 RP");
+   }
+   if(b.active){b.group.rotation.y+=dt*1.5;b.group.position.y=1.15+Math.sin(now*.002+b.phase)*.25}
+  }
+  tornado.rotation.y+=dt*.22;dust.rotation.z+=dt*.9;
+ }
+ const desired=car.position.clone().add(new THREE.Vector3(0,6.2,12.5).applyQuaternion(car.quaternion));
+ camera.position.lerp(desired,Math.min(1,dt*3.5));
+ camera.lookAt(car.position.clone().add(new THREE.Vector3(0,1.2,-5).applyQuaternion(car.quaternion)));
+ if(messageTimer>0){messageTimer-=dt;if(messageTimer<=0)$("message").style.display="none"}
+ $("speed").textContent=Math.round(Math.abs(speed)*3.6);
+ renderer.render(scene,camera);
+ requestAnimationFrame(animateFrame);
+}
+refresh();say("TRAINING COURSE READY — COLLECT THE CYAN BEACONS");requestAnimationFrame(animateFrame);
+})();
+</script>
+</body>
+</html>
