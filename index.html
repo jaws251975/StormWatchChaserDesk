@@ -5,874 +5,493 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#07111f">
-
 <title>StormWatch ChaseDesk</title>
-
 <meta name="description" content="StormWatch ChaseDesk - Severe weather radar and atmospheric analysis workstation.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 
 <style>
 :root {
   color-scheme: dark;
-  --bg: #07111f;
-  --panel: #0d1c2d;
-  --line: #20344a;
-  --text: #edf5ff;
-  --muted: #9db0c5;
-  --cyan: #52d8e8;
-  --blue: #55b8ff;
-  --orange: #ffb35c;
-  --green: #22c55e;
-  --red: #ff6464;
+  --bg:#07111f;
+  --panel:#0d1c2d;
+  --line:#20344a;
+  --text:#edf5ff;
+  --muted:#9db0c5;
+  --cyan:#52d8e8;
+  --blue:#55b8ff;
+  --orange:#ffb35c;
+  --green:#22c55e;
+  --red:#ff6464;
 }
-
-* {
-  box-sizing: border-box;
-}
-
+* {box-sizing:border-box}
 body {
-  margin: 0;
-  min-height: 100vh;
-  background:
-    radial-gradient(ellipse at 80% 0%, #112b43, transparent 42%),
-    var(--bg);
-  color: var(--text);
-  font-family: Manrope, system-ui, sans-serif;
+  margin:0;min-height:100vh;
+  background:radial-gradient(ellipse at 80% 0%,#112b43,transparent 42%),var(--bg);
+  color:var(--text);font-family:Manrope,system-ui,sans-serif
 }
-
-button, input, select {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-}
-
+button,input,select {font:inherit}
+button {cursor:pointer}
 .topbar {
-  min-height: 70px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 15px;
-  padding: 0 24px;
-  background: #07111fdd;
-  border-bottom: 1px solid var(--line);
+  min-height:70px;display:flex;align-items:center;justify-content:space-between;
+  gap:15px;padding:0 24px;background:#07111fdd;border-bottom:1px solid var(--line)
 }
-
-.brand {
-  color: var(--text);
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: .12em;
-  white-space: nowrap;
+.brand {font-size:15px;font-weight:800;letter-spacing:.12em;white-space:nowrap}
+.brand span {color:var(--cyan)}
+.brand-mark {margin-right:8px;color:var(--cyan);font-size:23px}
+.live-label,.eyebrow,.metric-label,.data-label,.metric-unit,footer,.source {
+  font-family:'DM Mono',monospace
 }
-
-.brand span {
-  color: var(--cyan);
-}
-
-.brand-mark {
-  margin-right: 8px;
-  color: var(--cyan);
-  font-size: 23px;
-}
-
-.live-label,
-.eyebrow,
-.metric-label,
-.data-label,
-.metric-unit,
-footer,
-.source {
-  font-family: 'DM Mono', monospace;
-}
-
-.live-label {
-  color: var(--muted);
-  font-size: 10px;
-  letter-spacing: .12em;
-}
-
+.live-label {color:var(--muted);font-size:10px;letter-spacing:.12em}
 .live-dot {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  margin-right: 7px;
-  border-radius: 50%;
-  background: #5fe0aa;
-  box-shadow: 0 0 10px #5fe0aa88;
+  display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;
+  background:#5fe0aa;box-shadow:0 0 10px #5fe0aa88
 }
-
-.layout {
-  width: min(1500px, 100%);
-  margin: auto;
-  padding: 35px 24px;
-}
-
-.eyebrow {
-  margin: 0 0 10px;
-  color: var(--cyan);
-  font-size: 10px;
-  letter-spacing: .12em;
-}
-
-h1 {
-  margin: 0;
-  font-size: clamp(30px, 5vw, 48px);
-  line-height: 1.1;
-  letter-spacing: -.045em;
-}
-
-h2 {
-  margin: 0;
-  font-size: 19px;
-}
-
-.subtitle {
-  max-width: 760px;
-  margin-top: 12px;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.7;
-}
-
-.status-row {
-  display: flex;
-  align-items: stretch;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin: 24px 0;
-}
-
-.status-card {
-  min-width: 170px;
-  padding: 14px 18px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #0d1c2ddd;
-}
-
-.status-card span {
-  display: block;
-  margin-bottom: 6px;
-  color: var(--muted);
-  font: 10px 'DM Mono', monospace;
-}
-
-.status-card strong {
-  font-size: 16px;
-}
-
-.panel {
-  min-width: 0;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: linear-gradient(145deg, #102136, #0a1828);
-}
-
+.layout {width:min(1500px,100%);margin:auto;padding:35px 24px}
+.eyebrow {margin:0 0 10px;color:var(--cyan);font-size:10px;letter-spacing:.12em}
+h1 {margin:0;font-size:clamp(30px,5vw,48px);line-height:1.1;letter-spacing:-.045em}
+h2 {margin:0;font-size:19px}
+h3 {margin:0;font-size:15px}
+.subtitle {max-width:760px;margin-top:12px;color:var(--muted);font-size:13px;line-height:1.7}
+.status-row {display:flex;align-items:stretch;flex-wrap:wrap;gap:12px;margin:24px 0}
+.status-card {min-width:170px;padding:14px 18px;border:1px solid var(--line);border-radius:10px;background:#0d1c2ddd}
+.status-card span {display:block;margin-bottom:6px;color:var(--muted);font:10px 'DM Mono',monospace}
+.status-card strong {font-size:16px}
+.panel {min-width:0;overflow:hidden;border:1px solid var(--line);border-radius:14px;background:linear-gradient(145deg,#102136,#0a1828)}
 .panel-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 20px;
-  border-bottom: 1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:20px;border-bottom:1px solid var(--line)
 }
-
-.toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 9px;
-  padding: 14px;
-  border-bottom: 1px solid var(--line);
-}
-
+.toolbar {display:flex;flex-wrap:wrap;gap:9px;padding:14px;border-bottom:1px solid var(--line)}
 .control-button {
-  padding: 10px 14px;
-  border: 1px solid #2a5268;
-  border-radius: 8px;
-  background: #102a3d;
-  color: var(--text);
-  font-size: 12px;
-  font-weight: 700;
+  padding:10px 14px;border:1px solid #2a5268;border-radius:8px;
+  background:#102a3d;color:var(--text);font-size:12px;font-weight:700
 }
-
-.control-button:hover,
-.control-button.active {
-  border-color: var(--cyan);
-  background: #17384d;
-}
-
-.control-button:disabled {
-  opacity: .5;
-  cursor: wait;
-}
-
-#map {
-  position: relative;
-  width: 100%;
-  height: 70vh;
-  min-height: 430px;
-  background: #091827;
-  overflow: hidden;
-  isolation: isolate;
-}
-
+.control-button:hover,.control-button.active {border-color:var(--cyan);background:#17384d}
+.control-button:disabled {opacity:.5;cursor:wait}
+#map {width:100%;height:70vh;min-height:430px;background:#091827;isolation:isolate}
 .map-footer {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding: 12px 17px;
-  color: var(--muted);
-  font: 10px 'DM Mono', monospace;
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  padding:12px 17px;color:var(--muted);font:10px 'DM Mono',monospace
 }
-
-.radar-legend {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
+.radar-legend {display:flex;align-items:center;gap:8px}
 .legend-color {
-  width: 100px;
-  height: 9px;
-  border-radius: 3px;
-  background: linear-gradient(
-    to right,
-    #50a6e8,
-    #42c65d,
-    #e5df36,
-    #f49a32,
-    #e74343,
-    #bd49d6
-  );
+  width:100px;height:9px;border-radius:3px;
+  background:linear-gradient(to right,#50a6e8,#42c65d,#e5df36,#f49a32,#e74343,#bd49d6)
 }
-
 .radar-controls {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding: 13px 17px;
-  background: #091827;
-  border-bottom: 1px solid var(--line);
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:13px 17px;
+  background:#091827;border-bottom:1px solid var(--line)
 }
-
-.radar-controls label {
-  color: var(--muted);
-  font: 10px 'DM Mono', monospace;
-}
-
-.radar-controls input {
-  width: 130px;
-  accent-color: var(--cyan);
-}
-
+.radar-controls label {color:var(--muted);font:10px 'DM Mono',monospace}
+.radar-controls input {width:130px;accent-color:var(--cyan)}
 .radar-controls select {
-  padding: 8px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: #102136;
-  color: var(--text);
+  padding:8px;border:1px solid var(--line);border-radius:6px;background:#102136;color:var(--text)
 }
-
-.atmosphere {
-  margin-top: 20px;
-}
-
+.atmosphere {margin-top:20px}
 .atmo-header {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 15px;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--line);
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:15px;
+  padding:16px 20px;border-bottom:1px solid var(--line)
 }
-
-.data-label {
-  margin-bottom: 7px;
-  color: var(--muted);
-  font-size: 10px;
-  letter-spacing: .1em;
-}
-
-.atmo-header strong {
-  font-size: 12px;
-}
-
-.metric-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 11px;
-  padding: 15px;
-}
-
-.metric {
-  min-width: 0;
-  padding: 15px;
-  border: 1px solid #263e56;
-  border-radius: 9px;
-  background: #142235;
-}
-
-.metric-label {
-  color: #8da8c2;
-  font-size: 10px;
-  letter-spacing: .07em;
-}
-
+.data-label {margin-bottom:7px;color:var(--muted);font-size:10px;letter-spacing:.1em}
+.atmo-header strong {font-size:12px}
+.metric-grid {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;padding:15px}
+.metric {min-width:0;padding:15px;border:1px solid #263e56;border-radius:9px;background:#142235}
+.metric-label {color:#8da8c2;font-size:10px;letter-spacing:.07em}
 .metric-value {
-  margin-top: 9px;
-  color: var(--blue);
-  font-size: clamp(21px, 3vw, 27px);
-  font-weight: 800;
-  overflow-wrap: anywhere;
+  margin-top:9px;color:var(--blue);font-size:clamp(21px,3vw,27px);
+  font-weight:800;overflow-wrap:anywhere
 }
-
-.metric-unit {
-  margin-top: 3px;
-  color: #8297ab;
-  font-size: 10px;
-}
-
-.metric-description {
-  margin-top: 9px;
-  color: var(--muted);
-  font-size: 10px;
-  line-height: 1.5;
-}
-
+.metric-unit {margin-top:3px;color:#8297ab;font-size:10px}
+.metric-description {margin-top:9px;color:var(--muted);font-size:10px;line-height:1.5}
 .atmo-status {
-  padding: 14px 18px;
-  border-top: 1px solid var(--line);
-  color: var(--cyan);
-  font: 10px 'DM Mono', monospace;
-  line-height: 1.7;
+  padding:14px 18px;border-top:1px solid var(--line);color:var(--cyan);
+  font:10px 'DM Mono',monospace;line-height:1.7
 }
-
-.secondary-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  margin-top: 20px;
-}
-
-.info-panel {
-  padding: 19px;
-}
-
-.info-panel p {
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.7;
-}
-
-.info-panel strong {
-  color: var(--cyan);
-}
-
-.source {
-  color: var(--muted);
-  font-size: 10px;
-  line-height: 1.8;
-}
-
-.source a,
-footer a {
-  color: var(--cyan);
-}
-
-.notice {
-  margin-top: 20px;
-  padding: 17px;
-  border: 1px solid #4d3c27;
-  border-radius: 10px;
-  background: #241e17;
-}
-
-.notice strong {
-  color: var(--orange);
-  font-size: 12px;
-}
-
-.notice p {
-  margin-bottom: 0;
-  color: #c6b7a5;
-  font-size: 11px;
-  line-height: 1.7;
-}
-
+.secondary-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:20px}
+.info-panel {padding:19px}
+.info-panel p {color:var(--muted);font-size:12px;line-height:1.7}
+.info-panel strong {color:var(--cyan)}
+.notice {margin-top:20px;padding:17px;border:1px solid #4d3c27;border-radius:10px;background:#241e17}
+.notice strong {color:var(--orange);font-size:12px}
+.notice p {margin-bottom:0;color:#c6b7a5;font-size:11px;line-height:1.7}
 footer {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding-top: 23px;
-  color: var(--muted);
-  font-size: 10px;
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;
+  padding-top:23px;color:var(--muted);font-size:10px
+}
+.source {color:var(--muted);font-size:10px;line-height:1.8}
+.source a,footer a {color:var(--cyan)}
+.leaflet-container {font-family:Manrope,sans-serif}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip {background:#102338;color:white}
+.selected-marker {
+  width:19px;height:19px;border:3px solid white;border-radius:50%;
+  background:var(--cyan);box-shadow:0 0 0 5px #52d8e855,0 0 18px #52d8e8
 }
 
-.leaflet-container {
-  font-family: Manrope, sans-serif;
+/* Animation panels */
+.animation-section {margin-top:22px}
+.animation-grid {display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:15px}
+.animation-card {
+  overflow:hidden;border:1px solid var(--line);border-radius:14px;
+  background:linear-gradient(145deg,#102136,#0a1828)
+}
+.animation-card-header {padding:18px;border-bottom:1px solid var(--line)}
+.animation-card-header p {margin:7px 0 0;color:var(--muted);font-size:11px;line-height:1.6}
+.animation-stage {
+  position:relative;height:270px;overflow:hidden;
+  background:linear-gradient(#102b42 0%,#172c3b 60%,#263344 60%,#182536 100%)
+}
+.animation-stage .horizon {
+  position:absolute;bottom:0;left:0;width:100%;height:34%;
+  background:linear-gradient(170deg,#243c45,#111f2d)
+}
+.animation-stage .cloud {
+  position:absolute;top:35px;left:12%;width:140px;height:35px;
+  border-radius:30px;background:#aebdca;opacity:.75;
+  box-shadow:25px -15px 0 2px #aebdca,55px 0 0 -3px #aebdca
+}
+.animation-controls {display:flex;gap:8px;flex-wrap:wrap;padding:14px}
+.animation-caption {padding:0 16px 16px;color:var(--muted);font-size:11px;line-height:1.6}
+.scene-label {
+  position:absolute;top:12px;left:12px;padding:6px 9px;
+  border:1px solid #52d8e866;border-radius:5px;background:#07111fbb;
+  color:var(--cyan);font:9px 'DM Mono',monospace;letter-spacing:.08em
+}
+.stage-status {
+  position:absolute;right:12px;top:12px;color:#dceeff;
+  font:9px 'DM Mono',monospace;text-align:right
 }
 
-.leaflet-popup-content-wrapper,
-.leaflet-popup-tip {
-  background: #102338;
-  color: white;
+/* Tornado formation SVG animation */
+.formation-svg {position:absolute;inset:0;width:100%;height:100%}
+.formation-cloud {transform-origin:50% 50%;animation:cloudShift 5s ease-in-out infinite alternate}
+.formation-funnel {transform-origin:50% 30%;animation:funnelGrow 7s ease-in-out infinite}
+.formation-spin {transform-origin:50% 50%;animation:spin 3s linear infinite}
+.formation-stage.paused * {animation-play-state:paused!important}
+@keyframes cloudShift {from{transform:translateX(-8px)}to{transform:translateX(10px)}}
+@keyframes funnelGrow {
+  0%,15%{transform:scaleY(.08);opacity:.15}
+  45%{transform:scaleY(.48);opacity:.6}
+  75%,100%{transform:scaleY(1);opacity:.9}
 }
+@keyframes spin {to{transform:rotate(360deg)}}
 
-@media(max-width: 750px) {
-  .layout {
-    padding: 25px 12px;
-  }
-
-  .topbar {
-    padding: 14px;
-  }
-
-  .metric-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .secondary-grid {
-    grid-template-columns: 1fr;
-  }
-
-  #map {
-    height: 58vh;
-    min-height: 360px;
-  }
+/* Fictional distant observation scene */
+.intercept-stage {background:linear-gradient(#122d45 0%,#53616a 64%,#293b42 64%,#15232d 100%)}
+.intercept-svg {position:absolute;inset:0;width:100%;height:100%}
+.dominator-tornado {transform-origin:50% 20%;animation:stormSway 4s ease-in-out infinite alternate}
+.vehicle {animation:vehicleIdle 2s ease-in-out infinite}
+.intercept-stage.paused * {animation-play-state:paused!important}
+@keyframes stormSway {from{transform:rotate(-2deg)}to{transform:rotate(2deg)}}
+@keyframes vehicleIdle {0%,100%{transform:translateY(0)}50%{transform:translateY(-1px)}}
+.scene-distance {
+  position:absolute;left:12px;bottom:12px;padding:7px 9px;
+  border:1px solid #ffffff55;border-radius:5px;background:#07111fbb;
+  color:#fff;font:9px 'DM Mono',monospace
 }
-
-@media(max-width: 380px) {
-  .metric {
-    padding: 11px;
-  }
-
-  .metric-value {
-    font-size: 21px;
-  }
+.safe-line {
+  position:absolute;left:0;right:0;bottom:29%;border-top:2px dashed #52d8e8aa
+}
+@media(max-width:750px) {
+  .layout{padding:25px 12px}
+  .topbar{padding:14px}
+  .metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .secondary-grid,.animation-grid{grid-template-columns:1fr}
+  #map{height:58vh;min-height:360px}
+}
+@media(max-width:380px) {
+  .metric{padding:11px}
+  .metric-value{font-size:21px}
 }
 </style>
 </head>
 
 <body>
-
 <header class="topbar">
-  <div class="brand">
-    <span class="brand-mark">◉</span>
-    STORM<span>WATCH</span> CHASEDESK
-  </div>
-
-  <div class="live-label">
-    <span class="live-dot"></span>
-    WEATHER ANALYSIS SYSTEM
-  </div>
+  <div class="brand"><span class="brand-mark">◉</span>STORM<span>WATCH</span> CHASEDESK</div>
+  <div class="live-label"><span class="live-dot"></span>WEATHER ANALYSIS SYSTEM</div>
 </header>
 
 <main class="layout">
-
   <section class="intro">
     <p class="eyebrow">SEVERE WEATHER OPERATIONS CENTER</p>
     <h1>StormChaser Dashboard</h1>
-
     <p class="subtitle">
-      Interactive NEXRAD radar and atmospheric analysis.
-      Examine reflectivity, atmospheric instability,
-      wind profiles, and environmental conditions.
+      Interactive NEXRAD radar, location-specific atmospheric analysis,
+      and educational severe-weather simulations.
     </p>
   </section>
 
   <section class="status-row">
-    <div class="status-card">
-      <span>RADAR STATUS</span>
-      <strong id="radarStatus">INITIALIZING</strong>
-    </div>
-
-    <div class="status-card">
-      <span>ATMOSPHERIC DATA</span>
-      <strong id="atmoStatusShort">CONNECTING</strong>
-    </div>
-
-    <div class="status-card">
-      <span>LAST RADAR REFRESH</span>
-      <strong id="lastRefresh">--</strong>
-    </div>
+    <div class="status-card"><span>RADAR STATUS</span><strong id="radarStatus">INITIALIZING</strong></div>
+    <div class="status-card"><span>ATMOSPHERIC DATA</span><strong id="atmoStatusShort">CONNECTING</strong></div>
+    <div class="status-card"><span>LAST RADAR REFRESH</span><strong id="lastRefresh">--</strong></div>
   </section>
-
-  <!-- RADAR CENTER -->
 
   <section class="panel">
     <div class="panel-heading">
-      <div>
-        <p class="eyebrow">LIVE NEXRAD NETWORK</p>
-        <h2>Radar Center</h2>
-      </div>
+      <div><p class="eyebrow">LIVE NEXRAD NETWORK</p><h2>Radar Center</h2></div>
       <span class="live-label">BASE REFLECTIVITY</span>
     </div>
 
     <div class="toolbar">
-      <button class="control-button active" id="radarToggle">
-        Radar: ON
-      </button>
-
-      <button class="control-button" id="satelliteToggle">
-        Satellite: OFF
-      </button>
-
-      <button class="control-button" id="refreshRadar">
-        ↻ Refresh Radar
-      </button>
-
-      <button class="control-button" id="resetMap">
-        Reset Map
-      </button>
+      <button class="control-button active" id="radarToggle">Radar: ON</button>
+      <button class="control-button" id="satelliteToggle">Satellite: OFF</button>
+      <button class="control-button" id="refreshRadar">↻ Refresh Radar</button>
+      <button class="control-button" id="resetMap">Reset Map</button>
     </div>
 
     <div class="radar-controls">
       <label for="opacity">RADAR OPACITY</label>
-      <input id="opacity" type="range"
-        min="0" max="100" value="75">
-
-      <label for="zoomInfo">MAP ZOOM</label>
-      <span id="zoomInfo">5</span>
+      <input id="opacity" type="range" min="0" max="100" value="75">
+      <label>MAP ZOOM</label><span id="zoomInfo">5</span>
     </div>
 
-    <div id="map" aria-label="Interactive radar map"></div>
+    <div id="map" aria-label="Interactive radar map. Click a location to analyze it."></div>
 
     <div class="map-footer">
       <span id="mapCenter">MAP CENTER: --</span>
-
-      <div class="radar-legend">
-        <span>LOW</span>
-        <div class="legend-color"></div>
-        <span>HIGH</span>
-      </div>
+      <div class="radar-legend"><span>LOW</span><div class="legend-color"></div><span>HIGH</span></div>
     </div>
   </section>
 
-  <!-- ATMOSPHERIC ANALYSIS -->
-
   <section class="panel atmosphere">
-
     <div class="panel-heading">
-      <div>
-        <p class="eyebrow">ATMOSPHERIC ENVIRONMENT</p>
-        <h2>Atmospheric Analysis</h2>
-      </div>
-
+      <div><p class="eyebrow">ATMOSPHERIC ENVIRONMENT</p><h2>Selected Location Analysis</h2></div>
       <span class="live-label">MODEL DATA</span>
     </div>
 
     <div class="atmo-header">
-      <div>
-        <div class="data-label">ANALYSIS LOCATION</div>
-        <strong id="atmoLocation">Waiting for map...</strong>
-      </div>
-
-      <div>
-        <div class="data-label">MODEL VALID TIME (UTC)</div>
-        <strong id="atmoTime">Waiting...</strong>
-      </div>
+      <div><div class="data-label">SELECTED LOCATION</div><strong id="atmoLocation">Waiting for map...</strong></div>
+      <div><div class="data-label">MODEL VALID TIME (UTC)</div><strong id="atmoTime">Waiting...</strong></div>
     </div>
 
     <div class="metric-grid">
-
-      <div class="metric">
-        <div class="metric-label">CAPE</div>
-        <div class="metric-value" id="cape">--</div>
-        <div class="metric-unit">J/kg</div>
-        <div class="metric-description">
-          Convective available potential energy
-        </div>
-      </div>
-
-      <div class="metric">
-        <div class="metric-label">CIN</div>
-        <div class="metric-value" id="cin">--</div>
-        <div class="metric-unit">J/kg</div>
-        <div class="metric-description">
-          Convective inhibition
-        </div>
-      </div>
-
-      <div class="metric">
-        <div class="metric-label">LIFTED INDEX</div>
-        <div class="metric-value" id="lifted">--</div>
-        <div class="metric-unit">°C</div>
-        <div class="metric-description">
-          Atmospheric stability estimate
-        </div>
-      </div>
-
-      <div class="metric">
-        <div class="metric-label">DEWPOINT</div>
-        <div class="metric-value" id="dewpoint">--</div>
-        <div class="metric-unit">°C</div>
-        <div class="metric-description">
-          Two-meter dewpoint temperature
-        </div>
-      </div>
-
-      <div class="metric">
-        <div class="metric-label">RELATIVE HUMIDITY</div>
-        <div class="metric-value" id="humidity">--</div>
-        <div class="metric-unit">%</div>
-        <div class="metric-description">
-          Near-surface humidity
-        </div>
-      </div>
-
-      <div class="metric">
-        <div class="metric-label">SURFACE WIND</div>
-        <div class="metric-value" id="surfaceWind">--</div>
-        <div class="metric-unit">mph</div>
-        <div class="metric-description">
-          Wind speed at 10 meters
-        </div>
-      </div>
-
-      <div class="metric">
-        <div class="metric-label">850 hPa WIND</div>
-        <div class="metric-value" id="wind850">--</div>
-        <div class="metric-unit">mph</div>
-        <div class="metric-description">
-          Lower-atmosphere wind speed
-        </div>
-      </div>
-
-      <div class="metric">
-        <div class="metric-label">500 hPa WIND</div>
-        <div class="metric-value" id="wind500">--</div>
-        <div class="metric-unit">mph</div>
-        <div class="metric-description">
-          Mid-atmosphere wind speed
-        </div>
-      </div>
-
-      <div class="metric">
-        <div class="metric-label">WIND GUSTS</div>
-        <div class="metric-value" id="gusts">--</div>
-        <div class="metric-unit">mph</div>
-        <div class="metric-description">
-          Model-estimated surface gusts
-        </div>
-      </div>
-
-      <div class="metric">
-        <div class="metric-label">SURFACE PRESSURE</div>
-        <div class="metric-value" id="pressure">--</div>
-        <div class="metric-unit">hPa</div>
-        <div class="metric-description">
-          Mean sea-level pressure
-        </div>
-      </div>
-
-      <div class="metric">
-        <div class="metric-label">10 m–500 hPa SHEAR</div>
-        <div class="metric-value" id="shear">--</div>
-        <div class="metric-unit">mph</div>
-        <div class="metric-description">
-          Approximate vector wind difference
-        </div>
-      </div>
-
-      <div class="metric">
-        <div class="metric-label">SURFACE WIND DIRECTION</div>
-        <div class="metric-value" id="windDirection">--</div>
-        <div class="metric-unit">degrees</div>
-        <div class="metric-description">
-          Meteorological direction
-        </div>
-      </div>
-
+      <div class="metric"><div class="metric-label">CAPE</div><div class="metric-value" id="cape">--</div><div class="metric-unit">J/kg</div><div class="metric-description">Convective available potential energy</div></div>
+      <div class="metric"><div class="metric-label">CIN</div><div class="metric-value" id="cin">--</div><div class="metric-unit">J/kg</div><div class="metric-description">Convective inhibition</div></div>
+      <div class="metric"><div class="metric-label">LIFTED INDEX</div><div class="metric-value" id="lifted">--</div><div class="metric-unit">°C</div><div class="metric-description">Atmospheric stability estimate</div></div>
+      <div class="metric"><div class="metric-label">DEWPOINT</div><div class="metric-value" id="dewpoint">--</div><div class="metric-unit">°C</div><div class="metric-description">Two-meter dewpoint temperature</div></div>
+      <div class="metric"><div class="metric-label">RELATIVE HUMIDITY</div><div class="metric-value" id="humidity">--</div><div class="metric-unit">%</div><div class="metric-description">Near-surface humidity</div></div>
+      <div class="metric"><div class="metric-label">SURFACE WIND</div><div class="metric-value" id="surfaceWind">--</div><div class="metric-unit">mph</div><div class="metric-description">Wind speed at 10 meters</div></div>
+      <div class="metric"><div class="metric-label">850 hPa WIND</div><div class="metric-value" id="wind850">--</div><div class="metric-unit">mph</div><div class="metric-description">Lower-atmosphere wind speed</div></div>
+      <div class="metric"><div class="metric-label">500 hPa WIND</div><div class="metric-value" id="wind500">--</div><div class="metric-unit">mph</div><div class="metric-description">Mid-atmosphere wind speed</div></div>
+      <div class="metric"><div class="metric-label">WIND GUSTS</div><div class="metric-value" id="gusts">--</div><div class="metric-unit">mph</div><div class="metric-description">Model-estimated surface gusts</div></div>
+      <div class="metric"><div class="metric-label">SURFACE PRESSURE</div><div class="metric-value" id="pressure">--</div><div class="metric-unit">hPa</div><div class="metric-description">Mean sea-level pressure</div></div>
+      <div class="metric"><div class="metric-label">10 m–500 hPa SHEAR</div><div class="metric-value" id="shear">--</div><div class="metric-unit">mph</div><div class="metric-description">Approximate vector wind difference</div></div>
+      <div class="metric"><div class="metric-label">SURFACE WIND DIRECTION</div><div class="metric-value" id="windDirection">--</div><div class="metric-unit">degrees</div><div class="metric-description">Meteorological direction</div></div>
     </div>
-
-    <div class="atmo-status" id="atmoStatus">
-      CONNECTING TO OPEN-METEO...
-    </div>
-
+    <div class="atmo-status" id="atmoStatus">CLICK A MAP LOCATION TO LOAD DATA.</div>
   </section>
 
-  <!-- ADVANCED DATA NOTES -->
-
   <section class="secondary-grid">
-
     <div class="panel info-panel">
-      <p class="eyebrow">WIND PROFILE</p>
-      <h2>Upper-air analysis</h2>
-
-      <p>
-        Wind measurements at different pressure levels
-        help describe how winds change with altitude.
-      </p>
-
-      <p>
-        <strong>850 hPa:</strong> Lower-atmosphere winds.
-      </p>
-
-      <p>
-        <strong>500 hPa:</strong> Mid-atmosphere winds.
-      </p>
-
-      <p>
-        <strong>Bulk shear:</strong> Calculated from
-        the vector difference between 10-meter and
-        500-hPa winds. It is an approximate layer
-        measurement, not a formal sounding analysis.
-      </p>
+      <p class="eyebrow">WIND PROFILE</p><h2>Upper-air analysis</h2>
+      <p>Wind measurements at different pressure levels help describe how winds change with altitude.</p>
+      <p><strong>850 hPa:</strong> Lower-atmosphere winds.</p>
+      <p><strong>500 hPa:</strong> Mid-atmosphere winds.</p>
+      <p><strong>Bulk shear:</strong> Approximate vector difference between 10-meter and 500-hPa winds. It is not a formal sounding analysis.</p>
     </div>
-
     <div class="panel info-panel">
-      <p class="eyebrow">ADVANCED PRODUCTS</p>
-      <h2>Additional storm parameters</h2>
-
-      <p>
-        <strong>SRH:</strong> Not currently supplied by
-        this weather-model data connection.
-      </p>
-
-      <p>
-        <strong>STP:</strong> Not currently calculated.
-        It requires several atmospheric ingredients.
-      </p>
-
-      <p>
-        <strong>Mesocyclone detection:</strong>
-        Requires specialized radar products.
-      </p>
-
-      <p>
-        These products will be added when we connect
-        suitable observational data sources.
-      </p>
+      <p class="eyebrow">ADVANCED PRODUCTS</p><h2>Additional storm parameters</h2>
+      <p><strong>SRH:</strong> Not currently supplied by this data connection.</p>
+      <p><strong>STP:</strong> Not currently calculated.</p>
+      <p><strong>Mesocyclone detection:</strong> Requires specialized radar products.</p>
+      <p>These products will be added when suitable observational data sources are connected.</p>
     </div>
+  </section>
 
+  <!-- EDUCATIONAL ANIMATIONS -->
+  <section class="animation-section">
+    <p class="eyebrow">WEATHER LAB</p>
+    <h2>Severe Weather Simulations</h2>
+    <p class="subtitle">Educational visualizations of storm development and a fictional remote observation scene.</p>
+
+    <div class="animation-grid">
+      <article class="animation-card">
+        <div class="animation-card-header">
+          <p class="eyebrow">SIMULATION 01</p>
+          <h3>Tornado Formation</h3>
+          <p>Watch a simplified sequence from unstable air and a rotating updraft to a developing funnel.</p>
+        </div>
+
+        <div class="animation-stage formation-stage" id="formationStage">
+          <div class="scene-label">FORMATION MODEL</div>
+          <div class="stage-status" id="formationStatus">PHASE 1 / 4</div>
+          <div class="horizon"></div>
+          <svg class="formation-svg" viewBox="0 0 500 270" preserveAspectRatio="xMidYMid slice">
+            <defs>
+              <linearGradient id="funnelGradient" x1="0" x2="1">
+                <stop offset="0" stop-color="#a8b9c7" stop-opacity=".15"/>
+                <stop offset=".5" stop-color="#e1e8ed" stop-opacity=".85"/>
+                <stop offset="1" stop-color="#8b9eae" stop-opacity=".2"/>
+              </linearGradient>
+            </defs>
+            <g class="formation-cloud">
+              <path d="M105 80 Q95 55 130 50 Q145 20 180 43 Q210 12 240 45 Q280 25 300 58 Q340 53 345 83 Q370 105 330 116 L130 116 Q90 110 105 80Z" fill="#647789"/>
+              <path d="M120 88 Q150 60 180 82 Q215 45 245 82 Q280 58 315 88 L320 110 L120 110Z" fill="#9cabb8" opacity=".75"/>
+            </g>
+            <g class="formation-funnel">
+              <path d="M200 105 Q250 120 300 105 L265 190 Q255 210 250 245 Q245 210 235 190Z" fill="url(#funnelGradient)"/>
+              <path d="M220 112 Q250 126 280 112 L260 184 Q252 200 250 225 Q245 196 240 184Z" fill="#d6e0e8" opacity=".2"/>
+            </g>
+            <g class="formation-spin" fill="none" stroke="#d9e7f1" stroke-width="2" opacity=".8">
+              <path d="M190 140 Q245 110 300 145"/>
+              <path d="M205 160 Q250 135 288 165"/>
+              <path d="M220 180 Q250 160 275 184"/>
+            </g>
+            <path d="M0 245 Q100 235 190 245 T500 245" fill="none" stroke="#71828d" stroke-width="2"/>
+            <g fill="#f3c66b">
+              <path d="M45 30 l8 -16 8 16Z"/><path d="M75 45 l7 -14 7 14Z"/>
+            </g>
+          </svg>
+        </div>
+
+        <div class="animation-controls">
+          <button class="control-button active" id="formationPlay">▶ Play</button>
+          <button class="control-button" id="formationPause">Ⅱ Pause</button>
+          <button class="control-button" id="formationRestart">↻ Restart</button>
+        </div>
+        <div class="animation-caption" id="formationCaption">Phase 1: Warm, moist air and atmospheric instability help create rising air currents.</div>
+      </article>
+
+      <article class="animation-card">
+        <div class="animation-card-header">
+          <p class="eyebrow">SIMULATION 02</p>
+          <h3>Dominator: Remote Observation</h3>
+          <p>A fictional research scene showing a vehicle observing a tornado from a designated distant viewing area.</p>
+        </div>
+
+        <div class="animation-stage intercept-stage" id="interceptStage">
+          <div class="scene-label">EDUCATIONAL SCENE</div>
+          <div class="stage-status" id="interceptStatus">SCENE 1 / 3</div>
+          <div class="horizon"></div>
+          <div class="safe-line"></div>
+          <svg class="intercept-svg" viewBox="0 0 500 270" preserveAspectRatio="xMidYMid slice">
+            <g class="dominator-tornado">
+              <path d="M300 42 Q345 38 365 55 L348 95 Q335 128 337 155 Q320 180 315 212 Q309 174 295 153 Q300 125 285 94Z" fill="#aab8c3" opacity=".8"/>
+              <path d="M315 45 Q335 55 350 46 L338 105 Q325 135 330 160 L315 190 Q318 145 305 112Z" fill="#e1e7eb" opacity=".28"/>
+              <path d="M285 70 Q330 45 370 75 M292 100 Q330 78 360 105 M300 130 Q330 112 350 138" stroke="#e3ebf0" stroke-width="3" fill="none" opacity=".7"/>
+            </g>
+            <path d="M0 207 Q100 190 200 208 T500 205" stroke="#82939a" stroke-width="2" fill="none"/>
+            <g class="vehicle">
+              <ellipse cx="125" cy="224" rx="64" ry="8" fill="#07111f" opacity=".5"/>
+              <path d="M65 185 L82 160 L155 160 L178 184 L185 211 L57 211Z" fill="#182c3b" stroke="#8ba3b5" stroke-width="2"/>
+              <path d="M91 164 L145 164 L160 183 L79 183Z" fill="#3d667e" stroke="#a8c7d7" stroke-width="2"/>
+              <path d="M60 190 L180 190 L180 207 L60 207Z" fill="#263e50"/>
+              <rect x="106" y="193" width="31" height="8" rx="2" fill="#52d8e8"/>
+              <circle cx="84" cy="211" r="12" fill="#101820" stroke="#a8b7c3" stroke-width="3"/>
+              <circle cx="158" cy="211" r="12" fill="#101820" stroke="#a8b7c3" stroke-width="3"/>
+              <text x="120" y="178" font-size="9" text-anchor="middle" fill="white" font-family="monospace">DOMINATOR</text>
+            </g>
+            <path d="M200 220 L285 220" stroke="#52d8e8" stroke-width="2" stroke-dasharray="5 5"/>
+            <text x="244" y="212" font-size="9" fill="#52d8e8" text-anchor="middle" font-family="monospace">DISTANT VIEW</text>
+          </svg>
+          <div class="scene-distance">VEHICLE REMAINS IN DESIGNATED VIEWING AREA</div>
+        </div>
+
+        <div class="animation-controls">
+          <button class="control-button active" id="interceptPlay">▶ Play</button>
+          <button class="control-button" id="interceptPause">Ⅱ Pause</button>
+          <button class="control-button" id="interceptRestart">↻ Restart</button>
+        </div>
+        <div class="animation-caption" id="interceptCaption">Scene 1: The research vehicle is parked in a distant observation area while the storm is monitored remotely.</div>
+      </article>
+    </div>
   </section>
 
   <section class="notice">
     <strong>Important weather information</strong>
-
     <p>
-      ChaseDesk is an educational and remote meteorological
-      analysis project, not an emergency warning service.
-      Model estimates are not direct observations and radar
-      mosaics may be delayed or incomplete. Never use this
-      dashboard to make safety-critical decisions or to
-      approach severe weather. Follow official National
-      Weather Service warnings and local emergency guidance.
+      ChaseDesk is an educational and remote meteorological analysis project,
+      not an emergency warning service. Model estimates are not direct observations.
+      Never use this dashboard or its simulations to make safety-critical decisions
+      or approach severe weather. Follow official National Weather Service warnings
+      and local emergency guidance.
     </p>
   </section>
 
   <footer>
-    <span>
-      RADAR:
-      <a href="https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/"
-        target="_blank" rel="noopener">
-        Iowa Environmental Mesonet
-      </a>
-    </span>
-
-    <span>
-      MODEL:
-      <a href="https://open-meteo.com/"
-        target="_blank" rel="noopener">
-        Open-Meteo
-      </a>
-    </span>
-
+    <span>RADAR: <a href="https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/" target="_blank" rel="noopener">Iowa Environmental Mesonet</a></span>
+    <span>MODEL: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a></span>
     <span>STORMWATCH CHASEDESK</span>
   </footer>
-
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script>
 "use strict";
 
-/* =====================================
-   MAP INITIALIZATION
-===================================== */
-
+/* MAP */
 const DEFAULT_CENTER = [32.5, -90];
 const DEFAULT_ZOOM = 5;
 
-const map = L.map("map").setView(
-  DEFAULT_CENTER,
-  DEFAULT_ZOOM
-);
+const map = L.map("map").setView(DEFAULT_CENTER, DEFAULT_ZOOM);
 
 const streetLayer = L.tileLayer(
   "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-  {
-    maxZoom: 19,
-    attribution: "&copy; OpenStreetMap contributors"
-  }
+  {maxZoom:19,attribution:"&copy; OpenStreetMap contributors"}
 ).addTo(map);
 
 const satelliteLayer = L.tileLayer(
   "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-  {
-    maxZoom: 19,
-    attribution: "Tiles &copy; Esri"
-  }
+  {maxZoom:19,attribution:"Tiles &copy; Esri"}
 );
 
 const radarLayer = L.tileLayer.wms(
   "https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi",
   {
-    layers: "nexrad-n0r",
-    format: "image/png",
-    transparent: true,
-    version: "1.1.1",
-    opacity: 0.75,
-    attribution: "Radar: Iowa Environmental Mesonet"
+    layers:"nexrad-n0r",
+    format:"image/png",
+    transparent:true,
+    version:"1.1.1",
+    opacity:.75,
+    attribution:"Radar: Iowa Environmental Mesonet"
   }
 ).addTo(map);
 
 let radarEnabled = true;
 let satelliteEnabled = false;
-let atmosphereTimer = null;
 let atmosphereController = null;
+let selectedMarker = null;
+let selectedLocation = {lat:DEFAULT_CENTER[0],lng:DEFAULT_CENTER[1]};
 
-/* =====================================
-   MAP INFORMATION
-===================================== */
+const markerIcon = L.divIcon({
+  className:"",
+  html:'<div class="selected-marker"></div>',
+  iconSize:[19,19],
+  iconAnchor:[9,9]
+});
 
 function updateMapInformation() {
   const center = map.getCenter();
-
   document.getElementById("mapCenter").textContent =
-    "MAP CENTER: " +
-    center.lat.toFixed(2) + ", " +
-    center.lng.toFixed(2);
+    "MAP CENTER: " + center.lat.toFixed(2) + ", " + center.lng.toFixed(2);
+  document.getElementById("zoomInfo").textContent = map.getZoom();
+}
 
-  document.getElementById("zoomInfo").textContent =
-    map.getZoom();
+function selectLocation(lat,lng) {
+  selectedLocation = {lat,lng};
+
+  if (selectedMarker) map.removeLayer(selectedMarker);
+
+  selectedMarker = L.marker([lat,lng],{icon:markerIcon}).addTo(map);
+  selectedMarker.bindPopup(
+    "<b>Selected analysis point</b><br>" +
+    lat.toFixed(4) + ", " + lng.toFixed(4)
+  ).openPopup();
+
+  loadAtmosphere(lat,lng);
 }
 
 function refreshRadar() {
   const button = document.getElementById("refreshRadar");
-
   button.disabled = true;
   button.textContent = "Refreshing...";
 
-  if (radarEnabled) {
-    radarLayer.setParams({
-      refresh: Date.now()
-    });
-
-    radarLayer.redraw();
-  }
+  if (radarEnabled) radarLayer.redraw();
 
   document.getElementById("lastRefresh").textContent =
     new Date().toLocaleTimeString();
@@ -880,204 +499,146 @@ function refreshRadar() {
   setTimeout(() => {
     button.disabled = false;
     button.textContent = "↻ Refresh Radar";
-  }, 700);
+  },700);
 }
 
-/* =====================================
-   RADAR CONTROLS
-===================================== */
-
-document.getElementById("radarToggle")
-.addEventListener("click", function() {
+/* MAP CONTROLS */
+document.getElementById("radarToggle").addEventListener("click",function() {
   radarEnabled = !radarEnabled;
-
   if (radarEnabled) {
     radarLayer.addTo(map);
     this.textContent = "Radar: ON";
     this.classList.add("active");
-
-    document.getElementById("radarStatus").textContent =
-      "ENABLED";
+    document.getElementById("radarStatus").textContent = "ENABLED";
   } else {
     map.removeLayer(radarLayer);
     this.textContent = "Radar: OFF";
     this.classList.remove("active");
-
-    document.getElementById("radarStatus").textContent =
-      "HIDDEN";
+    document.getElementById("radarStatus").textContent = "HIDDEN";
   }
 });
 
-document.getElementById("satelliteToggle")
-.addEventListener("click", function() {
+document.getElementById("satelliteToggle").addEventListener("click",function() {
   satelliteEnabled = !satelliteEnabled;
-
   if (satelliteEnabled) {
     map.removeLayer(streetLayer);
     satelliteLayer.addTo(map);
-
     this.textContent = "Satellite: ON";
     this.classList.add("active");
   } else {
     map.removeLayer(satelliteLayer);
     streetLayer.addTo(map);
-
     this.textContent = "Satellite: OFF";
     this.classList.remove("active");
   }
 });
 
-document.getElementById("refreshRadar")
-.addEventListener("click", refreshRadar);
+document.getElementById("refreshRadar").addEventListener("click",refreshRadar);
 
-document.getElementById("resetMap")
-.addEventListener("click", function() {
-  map.setView(DEFAULT_CENTER, DEFAULT_ZOOM);
+document.getElementById("resetMap").addEventListener("click",function() {
+  map.setView(DEFAULT_CENTER,DEFAULT_ZOOM);
+  selectLocation(DEFAULT_CENTER[0],DEFAULT_CENTER[1]);
 });
 
-document.getElementById("opacity")
-.addEventListener("input", function() {
-  radarLayer.setOpacity(Number(this.value) / 100);
+document.getElementById("opacity").addEventListener("input",function() {
+  radarLayer.setOpacity(Number(this.value)/100);
 });
 
-/* =====================================
-   ATMOSPHERIC DATA
-===================================== */
+/* CLICK-TO-ANALYZE */
+map.on("click",function(event) {
+  selectLocation(event.latlng.lat,event.latlng.lng);
+});
 
+map.on("moveend",updateMapInformation);
+map.on("zoomend",updateMapInformation);
+
+/* WEATHER DATA */
 const WEATHER_VARIABLES = [
-  "cape",
-  "convective_inhibition",
-  "lifted_index",
-  "dew_point_2m",
-  "relative_humidity_2m",
-  "wind_speed_10m",
-  "wind_direction_10m",
-  "wind_gusts_10m",
-  "wind_speed_850hPa",
-  "wind_direction_850hPa",
-  "wind_speed_500hPa",
-  "wind_direction_500hPa",
-  "pressure_msl"
+  "cape","convective_inhibition","lifted_index","dew_point_2m",
+  "relative_humidity_2m","wind_speed_10m","wind_direction_10m",
+  "wind_gusts_10m","wind_speed_850hPa","wind_direction_850hPa",
+  "wind_speed_500hPa","wind_direction_500hPa","pressure_msl"
 ];
 
-function displayValue(id, value, decimals = 0) {
+function displayValue(id,value,decimals=0) {
   const element = document.getElementById(id);
-
-  if (
-    value === null ||
-    value === undefined ||
-    !Number.isFinite(Number(value))
-  ) {
+  if (value === null || value === undefined || !Number.isFinite(Number(value))) {
     element.textContent = "N/A";
-    return;
+  } else {
+    element.textContent = Number(value).toFixed(decimals);
   }
-
-  element.textContent =
-    Number(value).toFixed(decimals);
 }
 
-function windComponents(speed, direction) {
+function windComponents(speed,direction) {
   const radians = direction * Math.PI / 180;
-
   return {
-    u: -speed * Math.sin(radians),
-    v: -speed * Math.cos(radians)
+    u:-speed*Math.sin(radians),
+    v:-speed*Math.cos(radians)
   };
 }
 
-function calculateWindDifference(
-  speed1,
-  direction1,
-  speed2,
-  direction2
-) {
-  if (
-    speed1 == null ||
-    direction1 == null ||
-    speed2 == null ||
-    direction2 == null
-  ) {
+function calculateWindDifference(speed1,direction1,speed2,direction2) {
+  if ([speed1,direction1,speed2,direction2].some(v => v === null || v === undefined)) {
     return null;
   }
-
-  const lower = windComponents(speed1, direction1);
-  const upper = windComponents(speed2, direction2);
-
-  const du = upper.u - lower.u;
-  const dv = upper.v - lower.v;
-
-  return Math.sqrt(du * du + dv * dv);
+  const lower = windComponents(speed1,direction1);
+  const upper = windComponents(speed2,direction2);
+  return Math.sqrt(
+    Math.pow(upper.u-lower.u,2) + Math.pow(upper.v-lower.v,2)
+  );
 }
 
 function nearestTimeIndex(times) {
-  const now = Date.now() / 1000;
-
+  const now = Date.now()/1000;
   let bestIndex = 0;
   let bestDifference = Infinity;
 
-  times.forEach((time, index) => {
-    const difference = Math.abs(time - now);
-
+  times.forEach((time,index) => {
+    const difference = Math.abs(time-now);
     if (difference < bestDifference) {
       bestDifference = difference;
       bestIndex = index;
     }
   });
-
   return bestIndex;
 }
 
-async function loadAtmosphere() {
-  if (atmosphereController) {
-    atmosphereController.abort();
-  }
-
+async function loadAtmosphere(lat,lng) {
+  if (atmosphereController) atmosphereController.abort();
   atmosphereController = new AbortController();
 
-  const center = map.getCenter();
+  const requestController = atmosphereController;
 
   document.getElementById("atmoLocation").textContent =
-    center.lat.toFixed(3) + ", " +
-    center.lng.toFixed(3);
+    lat.toFixed(4) + ", " + lng.toFixed(4);
 
+  document.getElementById("atmoTime").textContent = "Loading...";
   document.getElementById("atmoStatus").textContent =
-    "FETCHING ATMOSPHERIC MODEL DATA...";
-
-  document.getElementById("atmoStatusShort").textContent =
-    "LOADING";
+    "FETCHING MODEL DATA FOR SELECTED COORDINATES...";
+  document.getElementById("atmoStatusShort").textContent = "LOADING";
 
   const parameters = new URLSearchParams({
-    latitude: center.lat.toFixed(4),
-    longitude: center.lng.toFixed(4),
-    hourly: WEATHER_VARIABLES.join(","),
-    wind_speed_unit: "mph",
-    temperature_unit: "celsius",
-    past_days: "1",
-    forecast_days: "1",
-    timezone: "UTC",
-    timeformat: "unixtime"
+    latitude:lat.toFixed(4),
+    longitude:lng.toFixed(4),
+    hourly:WEATHER_VARIABLES.join(","),
+    wind_speed_unit:"mph",
+    temperature_unit:"celsius",
+    past_days:"1",
+    forecast_days:"1",
+    timezone:"UTC",
+    timeformat:"unixtime"
   });
 
-  const url =
-    "https://api.open-meteo.com/v1/forecast?" +
-    parameters.toString();
+  const url = "https://api.open-meteo.com/v1/forecast?" + parameters.toString();
 
   try {
-    const response = await fetch(url, {
-      signal: atmosphereController.signal
-    });
-
-    if (!response.ok) {
-      throw new Error("API HTTP " + response.status);
-    }
+    const response = await fetch(url,{signal:requestController.signal});
+    if (!response.ok) throw new Error("API HTTP " + response.status);
 
     const data = await response.json();
+    if (requestController !== atmosphereController) return;
 
-    if (
-      !data.hourly ||
-      !data.hourly.time ||
-      data.hourly.time.length === 0
-    ) {
+    if (!data.hourly || !data.hourly.time || !data.hourly.time.length) {
       throw new Error("No hourly data returned");
     }
 
@@ -1086,38 +647,20 @@ async function loadAtmosphere() {
 
     function get(variable) {
       const values = hourly[variable];
-
-      if (!values || values[index] === undefined) {
-        return null;
-      }
-
-      return values[index];
+      return !values || values[index] === undefined ? null : values[index];
     }
 
-    /* Main instability measurements */
-
-    displayValue("cape", get("cape"));
-    displayValue("cin", get("convective_inhibition"));
-    displayValue("lifted", get("lifted_index"), 1);
-
-    /* Moisture */
-
-    displayValue("dewpoint", get("dew_point_2m"), 1);
-    displayValue("humidity", get("relative_humidity_2m"));
-
-    /* Surface wind */
-
-    displayValue("surfaceWind", get("wind_speed_10m"), 1);
-    displayValue("gusts", get("wind_gusts_10m"), 1);
-    displayValue("pressure", get("pressure_msl"), 1);
-    displayValue("windDirection", get("wind_direction_10m"));
-
-    /* Upper-air wind */
-
-    displayValue("wind850", get("wind_speed_850hPa"), 1);
-    displayValue("wind500", get("wind_speed_500hPa"), 1);
-
-    /* Approximate vector wind difference */
+    displayValue("cape",get("cape"));
+    displayValue("cin",get("convective_inhibition"));
+    displayValue("lifted",get("lifted_index"),1);
+    displayValue("dewpoint",get("dew_point_2m"),1);
+    displayValue("humidity",get("relative_humidity_2m"));
+    displayValue("surfaceWind",get("wind_speed_10m"),1);
+    displayValue("gusts",get("wind_gusts_10m"),1);
+    displayValue("pressure",get("pressure_msl"),1);
+    displayValue("windDirection",get("wind_direction_10m"));
+    displayValue("wind850",get("wind_speed_850hPa"),1);
+    displayValue("wind500",get("wind_speed_500hPa"),1);
 
     const shear = calculateWindDifference(
       get("wind_speed_10m"),
@@ -1125,70 +668,133 @@ async function loadAtmosphere() {
       get("wind_speed_500hPa"),
       get("wind_direction_500hPa")
     );
-
-    displayValue("shear", shear, 1);
-
-    /* Model time */
+    displayValue("shear",shear,1);
 
     document.getElementById("atmoTime").textContent =
-      new Date(hourly.time[index] * 1000)
-        .toISOString()
-        .replace("T", " ")
-        .slice(0, 19);
+      new Date(hourly.time[index]*1000).toISOString().replace("T"," ").slice(0,19);
 
     document.getElementById("atmoStatus").textContent =
-      "MODEL DATA LOADED | OPEN-METEO | NEAREST GRID CELL | HOURLY ESTIMATE";
+      "DATA LOADED | OPEN-METEO | NEAREST GRID CELL | HOURLY MODEL ESTIMATE";
+    document.getElementById("atmoStatusShort").textContent = "LOADED";
 
-    document.getElementById("atmoStatusShort").textContent =
-      "LOADED";
+  } catch(error) {
+    if (error.name === "AbortError") return;
+    if (requestController !== atmosphereController) return;
 
-  } catch (error) {
-    if (error.name === "AbortError") {
-      return;
-    }
-
-    console.error("Atmospheric data error:", error);
-
+    console.error("Atmospheric data error:",error);
     document.getElementById("atmoStatus").textContent =
       "DATA UNAVAILABLE | " + error.message;
-
-    document.getElementById("atmoStatusShort").textContent =
-      "UNAVAILABLE";
+    document.getElementById("atmoStatusShort").textContent = "UNAVAILABLE";
   }
 }
 
-/* =====================================
-   AUTOMATIC MAP UPDATES
-===================================== */
+/* TORNADO FORMATION ANIMATION */
+const formationPhases = [
+  "Phase 1: Warm, moist air and atmospheric instability help create rising air currents.",
+  "Phase 2: Wind changing with height can contribute to a rotating storm updraft.",
+  "Phase 3: Rotation may become concentrated beneath the storm as the updraft develops.",
+  "Phase 4: A funnel may extend downward. Not every rotating storm produces a tornado."
+];
 
-function scheduleAtmosphereUpdate() {
-  updateMapInformation();
+let formationTimer = null;
+let formationPhase = 0;
 
-  clearTimeout(atmosphereTimer);
-
-  atmosphereTimer = setTimeout(() => {
-    loadAtmosphere();
-  }, 700);
+function showFormationPhase() {
+  document.getElementById("formationCaption").textContent =
+    formationPhases[formationPhase];
+  document.getElementById("formationStatus").textContent =
+    "PHASE " + (formationPhase+1) + " / 4";
 }
 
-map.on("moveend", scheduleAtmosphereUpdate);
-map.on("zoomend", updateMapInformation);
+function stopFormation() {
+  clearInterval(formationTimer);
+  formationTimer = null;
+}
 
-/* Allow clicking the map to analyze a location */
+function playFormation() {
+  if (formationTimer) return;
+  document.getElementById("formationStage").classList.remove("paused");
+  formationTimer = setInterval(() => {
+    formationPhase = (formationPhase+1)%formationPhases.length;
+    showFormationPhase();
+  },5000);
+}
 
-map.on("click", function(event) {
-  map.setView(event.latlng, map.getZoom());
-});
+function pauseFormation() {
+  stopFormation();
+  document.getElementById("formationStage").classList.add("paused");
+}
 
-/* =====================================
-   INITIAL STARTUP
-===================================== */
+function restartFormation() {
+  stopFormation();
+  formationPhase = 0;
+  const stage = document.getElementById("formationStage");
+  stage.classList.remove("paused");
+  stage.classList.remove("restart-animation");
+  void stage.offsetWidth;
+  showFormationPhase();
+  playFormation();
+}
 
+document.getElementById("formationPlay").addEventListener("click",playFormation);
+document.getElementById("formationPause").addEventListener("click",pauseFormation);
+document.getElementById("formationRestart").addEventListener("click",restartFormation);
+
+/* DOMINATOR REMOTE OBSERVATION SCENE */
+const interceptScenes = [
+  "Scene 1: The research vehicle is parked in a distant observation area while the storm is monitored remotely.",
+  "Scene 2: The team reviews weather information and observes the storm from its designated viewing position.",
+  "Scene 3: The scene ends with the vehicle remaining in the observation area. This is an illustration, not an interception procedure."
+];
+
+let interceptTimer = null;
+let interceptScene = 0;
+
+function showInterceptScene() {
+  document.getElementById("interceptCaption").textContent =
+    interceptScenes[interceptScene];
+  document.getElementById("interceptStatus").textContent =
+    "SCENE " + (interceptScene+1) + " / 3";
+}
+
+function stopIntercept() {
+  clearInterval(interceptTimer);
+  interceptTimer = null;
+}
+
+function playIntercept() {
+  if (interceptTimer) return;
+  document.getElementById("interceptStage").classList.remove("paused");
+  interceptTimer = setInterval(() => {
+    interceptScene = (interceptScene+1)%interceptScenes.length;
+    showInterceptScene();
+  },5000);
+}
+
+function pauseIntercept() {
+  stopIntercept();
+  document.getElementById("interceptStage").classList.add("paused");
+}
+
+function restartIntercept() {
+  stopIntercept();
+  interceptScene = 0;
+  document.getElementById("interceptStage").classList.remove("paused");
+  showInterceptScene();
+  playIntercept();
+}
+
+document.getElementById("interceptPlay").addEventListener("click",playIntercept);
+document.getElementById("interceptPause").addEventListener("click",pauseIntercept);
+document.getElementById("interceptRestart").addEventListener("click",restartIntercept);
+
+/* STARTUP */
 updateMapInformation();
-refreshRadar();
-loadAtmosphere();
-
+document.getElementById("radarStatus").textContent = "ENABLED";
+document.getElementById("lastRefresh").textContent = new Date().toLocaleTimeString();
+selectLocation(DEFAULT_CENTER[0],DEFAULT_CENTER[1]);
+showFormationPhase();
+showInterceptScene();
 </script>
-
 </body>
 </html>
