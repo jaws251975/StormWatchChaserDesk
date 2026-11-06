@@ -4,73 +4,58 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>ChaseDesk — Tornado Intercept Simulator</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<title>ChaseDesk — Tornado Simulator</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#07111f;--panel:#0d1c2d;--line:#20344a;
-  --text:#edf5ff;--muted:#9db0c5;--cyan:#52d8e8;
-  --blue:#55b8ff;--red:#ff555f;--gold:#ffd166;
-}
+:root{--bg:#07111f;--panel:#0d1c2d;--line:#20344a;--text:#edf5ff;--muted:#9db0c5;--cyan:#52d8e8;--red:#ff5964}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:Manrope,Arial;overflow:hidden}
-button{font-family:inherit;color:var(--text);background:#142a40;border:1px solid var(--line);border-radius:8px;padding:10px 13px;font-weight:800;cursor:pointer}
-button:hover{border-color:var(--cyan)}
-button:disabled{opacity:.4}
+button{font:800 12px Manrope;color:var(--text);background:#142a40;border:1px solid var(--line);border-radius:8px;padding:10px;cursor:pointer}
+button:active{background:#21445e}
 #game{position:fixed;inset:0}
 #hud{position:fixed;inset:0;pointer-events:none}
-.panel{background:#081522e8;border:1px solid var(--line);border-radius:10px;padding:11px;backdrop-filter:blur(8px)}
-#topbar{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
-.brand{font-size:14px;font-weight:900;letter-spacing:1px}
-.mono{font-family:"DM Mono",monospace;font-size:11px;color:var(--muted)}
-.stat{font-family:"DM Mono",monospace;font-size:13px;margin-top:4px}
-#stormBox{position:absolute;top:75px;left:10px;width:175px}
-#vehicleBox{position:absolute;top:75px;right:10px;width:175px;text-align:right}
-#actions{position:absolute;top:160px;right:10px;display:flex;flex-direction:column;gap:6px;pointer-events:auto}
-#actions button{font-size:11px}
-#message{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:900;font-size:20px;text-align:center;text-shadow:0 2px 12px #000;opacity:0;transition:opacity .3s;pointer-events:none}
-#message.show{opacity:1}
-#bottom{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap}
-#bottom .panel{padding:7px 12px}
-#controls{position:absolute;bottom:15px;left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none}
-.pad{display:grid;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(2,43px);gap:5px;pointer-events:auto}
-.pad button{padding:3px;font-size:17px;background:#0a1b2bd9;touch-action:none}
-.pad .wide{grid-column:2}
-#rightControls{display:flex;gap:6px;align-items:flex-end;pointer-events:auto}
+.panel{background:#081522ed;border:1px solid var(--line);border-radius:9px;padding:10px;backdrop-filter:blur(8px)}
+.mono{font:11px "DM Mono";color:var(--muted)}
+.stat{font:13px "DM Mono";margin-top:5px}
+#top{position:absolute;top:9px;left:9px;right:9px;display:flex;justify-content:space-between}
+#stormBox{position:absolute;top:67px;left:9px;width:165px}
+#carBox{position:absolute;top:67px;right:9px;width:165px;text-align:right}
+#actions{position:absolute;right:9px;top:157px;display:flex;flex-direction:column;gap:5px;pointer-events:auto}
+#actions button{font-size:10px;padding:9px}
+#hint{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);white-space:nowrap}
+#controls{position:absolute;bottom:12px;left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none}
+.pad{display:grid;grid-template-columns:repeat(3,43px);grid-template-rows:repeat(2,38px);gap:4px;pointer-events:auto}
+.pad button{padding:2px;font-size:16px;touch-action:none}
+#rightControls{display:flex;gap:5px;align-items:flex-end;pointer-events:auto}
 #rightControls button{touch-action:none}
-#garage{position:fixed;z-index:5;right:10px;bottom:100px;width:240px;max-height:55vh;overflow:auto;display:none}
-#garage h3{margin:0 0 8px}
-#garage button{width:100%;margin:3px 0;text-align:left;font-size:11px}
-#intro,#gameover{position:fixed;inset:0;z-index:10;background:#030914;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px}
-#introContent,#overContent{max-width:500px}
-#intro h1{font-size:clamp(30px,7vw,54px);margin:0;color:var(--cyan)}
+#garage{display:none;position:fixed;z-index:6;right:10px;bottom:105px;width:230px;max-height:55vh;overflow:auto}
+#garage button{display:block;width:100%;margin:4px 0;text-align:left}
+#toast{display:none;position:fixed;z-index:20;bottom:22%;left:50%;transform:translateX(-50%);background:#081522f5;border:1px solid var(--cyan);padding:11px 16px;border-radius:8px;font-weight:800;text-align:center}
+#intro,#gameover{position:fixed;z-index:10;inset:0;background:#030914;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px}
+#introContent,#overContent{width:min(500px,95vw)}
+#intro h1{font-size:clamp(30px,7vw,50px);color:var(--cyan);margin:4px}
 #intro p{color:var(--muted);line-height:1.6}
-#startBtn{background:#12384b;border-color:var(--cyan);font-size:16px;padding:14px 24px}
-#formation{width:min(90vw,420px);height:180px;margin:20px auto;position:relative;overflow:hidden;background:linear-gradient(#182b40,#111b28 65%,#080e17);border-radius:12px;border:1px solid #29435c}
-.formCloud{position:absolute;background:#68788b;border-radius:50%;filter:blur(7px);opacity:.8}
-#form1{width:250px;height:65px;top:35px;left:80px;animation:cloudmove 4s infinite alternate}
-#form2{width:170px;height:55px;top:53px;left:20px;animation:cloudmove 5s infinite alternate-reverse}
-#formWall{position:absolute;top:88px;left:150px;width:120px;height:28px;background:#46596b;border-radius:50%;filter:blur(5px)}
-#formFunnel{position:absolute;top:96px;left:185px;width:48px;height:0;background:linear-gradient(#7c8995,#394858);clip-path:polygon(25% 0,75% 0,100% 100%,0 100%);animation:formdown 5s forwards}
-#formDust{position:absolute;bottom:15px;left:165px;width:90px;height:20px;background:#6b655b;border-radius:50%;filter:blur(7px);opacity:0;animation:dust 5s forwards}
-@keyframes formdown{0%,25%{height:0}75%,100%{height:75px}}
-@keyframes dust{0%,70%{opacity:0}100%{opacity:.9}}
-@keyframes cloudmove{to{transform:translateX(35px)}}
-#photo{position:fixed;z-index:8;inset:0;background:#020812d9;display:none;align-items:center;justify-content:center}
-.polaroid{background:#f5f1e8;color:#111;padding:12px 12px 35px;transform:rotate(-2deg);width:min(85vw,380px);box-shadow:0 15px 60px #000}
-.polaroid img{width:100%;display:block;aspect-ratio:16/9;object-fit:cover;background:#222}
-.polaroid strong{display:block;text-align:center;margin-top:12px;font-family:"DM Mono";letter-spacing:2px}
-#toast{position:fixed;z-index:20;bottom:20%;left:50%;transform:translateX(-50%);background:#071522ed;border:1px solid var(--cyan);padding:10px 16px;border-radius:8px;display:none;font-weight:800}
+#start{background:#12384b;border-color:var(--cyan);font-size:16px;padding:14px 25px}
+#introScene{height:180px;background:linear-gradient(#26384b,#101c29 70%,#080e17);border:1px solid #29435c;border-radius:12px;position:relative;overflow:hidden;margin:20px 0}
+.ic{position:absolute;background:#72808e;border-radius:50%;filter:blur(7px);opacity:.8}
+#ic1{width:270px;height:65px;top:28px;left:20%;animation:cloud 4s infinite alternate}
+#ic2{width:190px;height:55px;top:53px;left:5%;animation:cloud 5s infinite alternate-reverse}
+#iwall{position:absolute;top:88px;left:43%;width:120px;height:25px;background:#4a5a69;border-radius:50%;filter:blur(5px)}
+#ifunnel{position:absolute;top:95px;left:48%;width:55px;height:0;background:#68747f;clip-path:polygon(20% 0,80% 0,100% 100%,0 100%);animation:form 4s forwards}
+@keyframes form{0%,25%{height:0}100%{height:80px}}
+@keyframes cloud{to{transform:translateX(35px)}}
+#photoOverlay{display:none;position:fixed;inset:0;z-index:9;background:#020812dc;align-items:center;justify-content:center}
+.polaroid{background:#f5f1e8;color:#111;padding:12px 12px 30px;width:min(85vw,380px);transform:rotate(-2deg);box-shadow:0 15px 60px #000}
+.polaroid img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:#222}
+.polaroid strong{display:block;text-align:center;margin-top:12px;font: bold 13px "DM Mono"}
 @media(max-width:650px){
- #stormBox,#vehicleBox{top:70px;width:145px;padding:8px}
- #actions{top:160px}
- #actions button{padding:8px;font-size:10px}
- #controls{bottom:12px}
- .pad{grid-template-columns:repeat(3,42px);grid-template-rows:repeat(2,38px)}
+ #stormBox,#carBox{width:140px;padding:8px}
+ #actions{top:158px}
+ #actions button{padding:8px;font-size:9px}
+ #hint{bottom:112px;font-size:9px}
+ .pad{grid-template-columns:repeat(3,39px);grid-template-rows:repeat(2,35px)}
  #rightControls{flex-direction:column}
- #bottom{bottom:125px}
- #garage{bottom:170px;width:210px}
+ #garage{bottom:160px}
 }
 </style>
 </head>
@@ -81,67 +66,47 @@ button:disabled{opacity:.4}
  <div id="introContent">
   <div class="mono">CHASEDESK // FIELD SIMULATOR</div>
   <h1>TORNADO INTERCEPT</h1>
-  <div id="formation">
-   <div class="formCloud" id="form1"></div>
-   <div class="formCloud" id="form2"></div>
-   <div id="formWall"></div>
-   <div id="formFunnel"></div>
-   <div id="formDust"></div>
+  <div id="introScene">
+   <div class="ic" id="ic1"></div><div class="ic" id="ic2"></div>
+   <div id="iwall"></div><div id="ifunnel"></div>
   </div>
   <p>A supercell develops. A wall cloud forms. A funnel reaches the ground.</p>
-  <p>Explore the world, photograph storms, place research probes, and upgrade your vehicles.</p>
-  <button id="startBtn">START GAME</button>
+  <p>Explore two towns, photograph storms, place probes, and upgrade your vehicles.</p>
+  <button id="start">START GAME</button>
   <div class="mono" style="margin-top:12px">FICTIONAL ARCADE WEATHER SIMULATION</div>
  </div>
 </div>
 
 <div id="hud">
- <div id="topbar">
-  <div class="panel">
-   <div class="brand">🌪 CHASEDESK</div>
-   <div class="mono">TORNADO FIELD OPERATIONS</div>
-  </div>
-  <div class="panel" style="text-align:right">
-   <div class="mono">TOKENS</div>
-   <div class="stat" id="tokens">100</div>
-  </div>
+ <div id="top">
+  <div class="panel"><b>🌪 CHASEDESK</b><div class="mono">TORNADO FIELD OPERATIONS</div></div>
+  <div class="panel"><div class="mono">TOKENS</div><div class="stat" id="tokens">100</div></div>
  </div>
-
  <div class="panel" id="stormBox">
-  <div class="mono">ACTIVE TORNADO</div>
-  <div class="stat" id="ef">EF3</div>
+  <div class="mono">ACTIVE TORNADO</div><div class="stat" id="ef">EF3</div>
   <div class="stat" id="wind">WIND: 165 MPH</div>
-  <div class="mono" id="substatus">SUB-VORTICES: 0</div>
-  <div class="mono" id="stormStatus">MOVING</div>
+  <div class="mono" id="subs">SUB-VORTICES: 2</div>
+  <div class="mono" id="stormDistance">MOVING</div>
  </div>
-
- <div class="panel" id="vehicleBox">
+ <div class="panel" id="carBox">
   <div class="mono" id="vehicleName">STARTER PICKUP</div>
   <div class="stat" id="speed">0 MPH</div>
   <div class="mono" id="fuel">FUEL: 100%</div>
   <div class="mono" id="mode">IN VEHICLE</div>
+  <div class="mono" id="health">VEHICLE: 100%</div>
  </div>
-
  <div id="actions">
   <button id="newTornado">🌪 MAKE NEW TORNADO</button>
   <button id="photoBtn">📷 TAKE PHOTO</button>
   <button id="probeBtn">📡 PLACE PROBE</button>
   <button id="garageBtn">🚙 GARAGE</button>
-  <button id="enterBtn">🚶 EXIT / ENTER</button>
+  <button id="exitBtn">🚶 EXIT VEHICLE</button>
  </div>
-
- <div id="message"></div>
-
- <div id="bottom">
-  <div class="panel mono" id="hint">WASD / ARROWS TO DRIVE · SPACE TO BRAKE · E TO EXIT / ENTER</div>
- </div>
-
+ <div class="panel mono" id="hint">WASD / ARROWS TO MOVE · SPACE TO BRAKE · E TO ENTER / EXIT</div>
  <div id="controls">
   <div class="pad">
-   <button data-key="ArrowUp" class="wide">▲</button>
-   <button data-key="ArrowLeft">◀</button>
-   <button data-key="ArrowDown">▼</button>
-   <button data-key="ArrowRight">▶</button>
+   <button class="wide" data-key="ArrowUp">▲</button>
+   <button data-key="ArrowLeft">◀</button><button data-key="ArrowDown">▼</button><button data-key="ArrowRight">▶</button>
   </div>
   <div id="rightControls">
    <button data-key="Space">BRAKE</button>
@@ -151,31 +116,25 @@ button:disabled{opacity:.4}
 </div>
 
 <div id="garage" class="panel">
- <h3>VEHICLE GARAGE</h3>
- <div class="mono" id="garageInfo">CURRENT VEHICLE</div>
- <button id="buyStorm">BUY NEXT CAR — STORM PICKUP · 250 TOKENS</button>
- <button id="buyArmor">BUY NEXT CAR — ARMORED INTERCEPTOR · 600 TOKENS</button>
- <button id="upgradeEngine">UPGRADE ENGINE · 100 TOKENS</button>
- <button id="upgradeArmor">UPGRADE WIND TOLERANCE · 100 TOKENS</button>
+ <b>VEHICLE GARAGE</b>
+ <div class="mono" id="garageInfo"></div>
+ <button id="buyStorm">BUY STORM PICKUP · 250 TOKENS</button>
+ <button id="buyArmor">BUY ARMORED INTERCEPTOR · 600 TOKENS</button>
+ <button id="engine">UPGRADE ENGINE · 100 TOKENS</button>
+ <button id="armor">UPGRADE WIND TOLERANCE · 100 TOKENS</button>
  <button id="repair">REPAIR VEHICLE · 40 TOKENS</button>
  <button id="closeGarage">CLOSE GARAGE</button>
 </div>
 
-<div id="photo">
- <div class="polaroid">
-  <img id="photoImage" alt="Storm photograph">
-  <strong id="photoCaption">PHOTO TAKEN!</strong>
- </div>
-</div>
-
+<button id="refuel" style="display:none;position:fixed;z-index:7;left:50%;bottom:160px;transform:translateX(-50%)">⛽ REFILL · 5 TOKENS</button>
 <div id="toast"></div>
+<div id="photoOverlay"><div class="polaroid"><img id="photoImage"><strong id="photoCaption">PHOTO TAKEN!</strong></div></div>
 
 <div id="gameover" style="display:none">
  <div id="overContent">
-  <div class="mono">CHASEDESK // VEHICLE STATUS</div>
-  <h1>VEHICLE DISABLED</h1>
-  <p>Your vehicle was overwhelmed by the simulated storm environment.</p>
-  <button id="restart">RESTART GAME</button>
+  <div class="mono">CHASEDESK // FIELD STATUS</div>
+  <h1>RUN ENDED</h1><p id="overText">The storm overwhelmed your character.</p>
+  <button id="restart">RESTART</button>
  </div>
 </div>
 
@@ -184,369 +143,368 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
 
 const $=id=>document.getElementById(id);
 const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x17283a);
-scene.fog=new THREE.FogExp2(0x253447,0.0025);
-
-const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,1800);
-camera.position.set(0,8,16);
-
+scene.background=new THREE.Color(0x27394b);
+scene.fog=new THREE.FogExp2(0x26394a,.0018);
+const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,1500);
 const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
 renderer.setSize(innerWidth,innerHeight);
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));
 renderer.shadowMap.enabled=true;
-renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 $('game').appendChild(renderer.domElement);
 
-scene.add(new THREE.HemisphereLight(0x9dbbd7,0x343c36,1.4));
-const sun=new THREE.DirectionalLight(0xd4e2ef,1.2);
-sun.position.set(-100,150,80);
-sun.castShadow=true;
-scene.add(sun);
+scene.add(new THREE.HemisphereLight(0xb6d2e6,0x374333,1.6));
+const sun=new THREE.DirectionalLight(0xd7e5f0,1.1);
+sun.position.set(-100,150,80);sun.castShadow=true;scene.add(sun);
 
-const mat=(color,roughness=.9)=>new THREE.MeshStandardMaterial({color,roughness});
-const groundMat=mat(0x52614d);
-const roadMat=mat(0x252d34);
-const whiteMat=mat(0xdce3df);
-const darkMat=mat(0x111a24);
-const treeMat=mat(0x284d34);
-const trunkMat=mat(0x594333);
-const houseMats=[0x9b8c7b,0x9a6658,0x7c8d99,0xb1a18a,0x777b83].map(c=>mat(c));
-const debrisMat=mat(0x81796b);
-const cloudMat=new THREE.MeshStandardMaterial({color:0x5e6b79,transparent:true,opacity:.45,roughness:1});
-const funnelMat=new THREE.MeshStandardMaterial({color:0x777d82,roughness:1,transparent:true,opacity:.87});
-const ringMat=new THREE.MeshBasicMaterial({color:0xb5bec4,transparent:true,opacity:.35,side:THREE.DoubleSide});
+const material=(c,transparent=false,opacity=1)=>new THREE.MeshStandardMaterial({color:c,roughness:.9,transparent,opacity});
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(1600,1600),material(0x58664e));
+ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
 
-const ground=new THREE.Mesh(new THREE.PlaneGeometry(1800,1800),groundMat);
-ground.rotation.x=-Math.PI/2;
-ground.receiveShadow=true;
-scene.add(ground);
+const matRoad=material(0x292f34),matSide=material(0x999b94),matLine=material(0xe2e0cc);
+const dark=material(0x111b25),glass=material(0x243d50),treeGreen=material(0x31563b);
+const trunkMat=material(0x594332),debrisMat=material(0x817b70);
+const cloudMat=material(0x65717c,true,.55),funnelMat=material(0x879098,true,.84);
 
-function box(parent,w,h,d,color,x,y,z){
- const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),typeof color==='number'?mat(color):color);
- mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;
- parent.add(mesh);return mesh;
+function addBox(parent,w,h,d,mat,x,y,z){
+ const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);
+ m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;
+}
+function plane(w,d,mat,x,z,y=.03){
+ const m=new THREE.Mesh(new THREE.PlaneGeometry(w,d),mat);
+ m.rotation.x=-Math.PI/2;m.position.set(x,y,z);scene.add(m);return m;
 }
 function road(x,z,w,d){
- const r=new THREE.Mesh(new THREE.PlaneGeometry(w,d),roadMat);
- r.rotation.x=-Math.PI/2;r.position.set(x,.025,z);scene.add(r);
- for(let i=-Math.floor(w/12);i<Math.floor(w/12);i++){
-  const line=new THREE.Mesh(new THREE.PlaneGeometry(3,.22),whiteMat);
-  line.rotation.x=-Math.PI/2;line.position.set(x+i*12,.04,z);scene.add(line);
+ plane(w,d,matRoad,x,z,.04);
+ if(w>d){
+  for(let a=-w/2+8;a<w/2;a+=16)plane(5,.18,matLine,x+a,z,.06);
+ }else{
+  for(let a=-d/2+8;a<d/2;a+=16)plane(.18,5,matLine,x,z+a,.06);
  }
 }
-road(0,0,1600,12);
-road(0,0,12,1600);
-road(-170,-190,240,9);
-road(-170,-190,9,220);
-road(210,220,350,12);
-road(210,220,12,340);
+const roads=[];
+road(0,0,1000,13);road(0,0,13,1000);
+road(-170,-190,220,12);road(-170,-190,12,220);
+road(220,220,360,14);road(220,220,14,360);
 
-const trees=[];
-function makeTree(x,z,s=1){
- const g=new THREE.Group();
- const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.18*s,.28*s,2.5*s,6),trunkMat);
- trunk.position.y=1.25*s;trunk.castShadow=true;g.add(trunk);
- const crown=new THREE.Mesh(new THREE.ConeGeometry(1.1*s,3*s,7),treeMat);
- crown.position.y=3*s;crown.castShadow=true;g.add(crown);
- g.position.set(x,0,z);scene.add(g);trees.push({group:g,trunk,crown,fallen:false});
-}
-for(let i=0;i<220;i++){
- let x=(Math.random()-.5)*950,z=(Math.random()-.5)*950;
- if(Math.abs(x)<35||Math.abs(z)<35)continue;
- makeTree(x,z,.7+Math.random()*.8);
-}
-
+const colliders=[];
 const buildings=[];
-function makeBuilding(x,z,scale=1){
+const trees=[];
+function addBuilding(x,z,type='house',scale=1){
  const g=new THREE.Group();
- const w=(8+Math.random()*5)*scale,h=(5+Math.random()*4)*scale,d=(7+Math.random()*5)*scale;
- const body=box(g,w,h,d,houseMats[Math.floor(Math.random()*houseMats.length)],0,h/2,0);
- const roof=box(g,w*1.12,.8*scale,d*1.12,0x3e4853,0,h+.4*scale,0);
- const door=box(g,1.2*scale,2.4*scale,.15,0x493a30,0,1.2*scale,d/2+.09);
+ let w=type==='shop'?16:10*scale;
+ let d=type==='shop'?13:9*scale;
+ let h=type==='shop'?7:5.5*scale;
+ let bodyColor=type==='shop'?0xb3b5b1:[0xa69b88,0x9d7770,0x9aa8ac,0xc1b59d][Math.floor(Math.random()*4)];
+ const bodyMat=material(bodyColor);
+ addBox(g,w,h,d,bodyMat,0,h/2,0);
+ if(type==='house'){
+  const roof=addBox(g,w+1,1,d+1,material(0x46505a),0,h+.45,0);
+  // Front porch and door
+  addBox(g,2.2,2.5,.16,material(0x493b31),0,1.25,d/2+.09);
+  for(let wx of [-w*.28,w*.28]){
+   addBox(g,1.5,1.4,.12,material(0x36556b),wx,3,d/2+.08);
+  }
+  addBox(g,w*.65,.3,2.5,material(0x887e70),0,.3,d/2+1);
+ }else{
+  addBox(g,w+.6,.7,d+.6,material(0x414a54),0,h+.35,0);
+  for(let wx=-w/2+3;wx<w/2;wx+=5)addBox(g,2.2,2,.12,material(0x35556b),wx,3,d/2+.08);
+ }
  g.position.set(x,0,z);scene.add(g);
- buildings.push({group:g,parts:[body,roof,door],destroyed:false,hp:1,homeX:x,homeZ:z});
+ buildings.push({group:g,x,z,w,d,h,destroyed:false,hp:1,parts:g.children.slice()});
+ colliders.push({x,z,hw:w/2+.8,hd:d/2+.8,kind:'building'});
  return g;
 }
-function makeTown(cx,cz,count,spacing,large=false){
- for(let i=0;i<count;i++){
-  for(let j=0;j<count;j++){
-   if(Math.random()<.19)continue;
-   const x=cx+(i-count/2)*spacing;
-   const z=cz+(j-count/2)*spacing;
-   if(Math.abs(x-cx)<spacing*.45||Math.abs(z-cz)<spacing*.45)continue;
-   makeBuilding(x,z,large?1.25:.9);
-   if(Math.random()<.55)makeTree(x+8,z+6,.8);
+function makeTree(x,z,s=1){
+ const g=new THREE.Group();
+ const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.18*s,.28*s,2.6*s,7),trunkMat);
+ trunk.position.y=1.3*s;g.add(trunk);
+ const crown=new THREE.Mesh(new THREE.ConeGeometry(1.15*s,3.2*s,7),treeGreen);
+ crown.position.y=3.1*s;g.add(crown);
+ g.position.set(x,0,z);scene.add(g);
+ trees.push({group:g,fallen:false});
+}
+function town(cx,cz,gridSize,spacing,large=false){
+ // Neat blocks with consistent street spacing
+ const offset=(gridSize-1)*spacing/2;
+ for(let row=0;row<gridSize;row++){
+  for(let col=0;col<gridSize;col++){
+   const x=cx+col*spacing-offset;
+   const z=cz+row*spacing-offset;
+   if(Math.abs(x-cx)<spacing*.25||Math.abs(z-cz)<spacing*.25)continue;
+   addBuilding(x,z,'house',large?1.1:1);
+   makeTree(x-8,z+8,.8);
+   if(large&&Math.random()<.45)addBuilding(x+10,z-10,'shop',1);
   }
  }
 }
-makeTown(-170,-190,5,27,false);
-makeTown(210,220,9,29,true);
+town(-170,-190,5,34,false);
+town(220,220,8,38,true);
 
-// Small town gas station
-const gasStation=new THREE.Group();
-box(gasStation,19,7,13,0xc3c5bd,0,3.5,0);
-box(gasStation,20,1,14,0xb84e43,0,7.3,0);
-box(gasStation,8,2,.2,0x29475c,0,4,6.61);
-const canopy=box(gasStation,24,.7,9,0xd8dce0,0,5,-13);
-for(let x of [-8,8])for(let z of [-16,-10]){
- box(gasStation,.5,5,.5,0xb8c5ce,x,2.5,z);
+// A recognizable American roadside gas station
+const station=new THREE.Group();
+station.position.set(-170,0,-190+95);
+scene.add(station);
+// Store building
+addBox(station,24,8,16,material(0xd8d8d0),0,4,0);
+addBox(station,24.5,.8,16.5,material(0xb83f38),0,8.4,0);
+// Glass storefront
+addBox(station,15,3.4,.18,material(0x23475a),0,3.8,8.1);
+addBox(station,2.2,3.4,.2,material(0x3e3029),-9,3.8,8.2);
+addBox(station,8,.6,.25,material(0xece8d9),0,6.3,8.25);
+// Large recognizable sign
+const signPost=addBox(station,.5,7,.5,material(0x7b858b),-15,3.5,-5);
+addBox(station,7,3,.4,material(0xc64b3e),-15,8,-5);
+addBox(station,5.5,.3,.42,material(0xf5f0df),-15,8.4,-5);
+addBox(station,5.5,.3,.42,material(0xf5f0df),-15,7.5,-5);
+// Pump canopy with red trim
+addBox(station,30,.7,17,material(0xf1eee4),0,6,-17);
+addBox(station,30,.35,17,material(0xc34237),0,6.5,-17);
+for(let x of [-12,12])for(let z of [-23,-11])addBox(station,.6,6,.6,material(0xb9c3c8),x,3,z);
+// Three fuel pumps
+for(let x of [-8,0,8]){
+ addBox(station,2.1,3,1.5,material(0xe9e9e5),x,1.5,-17);
+ addBox(station,1.4,.6,.12,material(0x263e4f),x,2.1,-16.2);
+ addBox(station,.15,1.1,.15,material(0x171c20),x+1,1.2,-16);
 }
-for(let x of [-5,5]){
- box(gasStation,1.4,2,1.3,0xe6e9e8,x,1,-8);
- box(gasStation,.9,.5,.2,0x202b34,x,2,-7.3);
-}
-gasStation.position.set(-170,0,-190);
-scene.add(gasStation);
+plane(42,32,matRoad,-170,-190+95,.05);
+for(let x of [-12,0,12])plane(3,.2,matLine,-170+x,-190+95+8,.07);
+colliders.push({x:-170,z:-95,hw:12.8,hd:8.5,kind:'building'});
+// Station pump collision areas
+for(let x of [-8,0,8])colliders.push({x:-170+x,z:-112,hw:1.3,hd:1.2,kind:'pump'});
 
-// Town 2 landmark buildings
+// Town 2 larger central commercial buildings
 for(let i=0;i<5;i++){
- const x=210+(i-2)*43;
- const g=new THREE.Group();
- box(g,18,15,16,0x7d8792,0,7.5,0);
- box(g,18.5,1,16.5,0x394653,0,15.5,0);
- for(let y=4;y<13;y+=4)for(let xx=-6;xx<=6;xx+=6)
-  box(g,2,2,.12,0x344e62,xx,y,8.08);
- g.position.set(x,0,220+(i%2)*25);scene.add(g);
- buildings.push({group:g,parts:g.children.slice(),destroyed:false,hp:2,homeX:g.position.x,homeZ:g.position.z});
+ const x=220+(i-2)*43,z=220-60;
+ addBuilding(x,z,'shop',1);
 }
 
-// Player vehicles
+// Vehicles
 const vehicles=[
  {name:'STARTER PICKUP',cost:0,color:0x397eaa,speed:24,tolerance:100},
- {name:'STORM PICKUP',cost:250,color:0xd4a447,speed:28,tolerance:145},
- {name:'ARMORED INTERCEPTOR',cost:600,color:0x536777,speed:31,tolerance:210}
+ {name:'STORM PICKUP',cost:250,color:0xc49b47,speed:28,tolerance:145},
+ {name:'ARMORED INTERCEPTOR',cost:600,color:0x566a79,speed:30,tolerance:210}
 ];
-let owned=[true,false,false],vehicleIndex=0;
-let tokens=100,engineLevel=0,armorLevel=0,fuel=100,health=100;
-const car=new THREE.Group();
-scene.add(car);
+let owned=[true,false,false],vehicleIndex=0,tokens=100;
+let fuel=100,health=100,engineLevel=0,armorLevel=0;
+const car=new THREE.Group();scene.add(car);
 function buildCar(){
- while(car.children.length)car.remove(car.children[0]);
- const v=vehicles[vehicleIndex],bodyMat=mat(v.color);
- box(car,3.2,1.1,6,bodyMat,0,1.15,0);
- box(car,2.8,1.2,2.6,0x344e60,0,2.15,-.8);
- box(car,2.7,.35,2.5,0x172a39,0,2.85,-.8);
- box(car,2.6,.6,2.3,bodyMat,0,1.9,-2.1);
- box(car,3.25,.25,1.4,0x293743,0,1.6,3.4);
- for(let x of [-1.65,1.65])for(let z of [-2,2]){
-  const tire=new THREE.Mesh(new THREE.CylinderGeometry(.65,.65,.38,12),darkMat);
-  tire.rotation.z=Math.PI/2;tire.position.set(x,.7,z);tire.castShadow=true;car.add(tire);
+ car.clear();
+ const v=vehicles[vehicleIndex],body=material(v.color);
+ addBox(car,3.3,1.1,6,body,0,1.1,0);
+ addBox(car,2.8,1.15,2.6,glass,0,2.15,-.8);
+ addBox(car,2.8,.3,2.5,dark,0,2.83,-.8);
+ addBox(car,2.8,.55,2.4,body,0,1.85,-2.1);
+ addBox(car,3.25,.3,1.4,dark,0,1.45,3.4);
+ for(let x of [-1.7,1.7])for(let z of [-2,2]){
+  const tire=new THREE.Mesh(new THREE.CylinderGeometry(.65,.65,.42,12),dark);
+  tire.rotation.z=Math.PI/2;tire.position.set(x,.7,z);car.add(tire);
  }
- for(let x of [-1.15,1.15]){
-  box(car,.55,.3,.3,0xe5e8c7,x,1.5,-3.05);
-  box(car,.5,.25,.25,0xb52c2c,x,1.5,3.05);
-  box(car,.13,.4,1.2,0x283b4b,x*1.35,1.3,0);
+ for(let x of [-1.2,1.2]){
+  addBox(car,.55,.3,.2,material(0xf3edc9),x,1.4,-3.05);
+  addBox(car,.5,.25,.2,material(0xc43e37),x,1.4,3.05);
  }
- box(car,2.8,.12,.4,0x1b2835,0,2.95,-.5);
- for(let x of [-.8,.8])box(car,.35,.12,.15,0xdce4e8,x,3.03,-.5);
+ addBox(car,2.8,.15,.35,dark,0,2.98,-.5);
  if(vehicleIndex===2){
-  box(car,3.5,.25,6.5,0x34434d,0,.65,0);
-  box(car,3.4,.2,.3,0x1b242d,0,.35,2.9);
-  // Cosmetic fictional armor panels and retractable stabilizer look
+  addBox(car,3.5,.25,6.5,material(0x394b59),0,.55,0);
   for(let x of [-1.7,1.7]){
-   box(car,.18,.55,3.5,0x697782,x,1.15,0);
-   box(car,.16,.8,.18,0x9aa5ac,x,1.2,2.5);
+   addBox(car,.2,.55,3.8,material(0x7b8992),x,1.2,0);
+   addBox(car,.18,.8,.2,material(0x9caab1),x,1.2,2.5);
   }
  }
 }
 buildCar();
 car.position.set(0,0,0);
 
-// Walking character
+// Polygonal human with separate animated arms and legs
 const player=new THREE.Group();
-const skin=mat(0xc99a78),shirt=mat(0x397da0),pants=mat(0x28374a);
-const torso=box(player,.8,1.1,.45,shirt,0,1.55,0);
-const head=new THREE.Mesh(new THREE.SphereGeometry(.32,7,6),skin);
-head.position.y=2.35;player.add(head);
-for(let x of [-.22,.22]){
- box(player,.25,.85,.28,pants,x,.55,0);
- box(player,.22,.75,.22,skin,x*.0,1.6,0); // simple arm detail
+const skin=material(0xc99778),shirt=material(0x387fa1),pants=material(0x27394b),shoe=material(0x171d24);
+addBox(player,.75,1.05,.42,shirt,0,1.55,0);
+const head=new THREE.Mesh(new THREE.SphereGeometry(.29,7,6),skin);
+head.position.y=2.3;player.add(head);
+const arms=[],legs=[];
+for(const side of [-1,1]){
+ const arm=new THREE.Group();arm.position.set(side*.48,1.95,0);
+ addBox(arm,.22,.78,.24,shirt,0,-.35,0);
+ const hand=new THREE.Mesh(new THREE.SphereGeometry(.12,6,5),skin);
+ hand.position.y=-.76;arm.add(hand);player.add(arm);arms.push(arm);
+ const leg=new THREE.Group();leg.position.set(side*.22,1.05,0);
+ addBox(leg,.25,.85,.3,pants,0,-.4,0);
+ addBox(leg,.3,.16,.42,shoe,0,-.85,-.04);
+ player.add(leg);legs.push(leg);
 }
 player.visible=false;scene.add(player);
-
-let inCar=true;
-let carSpeed=0,heading=0;
-let gameStarted=false,gameOver=false;
+let inCar=true,heading=0,carSpeed=0,walkTime=0;
 const keys={};
-let toastTimer;
-function toast(t){
- $('toast').textContent=t;$('toast').style.display='block';
- clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').style.display='none',2200);
+
+// Collision checks use a circular character/car footprint against building rectangles.
+function blocked(x,z,radius){
+ for(const c of colliders){
+  const closestX=Math.max(c.x-c.hw,Math.min(x,c.x+c.hw));
+  const closestZ=Math.max(c.z-c.hd,Math.min(z,c.z+c.hd));
+  const dx=x-closestX,dz=z-closestZ;
+  if(dx*dx+dz*dz<radius*radius)return true;
+ }
+ return false;
 }
-function message(t){
- $('message').textContent=t;$('message').classList.add('show');
- setTimeout(()=>$('message').classList.remove('show'),2200);
+function moveWithCollision(obj,dx,dz,radius){
+ let nx=obj.position.x+dx,nz=obj.position.z;
+ if(!blocked(nx,nz,radius))obj.position.x=nx;
+ nx=obj.position.x;nz=obj.position.z+dz;
+ if(!blocked(nx,nz,radius))obj.position.z=nz;
 }
+function nearCar(){return player.position.distanceTo(car.position)<9}
+function toggleVehicle(){
+ if(!gameStarted||gameOver)return;
+ if(inCar){
+  const side=new THREE.Vector3(Math.cos(heading),0,-Math.sin(heading));
+  const exitPos=car.position.clone().addScaledVector(side,4);
+  if(blocked(exitPos.x,exitPos.z,1)){toast('NO ROOM TO EXIT HERE');return;}
+  player.position.copy(exitPos);
+  player.rotation.y=heading;
+  player.visible=true;
+  car.visible=true; // Car stays parked in the world.
+  inCar=false;carSpeed=0;
+  toast('ON FOOT — YOUR VEHICLE IS PARKED');
+ }else{
+  if(!nearCar()){toast('WALK CLOSER TO YOUR PARKED VEHICLE');return;}
+  inCar=true;player.visible=false;car.visible=true;
+  toast('BACK IN YOUR VEHICLE');
+ }
+ updateHud();
+}
+$('exitBtn').onclick=toggleVehicle;
 
 // Tornado
-const tornado=new THREE.Group();
-scene.add(tornado);
+const tornado=new THREE.Group();scene.add(tornado);
 const funnel=new THREE.Group();tornado.add(funnel);
-const funnelParts=[];
-for(let i=0;i<9;i++){
- const y=i*2.4;
- const radius=.6+i*.42;
- const m=new THREE.Mesh(new THREE.CylinderGeometry(radius*.82,radius,2.8,12,1,true),funnelMat);
- m.position.y=y+1.2;m.castShadow=true;funnel.add(m);funnelParts.push(m);
+for(let i=0;i<10;i++){
+ const r=.55+i*.34;
+ const section=new THREE.Mesh(new THREE.CylinderGeometry(r*.8,r,2.5,12,1,true),funnelMat);
+ section.position.y=i*2.3+1.2;funnel.add(section);
 }
 const wallCloud=new THREE.Group();tornado.add(wallCloud);
-for(let i=0;i<13;i++){
- const c=new THREE.Mesh(new THREE.SphereGeometry(7+Math.random()*4,9,7),cloudMat);
- const a=i/13*Math.PI*2;
+for(let i=0;i<15;i++){
+ const c=new THREE.Mesh(new THREE.SphereGeometry(6+Math.random()*4,9,7),cloudMat);
+ const a=i/15*Math.PI*2;
  c.position.set(Math.cos(a)*12,22+Math.random()*3,Math.sin(a)*12);
- c.scale.set(1.8,.55,1.25);wallCloud.add(c);
-}
-const cloudDeck=new THREE.Group();scene.add(cloudDeck);
-for(let i=0;i<35;i++){
- const c=new THREE.Mesh(new THREE.SphereGeometry(24+Math.random()*22,8,7),cloudMat);
- c.position.set((Math.random()-.5)*500,75+Math.random()*35,(Math.random()-.5)*500);
- c.scale.set(1.8,.35,1.3);cloudDeck.add(c);
-}
-const circulation=[];
-for(let i=0;i<5;i++){
- const ring=new THREE.Mesh(new THREE.TorusGeometry(4+i*2,.1,4,40),ringMat);
- ring.rotation.x=Math.PI/2;ring.position.y=3+i*3;funnel.add(ring);circulation.push(ring);
+ c.scale.set(1.8,.55,1.3);wallCloud.add(c);
 }
 const subVortices=[];
-function makeSubVortex(){
+for(let i=0;i<4;i++){
  const g=new THREE.Group();
- const m=new THREE.Mesh(new THREE.CylinderGeometry(.2,.8,8,8,1,true),funnelMat);
- m.position.y=4;g.add(m);
- const dust=new THREE.Mesh(new THREE.TorusGeometry(1.6,.25,5,16),ringMat);
- dust.rotation.x=Math.PI/2;dust.position.y=.5;g.add(dust);
- tornado.add(g);subVortices.push(g);
+ const f=new THREE.Mesh(new THREE.CylinderGeometry(.15,.8,7,8,1,true),funnelMat);
+ f.position.y=3.5;g.add(f);
+ const dust=new THREE.Mesh(new THREE.TorusGeometry(1.4,.2,5,16),material(0x8a887d,true,.5));
+ dust.rotation.x=Math.PI/2;g.add(dust);tornado.add(g);subVortices.push(g);
 }
-for(let i=0;i<3;i++)makeSubVortex();
-
 let storm={ef:3,wind:165,subCount:2};
-let stormTarget=new THREE.Vector3(130,0,-100);
-let stormTimer=0;
-const debris=[];
-function makeDebris(x,y,z){
- const d=new THREE.Mesh(new THREE.BoxGeometry(.4+Math.random(),.3+Math.random(),.4+Math.random()),debrisMat);
- d.position.set(x,y,z);scene.add(d);
- debris.push({mesh:d,life:3+Math.random()*4,vel:new THREE.Vector3((Math.random()-.5)*12,Math.random()*10,(Math.random()-.5)*12)});
-}
-function setNewTornado(){
+let stormTarget=new THREE.Vector3(120,0,-100),stormTimer=0;
+function newTornado(){
  tornado.position.set((Math.random()-.5)*420,0,(Math.random()-.5)*420);
  stormTarget.set((Math.random()-.5)*500,0,(Math.random()-.5)*500);
  storm.ef=1+Math.floor(Math.random()*5);
  storm.wind=[90,115,145,175,215][storm.ef-1]+Math.floor(Math.random()*20);
- storm.subCount=Math.random()<.65?1+Math.floor(Math.random()*3):0;
- subVortices.forEach((v,i)=>v.visible=i<storm.subCount);
- stormTimer=0;
- funnel.scale.y=.01;
- message('NEW TORNADO GENERATED');
- updateHud();
+ storm.subCount=Math.random()<.65?1+Math.floor(Math.random()*4):0;
+ subVortices.forEach((s,i)=>s.visible=i<storm.subCount);
+ stormTimer=0;updateHud();toast('A NEW TORNADO HAS FORMED');
 }
-setNewTornado();
+$('newTornado').onclick=newTornado;
+newTornado();
 
+// Debris and probes
+const debris=[];
+function spawnDebris(x,y,z){
+ const m=new THREE.Mesh(new THREE.BoxGeometry(.5+Math.random(),.4+Math.random(),.5+Math.random()),debrisMat);
+ m.position.set(x,y,z);scene.add(m);
+ debris.push({mesh:m,life:4+Math.random()*5,velocity:new THREE.Vector3((Math.random()-.5)*18,Math.random()*12,(Math.random()-.5)*18)});
+}
 const probes=[];
 function placeProbe(){
- if(tokens<5){toast('You need 5 tokens to place a probe');return;}
+ if(!gameStarted||tokens<5){toast('PROBES COST 5 TOKENS');return;}
  tokens-=5;
  const g=new THREE.Group();
- const base=box(g,.8,.25,.8,0x374b59,0,.15,0);
- box(g,.25,1.5,.25,0x8999a5,0,.95,0);
- box(g,.65,.25,.65,0x283b4c,0,1.75,0);
- for(let x of [-.3,.3])box(g,.08,.6,.08,0xbac4c9,x,.8,0);
- const forward=new THREE.Mesh(new THREE.ConeGeometry(.18,.4,6),mat(0xe3aa4e));
- forward.rotation.x=Math.PI/2;forward.position.set(0,1.9,.2);g.add(forward);
- const p=new THREE.Vector3();
- if(inCar)car.getWorldPosition(p);else player.getWorldPosition(p);
+ addBox(g,.8,.25,.8,material(0x374b59),0,.15,0);
+ addBox(g,.22,1.5,.22,material(0x8999a5),0,.95,0);
+ addBox(g,.65,.25,.65,material(0x283b4c),0,1.75,0);
+ const tip=new THREE.Mesh(new THREE.ConeGeometry(.18,.4,6),material(0xe3aa4e));
+ tip.position.set(0,1.95,.2);g.add(tip);
+ const base=inCar?car.position:player.position;
  const dir=new THREE.Vector3(Math.sin(heading),0,Math.cos(heading));
- g.position.copy(p).add(dir.multiplyScalar(5));g.position.y=0;
- scene.add(g);probes.push({group:g,hit:false});
- toast('PROBE PLACED');
- updateHud();
+ g.position.copy(base).addScaledVector(dir,5);
+ if(blocked(g.position.x,g.position.z,.6)){tokens+=5;toast('NOT ENOUGH ROOM TO PLACE PROBE');updateHud();return;}
+ scene.add(g);probes.push({group:g,hit:false});updateHud();toast('PROBE PLACED');
 }
+$('probeBtn').onclick=placeProbe;
 
-// Observation checkpoints
+// Photo validation: distance, direction, camera frustum, and building obstruction.
+const raycaster=new THREE.Raycaster();
+function photoHasTornado(){
+ const target=new THREE.Vector3(tornado.position.x,13,tornado.position.z);
+ const origin=camera.position.clone();
+ const toTarget=target.clone().sub(origin);
+ const distance=toTarget.length();
+ if(distance>300||distance<12)return false;
+ const forward=new THREE.Vector3();
+ camera.getWorldDirection(forward);
+ if(forward.dot(toTarget.clone().normalize())<.82)return false;
+ const projected=target.clone().project(camera);
+ if(projected.z< -1||projected.z>1||Math.abs(projected.x)>1||Math.abs(projected.y)>1)return false;
+ // Check whether a building blocks the camera's view of the tornado.
+ raycaster.set(origin,toTarget.normalize());
+ const buildingMeshes=[];
+ for(const b of buildings){
+  if(!b.destroyed)buildingMeshes.push(...b.parts);
+ }
+ const hits=raycaster.intersectObjects(buildingMeshes,false);
+ if(hits.length&&hits[0].distance<distance-8)return false;
+ return true;
+}
+let photoCooldown=0;
+function takePhoto(){
+ if(!gameStarted||gameOver||photoCooldown>0)return;
+ renderer.render(scene,camera);
+ if(!photoHasTornado()){
+  toast('NO TORNADO VISIBLE — NO TOKENS AWARDED');
+  photoCooldown=1.5;return;
+ }
+ tokens+=15;updateHud();
+ $('photoImage').src=renderer.domElement.toDataURL('image/png');
+ $('photoCaption').textContent='PHOTO TAKEN!  +15 TOKENS';
+ $('photoOverlay').style.display='flex';
+ photoCooldown=4;
+ setTimeout(()=>$('photoOverlay').style.display='none',3000);
+}
+$('photoBtn').onclick=takePhoto;$('mobilePhoto').onclick=takePhoto;
+$('photoOverlay').onclick=()=>$('photoOverlay').style.display='none';
+
+// Checkpoints respawn automatically.
 const checkpoints=[];
 for(let i=0;i<7;i++){
  const g=new THREE.Group();
- const ring=new THREE.Mesh(new THREE.TorusGeometry(2,.15,6,24),new THREE.MeshBasicMaterial({color:0x52d8e8}));
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(2,.14,6,24),new THREE.MeshBasicMaterial({color:0x52d8e8}));
  ring.rotation.x=Math.PI/2;g.add(ring);
- const beam=new THREE.Mesh(new THREE.CylinderGeometry(.08,.08,4,6),new THREE.MeshBasicMaterial({color:0x52d8e8,transparent:true,opacity:.25}));
+ const beam=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,4,6),new THREE.MeshBasicMaterial({color:0x52d8e8,transparent:true,opacity:.25}));
  beam.position.y=2;g.add(beam);
- g.position.set((Math.random()-.5)*550,0,(Math.random()-.5)*550);
+ g.position.set((Math.random()-.5)*500,0,(Math.random()-.5)*500);
  scene.add(g);checkpoints.push({group:g,active:true,timer:0});
 }
 
-let photoCooldown=0;
-function takePhoto(){
- if(!gameStarted||photoCooldown>0)return;
- const p=new THREE.Vector3();
- if(inCar)car.getWorldPosition(p);else player.getWorldPosition(p);
- const toStorm=tornado.position.clone().sub(p);
- const dist=toStorm.length();
- const projected=tornado.position.clone().add(new THREE.Vector3(0,18,0)).project(camera);
- const visible=dist<420&&projected.z>-1&&Math.abs(projected.x)<1.25&&Math.abs(projected.y)<1.25;
- if(!visible){toast('NO TORNADO IN FRAME — NO TOKENS');photoCooldown=1;return;}
- tokens+=15;updateHud();
- try{$('photoImage').src=renderer.domElement.toDataURL('image/png');}catch(e){}
- $('photoCaption').textContent='PHOTO TAKEN!  +15 TOKENS';
- $('photo').style.display='flex';
- setTimeout(()=>$('photo').style.display='none',3000);
- photoCooldown=4;
-}
-$('photo').addEventListener('click',()=>$('photo').style.display='none');
-
-// Basic controls
-window.addEventListener('keydown',e=>{
- keys[e.code]=true;
- if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
- if(e.code==='KeyE')toggleVehicle();
- if(e.code==='KeyP')placeProbe();
- if(e.code==='KeyF')takePhoto();
- if(e.code==='KeyG')toggleGarage();
-});
-window.addEventListener('keyup',e=>keys[e.code]=false);
-document.querySelectorAll('[data-key]').forEach(b=>{
- const k=b.dataset.key;
- b.addEventListener('pointerdown',e=>{e.preventDefault();keys[k]=true;});
- ['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,()=>keys[k]=false));
-});
-$('mobilePhoto').onclick=takePhoto;
-$('photoBtn').onclick=takePhoto;
-$('probeBtn').onclick=placeProbe;
-$('newTornado').onclick=setNewTornado;
-$('enterBtn').onclick=toggleVehicle;
-$('garageBtn').onclick=toggleGarage;
-$('closeGarage').onclick=toggleGarage;
-
-function toggleVehicle(){
- if(!gameStarted)return;
- if(inCar){
-  player.position.copy(car.position);
-  player.position.x+=Math.sin(heading+Math.PI/2)*3;
-  player.position.z+=Math.cos(heading+Math.PI/2)*3;
-  player.visible=true;car.visible=false;inCar=false;carSpeed=0;
-  toast('ON FOOT — EXPLORE THE AREA');
- }else{
-  if(player.position.distanceTo(car.position)>9){toast('MOVE CLOSER TO YOUR VEHICLE');return;}
-  player.visible=false;car.visible=true;inCar=true;
-  toast('BACK IN VEHICLE');
- }
+// Garage
+function garageToggle(){$('garage').style.display=$('garage').style.display==='block'?'none':'block';}
+$('garageBtn').onclick=garageToggle;$('closeGarage').onclick=garageToggle;
+function buyVehicle(i){
+ if(owned[i]){vehicleIndex=i;buildCar();toast('VEHICLE SELECTED');}
+ else if(tokens>=vehicles[i].cost){tokens-=vehicles[i].cost;owned[i]=true;vehicleIndex=i;buildCar();toast('VEHICLE PURCHASED');}
+ else toast('NOT ENOUGH TOKENS');
  updateHud();
-}
-function toggleGarage(){
- $('garage').style.display=$('garage').style.display==='block'?'none':'block';
 }
 $('buyStorm').onclick=()=>buyVehicle(1);
 $('buyArmor').onclick=()=>buyVehicle(2);
-function buyVehicle(i){
- if(owned[i]){vehicleIndex=i;buildCar();toast('VEHICLE SELECTED');}
- else if(tokens>=vehicles[i].cost){
-  tokens-=vehicles[i].cost;owned[i]=true;vehicleIndex=i;buildCar();toast('NEW VEHICLE PURCHASED');
- }else toast('NOT ENOUGH TOKENS');
- updateHud();
-}
-$('upgradeEngine').onclick=()=>{
+$('engine').onclick=()=>{
  if(tokens>=100&&engineLevel<3){tokens-=100;engineLevel++;toast('ENGINE UPGRADED');updateHud();}
  else toast('NOT ENOUGH TOKENS OR MAX LEVEL');
 };
-$('upgradeArmor').onclick=()=>{
+$('armor').onclick=()=>{
  if(tokens>=100&&armorLevel<3){tokens-=100;armorLevel++;toast('WIND TOLERANCE UPGRADED');updateHud();}
  else toast('NOT ENOUGH TOKENS OR MAX LEVEL');
 };
@@ -555,93 +513,104 @@ $('repair').onclick=()=>{
  else toast('NOT ENOUGH TOKENS');
 };
 
+// Gas station
+function nearStation(){
+ const p=inCar?car.position:player.position;
+ return p.distanceTo(station.position)<34;
+}
+$('refuel').onclick=()=>{
+ if(!nearStation()){toast('GO TO THE GAS STATION');return;}
+ if(tokens<5){toast('REFILL COSTS 5 TOKENS');return;}
+ tokens-=5;fuel=100;updateHud();toast('TANK REFILLED — 5 TOKENS');
+};
+
+// Input
+window.addEventListener('keydown',e=>{
+ keys[e.code]=true;
+ if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
+ if(e.code==='KeyE')toggleVehicle();
+ if(e.code==='KeyP')placeProbe();
+ if(e.code==='KeyF')takePhoto();
+ if(e.code==='KeyG')garageToggle();
+});
+window.addEventListener('keyup',e=>keys[e.code]=false);
+document.querySelectorAll('[data-key]').forEach(b=>{
+ const k=b.dataset.key;
+ b.addEventListener('pointerdown',e=>{e.preventDefault();keys[k]=true;});
+ ['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,()=>keys[k]=false));
+});
+
+function toast(t){
+ $('toast').textContent=t;$('toast').style.display='block';
+ clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').style.display='none',2300);
+}
 function updateHud(){
  $('tokens').textContent=tokens;
  $('ef').textContent='EF'+storm.ef;
  $('wind').textContent='WIND: '+storm.wind+' MPH';
- $('substatus').textContent='SUB-VORTICES: '+storm.subCount;
+ $('subs').textContent='SUB-VORTICES: '+storm.subCount;
  $('vehicleName').textContent=vehicles[vehicleIndex].name;
  $('fuel').textContent='FUEL: '+Math.round(fuel)+'%';
  $('mode').textContent=inCar?'IN VEHICLE':'ON FOOT';
+ $('health').textContent=inCar?'VEHICLE: '+Math.round(health)+'%':'ON FOOT';
  $('garageInfo').textContent=vehicles[vehicleIndex].name+' · HEALTH '+Math.round(health)+'%';
- $('upgradeEngine').textContent='UPGRADE ENGINE · '+engineLevel+'/3 · 100 TOKENS';
- $('upgradeArmor').textContent='UPGRADE WIND TOLERANCE · '+armorLevel+'/3 · 100 TOKENS';
+ $('exitBtn').textContent=inCar?'🚶 EXIT VEHICLE':'🚙 ENTER VEHICLE';
+ $('engine').textContent='UPGRADE ENGINE · '+engineLevel+'/3 · 100 TOKENS';
+ $('armor').textContent='UPGRADE WIND TOLERANCE · '+armorLevel+'/3 · 100 TOKENS';
 }
-function getWindTolerance(){return vehicles[vehicleIndex].tolerance+armorLevel*45;}
-function showGameOver(){
- gameOver=true;$('gameover').style.display='flex';
+function tolerance(){return vehicles[vehicleIndex].tolerance+armorLevel*45;}
+let gameStarted=false,gameOver=false;
+function endGame(text){
+ if(gameOver)return;
+ gameOver=true;$('overText').textContent=text;$('gameover').style.display='flex';
 }
 $('restart').onclick=()=>{
  $('gameover').style.display='none';gameOver=false;
  health=100;fuel=100;carSpeed=0;car.position.set(0,0,0);
- inCar=true;car.visible=true;player.visible=false;
- setNewTornado();updateHud();
+ player.visible=false;car.visible=true;inCar=true;
+ newTornado();updateHud();
 };
 
-// Gas station interaction
-function nearGas(){
- const p=inCar?car.position:player.position;
- return p.distanceTo(gasStation.position)<24;
-}
-function refuel(){
- if(!nearGas()){toast('GO TO THE GAS STATION TO REFUEL');return;}
- if(tokens<5){toast('REFUELING COSTS 5 TOKENS');return;}
- tokens-=5;fuel=100;updateHud();toast('TANK FULL — 5 TOKENS');
-}
-const gasButton=document.createElement('button');
-gasButton.textContent='⛽ REFUEL · 5 TOKENS';
-gasButton.style.cssText='position:fixed;z-index:6;left:50%;bottom:165px;transform:translateX(-50%);display:none';
-document.body.appendChild(gasButton);gasButton.onclick=refuel;
-
-// Trees and destruction
+// Town destruction. Buildings disappear into debris when the simulated wind reaches them.
 function destroyBuilding(b){
- if(b.destroyed)return;
- b.destroyed=true;
- b.parts.forEach(part=>{
-  const world=new THREE.Vector3();part.getWorldPosition(world);
-  const d=new THREE.Mesh(new THREE.BoxGeometry(1+Math.random()*2,.5+Math.random()*2,1+Math.random()*2),debrisMat);
-  d.position.copy(world);scene.add(d);
-  debris.push({mesh:d,life:5+Math.random()*5,vel:new THREE.Vector3((Math.random()-.5)*25,Math.random()*18,(Math.random()-.5)*25)});
- });
+ if(b.destroyed)return;b.destroyed=true;
+ const pos=new THREE.Vector3();b.group.getWorldPosition(pos);
+ for(let i=0;i<9;i++)spawnDebris(pos.x+(Math.random()-.5)*9,1+Math.random()*5,pos.z+(Math.random()-.5)*9);
  b.group.visible=false;
 }
-function updateDestruction(dt){
+function updateEnvironment(dt){
  for(const b of buildings){
   if(b.destroyed)continue;
-  const d=b.group.position.distanceTo(tornado.position);
-  const radius=storm.ef*5+12;
-  if(d<radius&&Math.random()<dt*(storm.ef*.2))destroyBuilding(b);
+  const d=Math.hypot(b.x-tornado.position.x,b.z-tornado.position.z);
+  if(d<storm.ef*5+13&&Math.random()<dt*.22)destroyBuilding(b);
  }
  for(const t of trees){
   if(t.fallen)continue;
   const d=t.group.position.distanceTo(tornado.position);
-  if(d<storm.ef*8+18){
-   t.group.rotation.z+=(t.group.position.x<tornado.position.x?1:-1)*dt*1.5;
-   if(Math.random()<dt*.12){
+  if(d<storm.ef*8+20){
+   t.group.rotation.z+=(t.group.position.x<tornado.position.x?1:-1)*dt*1.2;
+   if(Math.random()<dt*.08){
     t.fallen=true;
-    for(let i=0;i<3;i++)makeDebris(t.group.position.x,1,t.group.position.z);
+    for(let i=0;i<3;i++)spawnDebris(t.group.position.x,1,t.group.position.z);
    }
   }
  }
 }
 
 // Weather particles
-const rainGeo=new THREE.BufferGeometry();
-const rainCount=1100;
-const rainPos=new Float32Array(rainCount*3);
+const rainCount=900,rainPositions=new Float32Array(rainCount*3);
 for(let i=0;i<rainCount;i++){
- rainPos[i*3]=(Math.random()-.5)*250;
- rainPos[i*3+1]=Math.random()*90;
- rainPos[i*3+2]=(Math.random()-.5)*250;
+ rainPositions[i*3]=(Math.random()-.5)*240;
+ rainPositions[i*3+1]=Math.random()*90;
+ rainPositions[i*3+2]=(Math.random()-.5)*240;
 }
-rainGeo.setAttribute('position',new THREE.BufferAttribute(rainPos,3));
-const rain=new THREE.Points(rainGeo,new THREE.PointsMaterial({color:0x9bbbd0,size:.13,transparent:true,opacity:.45}));
+const rainGeo=new THREE.BufferGeometry();
+rainGeo.setAttribute('position',new THREE.BufferAttribute(rainPositions,3));
+const rain=new THREE.Points(rainGeo,new THREE.PointsMaterial({color:0xaac4d5,size:.12,transparent:true,opacity:.4}));
 scene.add(rain);
+const lightning=new THREE.PointLight(0xc5e3ff,0,450);lightning.position.set(0,90,0);scene.add(lightning);
 let lightningTimer=0;
-const lightning=new THREE.PointLight(0xb8d9ff,0,500);
-lightning.position.set(0,90,0);scene.add(lightning);
 
-// Game loop
 const clock=new THREE.Clock();
 let elapsed=0;
 function update(dt){
@@ -657,148 +626,145 @@ function update(dt){
 
  if(inCar){
   if(fuel>0){
-   if(forward)carSpeed=Math.min(carSpeed+(13+engineLevel*3)*dt,vehicles[vehicleIndex].speed+engineLevel*5);
-   if(backward)carSpeed=Math.max(carSpeed-8*dt,-8);
+   if(forward)carSpeed=Math.min(carSpeed+(12+engineLevel*3)*dt,vehicles[vehicleIndex].speed+engineLevel*5);
+   if(backward)carSpeed=Math.max(carSpeed-9*dt,-7);
   }else carSpeed*=.97;
   if(brake)carSpeed*=Math.max(0,1-dt*5);
   if(!forward&&!backward&&!brake)carSpeed*=Math.pow(.94,dt*60);
-  const steering=(left?1:0)-(right?1:0);
-  heading+=steering*dt*(.9+Math.min(Math.abs(carSpeed)/30,.5))*(carSpeed<0?-1:1);
+  const steer=(left?1:0)-(right?1:0);
+  heading+=steer*dt*.85*(carSpeed<0?-1:1);
   car.rotation.y=heading;
-  car.position.x+=Math.sin(heading)*carSpeed*dt;
-  car.position.z+=Math.cos(heading)*carSpeed*dt;
-  if(Math.abs(carSpeed)>1)fuel=Math.max(0,fuel-dt*.045);
+  const dx=Math.sin(heading)*carSpeed*dt;
+  const dz=Math.cos(heading)*carSpeed*dt;
+  moveWithCollision(car,dx,dz,2.2);
+  if(Math.abs(carSpeed)>1)fuel=Math.max(0,fuel-dt*.04);
   $('speed').textContent=Math.round(Math.abs(carSpeed)*2.1)+' MPH';
  }else{
   const move=(forward?1:0)-(backward?1:0);
   const turn=(left?1:0)-(right?1:0);
   heading+=turn*dt*1.8;
   player.rotation.y=heading;
-  player.position.x+=Math.sin(heading)*move*dt*8;
-  player.position.z+=Math.cos(heading)*move*dt*8;
+  const dx=Math.sin(heading)*move*dt*7;
+  const dz=Math.cos(heading)*move*dt*7;
+  moveWithCollision(player,dx,dz,.8);
+  walkTime+=dt*8*Math.abs(move);
+  arms[0].rotation.x=Math.sin(walkTime)*.55;
+  arms[1].rotation.x=-Math.sin(walkTime)*.55;
+  legs[0].rotation.x=-Math.sin(walkTime)*.55;
+  legs[1].rotation.x=Math.sin(walkTime)*.55;
   $('speed').textContent='ON FOOT';
  }
- gasButton.style.display=nearGas()?'block':'none';
+ $('refuel').style.display=nearStation()?'block':'none';
 
- // Tornado movement
+ // Tornado moves toward a randomly selected destination.
  stormTimer+=dt;
- if(tornado.position.distanceTo(stormTarget)<12||stormTimer>35){
+ if(tornado.position.distanceTo(stormTarget)<10||stormTimer>36){
   stormTarget.set((Math.random()-.5)*500,0,(Math.random()-.5)*500);
   stormTimer=0;
  }
- const direction=stormTarget.clone().sub(tornado.position).normalize();
- tornado.position.add(direction.multiplyScalar(dt*(3+storm.ef*.5)));
- tornado.rotation.y+=dt*.25;
- funnel.scale.y=Math.min(1,funnel.scale.y+dt*.5);
- circulation.forEach((r,i)=>{r.rotation.z+=dt*(1+i*.15);});
- wallCloud.rotation.y+=dt*.08;
-
- subVortices.forEach((v,i)=>{
-  if(!v.visible)return;
-  const a=elapsed*(.8+i*.2)+i*2.1;
-  v.position.set(Math.cos(a)*(7+i*2),0,Math.sin(a)*(7+i*2));
-  v.rotation.y-=dt*2;
+ const dir=stormTarget.clone().sub(tornado.position).normalize();
+ tornado.position.addScaledVector(dir,dt*(3+storm.ef*.45));
+ tornado.rotation.y+=dt*.2;
+ funnel.rotation.y+=dt*.1;
+ wallCloud.rotation.y+=dt*.06;
+ subVortices.forEach((s,i)=>{
+  if(!s.visible)return;
+  const a=elapsed*(.8+i*.16)+i*2;
+  s.position.set(Math.cos(a)*(7+i*2),0,Math.sin(a)*(7+i*2));
+  s.rotation.y+=dt*2;
  });
 
- // Probe hits
+ // Probe only pays once on direct contact.
  for(const p of probes){
   if(p.hit)continue;
-  if(p.group.position.distanceTo(tornado.position)<storm.ef*3+5){
-   p.hit=true;p.group.visible=false;tokens+=20;updateHud();
-   toast('PROBE HIT BY TORNADO +20 TOKENS');
+  const d=p.group.position.distanceTo(tornado.position);
+  if(d<storm.ef*3+4){
+   p.hit=true;p.group.visible=false;tokens+=20;toast('PROBE HIT! +20 TOKENS');updateHud();
   }
  }
 
- // Photo checkpoints respawn
+ // Observation points respawn.
  for(const c of checkpoints){
   if(!c.active){
    c.timer-=dt;
    if(c.timer<=0){
-    c.active=true;
+    c.active=true;c.group.visible=true;
     c.group.position.set((Math.random()-.5)*550,0,(Math.random()-.5)*550);
-    c.group.visible=true;
    }
   }else{
    c.group.rotation.y+=dt;
    const p=inCar?car.position:player.position;
    if(p.distanceTo(c.group.position)<5){
-    c.active=false;c.timer=10;c.group.visible=false;
-    tokens+=25;updateHud();toast('OBSERVATION COMPLETE +25 TOKENS');
+    c.active=false;c.timer=12;c.group.visible=false;
+    tokens+=25;toast('OBSERVATION COMPLETE +25 TOKENS');updateHud();
    }
   }
  }
 
- // Simulated environmental damage to vehicle only
- if(inCar){
-  const dist=car.position.distanceTo(tornado.position);
-  const danger=storm.wind/Math.max(getWindTolerance(),1);
-  if(dist<storm.ef*5+18&&danger>1){
-   health-=dt*(danger*4);
-   car.rotation.z=Math.sin(elapsed*8)*.08;
-   if(health<=0)showGameOver();
+ // Wind danger for vehicle and pedestrian.
+ const subject=inCar?car:player;
+ const distance=subject.position.distanceTo(tornado.position);
+ const danger=storm.wind/tolerance();
+ if(distance<storm.ef*5+22&&danger>.8){
+  if(inCar){
+   health-=dt*danger*3.5;
+   car.rotation.z=Math.sin(elapsed*8)*.07;
+   if(health<=0)endGame('Your vehicle was disabled by the simulated tornado winds.');
+  }else{
+   // Arcade knockback: a non-graphic game effect.
+   const away=player.position.clone().sub(tornado.position).setY(0).normalize();
+   player.position.addScaledVector(away,dt*(12+storm.ef*2));
+   if(distance<storm.ef*3+7&&Math.random()<dt*.35){
+    endGame('The simulated wind knocked your character out of the field area.');
+   }
   }
  }
 
- updateDestruction(dt);
+ updateEnvironment(dt);
  for(let i=debris.length-1;i>=0;i--){
   const d=debris[i];d.life-=dt;
-  d.mesh.position.addScaledVector(d.vel,dt);
-  d.vel.y-=9.8*dt;d.mesh.rotation.x+=dt*2;d.mesh.rotation.z+=dt;
-  if(d.mesh.position.y<.3){d.mesh.position.y=.3;d.vel.y=Math.abs(d.vel.y)*.2;d.vel.x*=.8;d.vel.z*=.8;}
+  d.mesh.position.addScaledVector(d.velocity,dt);
+  d.velocity.y-=9.8*dt;
+  d.mesh.rotation.x+=dt*2;d.mesh.rotation.z+=dt;
+  if(d.mesh.position.y<.25){
+   d.mesh.position.y=.25;d.velocity.y=Math.abs(d.velocity.y)*.18;
+   d.velocity.x*=.8;d.velocity.z*=.8;
+  }
   if(d.life<=0){scene.remove(d.mesh);debris.splice(i,1);}
  }
- const positions=rainGeo.attributes.position.array;
  for(let i=0;i<rainCount;i++){
-  positions[i*3+1]-=dt*65;
-  positions[i*3]+=(Math.random()-.5)*dt*3;
-  if(positions[i*3+1]<0){
-   positions[i*3+1]=90;
-   positions[i*3]=camera.position.x+(Math.random()-.5)*250;
-   positions[i*3+2]=camera.position.z+(Math.random()-.5)*250;
+  rainPositions[i*3+1]-=dt*65;
+  if(rainPositions[i*3+1]<0){
+   rainPositions[i*3+1]=90;
+   rainPositions[i*3]=subject.position.x+(Math.random()-.5)*240;
+   rainPositions[i*3+2]=subject.position.z+(Math.random()-.5)*240;
   }
  }
  rainGeo.attributes.position.needsUpdate=true;
- lightningTimer-=dt;
- if(lightningTimer<=0){
-  lightning.intensity=7+Math.random()*7;lightningTimer=.12;
- }else if(lightningTimer<.07)lightning.intensity=0;
+ rain.position.set(subject.position.x,0,subject.position.z);
 
- // Camera follows whichever character is active
- const target=inCar?car:player;
- const behind=new THREE.Vector3(Math.sin(heading)*-13,8,Math.cos(heading)*-13);
- const desired=target.position.clone().add(behind);
- camera.position.lerp(desired,.075);
- const look=target.position.clone().add(new THREE.Vector3(0,2,0));
- camera.lookAt(look);
- cloudDeck.position.x=target.position.x*.15;
- cloudDeck.position.z=target.position.z*.15;
- rain.position.copy(target.position);
+ lightningTimer-=dt;
+ if(lightningTimer<=0){lightning.intensity=7+Math.random()*8;lightningTimer=.12;}
+ else if(lightningTimer<.07)lightning.intensity=0;
+
+ // Follow the actual active player. The parked vehicle stays visible.
+ const behind=new THREE.Vector3(-Math.sin(heading)*12,7,-Math.cos(heading)*12);
+ const desired=subject.position.clone().add(behind);
+ camera.position.lerp(desired,.09);
+ camera.lookAt(subject.position.clone().add(new THREE.Vector3(0,2,0)));
  updateHud();
 }
-
 function animate(){
  requestAnimationFrame(animate);
  const dt=Math.min(clock.getDelta(),.04);
- update(dt);
- renderer.render(scene,camera);
+ update(dt);renderer.render(scene,camera);
 }
 animate();
 
-function startGame(){
- $('intro').style.display='none';
- gameStarted=true;
- // Opening cinematic: the funnel grows from the wall cloud
- funnel.scale.y=.01;
- let t=0;
- const introInterval=setInterval(()=>{
-  t+=.025;
-  funnel.scale.y=Math.min(1,t);
-  if(t>=1)clearInterval(introInterval);
- },50);
- message('TORNADO FORMED — FIELD SIMULATION ACTIVE');
-}
-$('startBtn').onclick=startGame;
-
+$('start').onclick=()=>{
+ $('intro').style.display='none';gameStarted=true;
+ toast('TORNADO FORMED — SIMULATION STARTED');
+};
 function resize(){
  camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
  renderer.setSize(innerWidth,innerHeight);
