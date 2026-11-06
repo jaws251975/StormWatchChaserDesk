@@ -3,255 +3,70 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ChaseDesk — Tornado Intercept Simulator</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>ChaseDesk — Open World Simulator</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-
 <style>
 :root {
-  --bg:#07111f;
-  --panel:#0d1c2d;
-  --line:#20344a;
-  --text:#edf5ff;
-  --muted:#9db0c5;
-  --cyan:#52d8e8;
-  --blue:#55b8ff;
-  --red:#ff625e;
-  --yellow:#ffd166;
+  --bg:#07111f;--panel:#0d1c2d;--line:#20344a;
+  --text:#edf5ff;--muted:#9db0c5;--cyan:#52d8e8;
+  --red:#ff625e;--yellow:#ffd166;
 }
-* { box-sizing:border-box; }
-body {
-  margin:0;
-  overflow:hidden;
-  background:var(--bg);
-  color:var(--text);
-  font-family:Manrope,sans-serif;
-}
-#game { position:fixed; inset:0; }
-canvas { display:block; }
-
-#topbar {
-  position:fixed;
-  top:12px;
-  left:12px;
-  right:12px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:8px;
-  z-index:5;
-  pointer-events:none;
-}
-.brand,.stat {
-  background:rgba(7,17,31,.88);
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:9px 12px;
-  backdrop-filter:blur(8px);
-}
-.brand { font-weight:800; letter-spacing:1px; }
-.brand span { color:var(--cyan); }
-.stats {
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:flex-end;
-  gap:6px;
-}
-.stat {
-  font:12px "DM Mono",monospace;
-  color:var(--muted);
-}
-.stat strong { color:var(--text); }
-
-#leftpanel {
-  position:fixed;
-  top:75px;
-  left:12px;
-  width:190px;
-  z-index:5;
-  background:rgba(7,17,31,.88);
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:13px;
-  backdrop-filter:blur(8px);
-}
-.panel-title {
-  color:var(--cyan);
-  font-size:11px;
-  font-weight:800;
-  letter-spacing:1.5px;
-  margin-bottom:10px;
-}
-.reading {
-  display:flex;
-  justify-content:space-between;
-  margin:9px 0;
-  font:12px "DM Mono",monospace;
-  color:var(--muted);
-}
-.reading strong { color:var(--text); }
-.meter {
-  height:7px;
-  background:#1b2b3d;
-  border-radius:10px;
-  overflow:hidden;
-  margin-top:5px;
-}
-.meter div {
-  height:100%;
-  width:0%;
-  background:var(--cyan);
-  transition:width .2s;
-}
-#windbar { background:var(--red); }
-#checkpoint-list {
-  font-size:11px;
-  color:var(--muted);
-  line-height:2;
-}
-.done { color:var(--cyan); }
-
-#garage {
-  position:fixed;
-  right:12px;
-  top:75px;
-  width:190px;
-  z-index:5;
-  background:rgba(7,17,31,.9);
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:12px;
-  backdrop-filter:blur(8px);
-}
-button {
-  background:#132a40;
-  border:1px solid #294761;
-  color:var(--text);
-  padding:9px 10px;
-  border-radius:8px;
-  font-family:Manrope,sans-serif;
-  font-size:11px;
-  font-weight:700;
-  cursor:pointer;
-}
-button:active { transform:scale(.97); }
-.upgrade {
-  width:100%;
-  margin:4px 0;
-  text-align:left;
-}
-.upgrade:hover { border-color:var(--cyan); }
-#garage small {
-  display:block;
-  color:var(--muted);
-  font:10px "DM Mono",monospace;
-  margin-top:8px;
-  line-height:1.5;
-}
-
-#message {
-  position:fixed;
-  left:50%;
-  top:19%;
-  transform:translateX(-50%);
-  z-index:6;
-  padding:10px 17px;
-  border:1px solid var(--cyan);
-  border-radius:9px;
-  background:rgba(7,17,31,.9);
-  color:var(--cyan);
-  font:12px "DM Mono",monospace;
-  opacity:0;
-  transition:opacity .3s;
-  pointer-events:none;
-}
-#message.show { opacity:1; }
-
-#gameover {
-  position:fixed;
-  inset:0;
-  z-index:10;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  background:rgba(2,7,14,.82);
-  backdrop-filter:blur(8px);
-}
-#gameover .box {
-  width:min(340px,90vw);
-  padding:25px;
-  background:var(--panel);
-  border:1px solid var(--red);
-  border-radius:16px;
-  text-align:center;
-}
-#gameover h1 { color:var(--red); }
-#gameover p { color:var(--muted); font-size:13px; }
-#restart {
-  background:#174052;
-  border-color:var(--cyan);
-  margin-top:10px;
-  width:100%;
-}
-
-#controls {
-  position:fixed;
-  left:12px;
-  right:12px;
-  bottom:15px;
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-end;
-  z-index:7;
-  pointer-events:none;
-}
-.control-group {
-  display:flex;
-  gap:8px;
-  pointer-events:auto;
-}
-.pad {
-  width:57px;
-  height:53px;
-  font-size:20px;
-  background:rgba(7,17,31,.85);
-  border:1px solid #496078;
-  touch-action:none;
-}
-.pad.wide { width:70px; font-size:11px; }
-#hint {
-  position:fixed;
-  bottom:83px;
-  left:50%;
-  transform:translateX(-50%);
-  z-index:4;
-  color:#b7c8d8;
-  font:10px "DM Mono",monospace;
-  background:rgba(7,17,31,.7);
-  padding:6px 9px;
-  border-radius:6px;
-  white-space:nowrap;
-}
-
-@media(max-width:650px) {
-  #leftpanel { top:70px; width:155px; padding:9px; }
-  #garage { top:auto; bottom:85px; right:10px; width:150px; padding:8px; }
-  .brand { font-size:11px; padding:8px; }
-  .stat { font-size:10px; padding:7px; }
-  #hint { bottom:72px; font-size:9px; }
-  .reading { font-size:10px; }
-  .panel-title { font-size:10px; }
-  .upgrade { padding:7px; font-size:10px; }
+*{box-sizing:border-box}
+body{margin:0;overflow:hidden;background:var(--bg);color:var(--text);font-family:Manrope,sans-serif;touch-action:none}
+#game{position:fixed;inset:0}
+canvas{display:block}
+#topbar{position:fixed;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;gap:6px;z-index:5;pointer-events:none}
+.brand,.stat{background:#07111fe8;border:1px solid var(--line);border-radius:9px;padding:9px 11px;backdrop-filter:blur(8px)}
+.brand{font-weight:800;letter-spacing:1px;font-size:13px}
+.brand span{color:var(--cyan)}
+.stats{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.stat{font:11px "DM Mono",monospace;color:var(--muted)}
+.stat strong{color:var(--text)}
+.panel{position:fixed;z-index:5;background:#07111fe8;border:1px solid var(--line);border-radius:11px;padding:12px;backdrop-filter:blur(8px)}
+#telemetry{top:67px;left:10px;width:175px}
+#garage{top:67px;right:10px;width:170px}
+.heading{font-size:10px;font-weight:800;letter-spacing:1.3px;color:var(--cyan);margin-bottom:10px}
+.reading{display:flex;justify-content:space-between;gap:4px;margin:8px 0;color:var(--muted);font:10px "DM Mono",monospace}
+.reading strong{color:var(--text)}
+.meter{height:6px;background:#1b2b3d;border-radius:8px;overflow:hidden}
+.meter div{height:100%;width:100%;background:var(--cyan)}
+button{font-family:Manrope,sans-serif;font-weight:700;color:var(--text);background:#132a40;border:1px solid #294761;border-radius:8px;padding:9px;cursor:pointer;touch-action:none}
+button:active{transform:scale(.96)}
+.upgrade{display:block;width:100%;text-align:left;font-size:10px;margin:5px 0}
+#garage small{font:9px "DM Mono",monospace;color:var(--muted);line-height:1.6}
+#checkpoints{font:10px "DM Mono",monospace;color:var(--muted);line-height:2}
+.done{color:var(--cyan)}
+#message{position:fixed;top:22%;left:50%;transform:translateX(-50%);z-index:8;background:#07111fee;border:1px solid var(--cyan);border-radius:8px;padding:10px 15px;color:var(--cyan);font:11px "DM Mono",monospace;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+#message.show{opacity:1}
+#controls{position:fixed;left:12px;right:12px;bottom:14px;display:flex;justify-content:space-between;align-items:flex-end;z-index:7;pointer-events:none}
+.controlgroup{display:flex;gap:8px;pointer-events:auto}
+.pad{width:65px;height:62px;font-size:21px;background:#07111fee;border:2px solid #496078;border-radius:13px;touch-action:none;user-select:none;-webkit-user-select:none}
+.pad.wide{width:78px;font-size:11px}
+#hint{position:fixed;bottom:85px;left:50%;transform:translateX(-50%);z-index:4;color:#b7c8d8;font:9px "DM Mono",monospace;background:#07111fbf;padding:6px 9px;border-radius:6px;white-space:nowrap}
+#gameover{position:fixed;inset:0;z-index:10;display:none;align-items:center;justify-content:center;background:#02070edb}
+#gameover .box{width:min(340px,90vw);background:var(--panel);border:1px solid var(--red);border-radius:15px;padding:25px;text-align:center}
+#gameover h1{color:var(--red)}
+#gameover p{font-size:13px;color:var(--muted)}
+#restart{width:100%;border-color:var(--cyan);margin-top:10px}
+@media(max-width:650px){
+  #telemetry{top:61px;width:145px;padding:9px}
+  #garage{top:auto;bottom:91px;width:145px;padding:8px}
+  .brand{font-size:10px;padding:8px}
+  .stat{font-size:9px;padding:7px}
+  .reading{font-size:9px;margin:6px 0}
+  .pad{width:58px;height:56px}
+  .pad.wide{width:67px;height:56px}
+  #hint{bottom:73px;font-size:8px}
+  .heading{font-size:9px}
 }
 </style>
 </head>
-
 <body>
 <div id="game"></div>
 
 <div id="topbar">
-  <div class="brand">CHASE<span>DESK</span> / SIM</div>
+  <div class="brand">CHASE<span>DESK</span> / OPEN WORLD</div>
   <div class="stats">
     <div class="stat">CREDITS: <strong id="credits">0</strong></div>
     <div class="stat">SPEED: <strong id="speed">0</strong> MPH</div>
@@ -259,44 +74,42 @@ button:active { transform:scale(.97); }
   </div>
 </div>
 
-<div id="leftpanel">
-  <div class="panel-title">STORM TELEMETRY</div>
+<div id="telemetry" class="panel">
+  <div class="heading">STORM TELEMETRY</div>
   <div class="reading"><span>INTENSITY</span><strong id="intensity">EF2</strong></div>
   <div class="reading"><span>TORNADO WIND</span><strong id="windRead">130 MPH</strong></div>
   <div class="reading"><span>VEHICLE LIMIT</span><strong id="tolerance">110 MPH</strong></div>
-  <div class="reading"><span>VEHICLE CONDITION</span><strong id="condition">100%</strong></div>
+  <div class="reading"><span>CONDITION</span><strong id="condition">100%</strong></div>
   <div class="meter"><div id="conditionbar"></div></div>
   <br>
-  <div class="panel-title">OBSERVATION CHECKPOINTS</div>
-  <div id="checkpoint-list">
+  <div class="heading">OBSERVATION CHECKPOINTS</div>
+  <div id="checkpoints">
     <div id="cp0">○ Checkpoint 01</div>
     <div id="cp1">○ Checkpoint 02</div>
     <div id="cp2">○ Checkpoint 03</div>
     <div id="cp3">○ Checkpoint 04</div>
     <div id="cp4">○ Checkpoint 05</div>
   </div>
-  <small style="color:#9db0c5;font-size:9px;">Complete checkpoints to earn credits.</small>
 </div>
 
-<div id="garage">
-  <div class="panel-title">VEHICLE GARAGE</div>
-  <button class="upgrade" onclick="buyUpgrade('engine')">ENGINE + <span id="engineCost">100</span></button>
-  <button class="upgrade" onclick="buyUpgrade('handling')">HANDLING + <span id="handlingCost">80</span></button>
-  <button class="upgrade" onclick="buyUpgrade('armor')">REINFORCED BODY + <span id="armorCost">120</span></button>
+<div id="garage" class="panel">
+  <div class="heading">VEHICLE GARAGE</div>
+  <button class="upgrade" onclick="buyUpgrade('engine')">ENGINE — <span id="engineCost">100</span></button>
+  <button class="upgrade" onclick="buyUpgrade('handling')">HANDLING — <span id="handlingCost">80</span></button>
+  <button class="upgrade" onclick="buyUpgrade('armor')">REINFORCED BODY — <span id="armorCost">120</span></button>
   <button class="upgrade" onclick="repair()">REPAIR — 40</button>
-  <small id="garageinfo">Starter chase vehicle<br>Wind tolerance: 110 MPH</small>
+  <small id="garageinfo">Starter vehicle<br>Wind tolerance: 110 MPH</small>
 </div>
 
 <div id="message">CHECKPOINT COMPLETE</div>
-
-<div id="hint">WASD / ARROWS TO DRIVE · SPACE = HANDBRAKE</div>
+<div id="hint">WASD / ARROWS: DRIVE · SPACE: HANDBRAKE</div>
 
 <div id="controls">
-  <div class="control-group">
+  <div class="controlgroup">
     <button class="pad" id="left">◀</button>
     <button class="pad" id="right">▶</button>
   </div>
-  <div class="control-group">
+  <div class="controlgroup">
     <button class="pad wide" id="brake">BRAKE</button>
     <button class="pad wide" id="gas">GAS</button>
   </div>
@@ -312,413 +125,298 @@ button:active { transform:scale(.97); }
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
-
 <script>
-/* ==========================================
-   CHASEDESK TORNADO SIMULATOR
-   Fictional arcade-style weather simulation
-========================================== */
+/* =========================================
+   CHASEDESK OPEN WORLD SIMULATOR
+========================================= */
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x182333);
-scene.fog = new THREE.FogExp2(0x182333, 0.008);
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x182333);
+scene.fog=new THREE.FogExp2(0x182333,.0035);
 
-const camera = new THREE.PerspectiveCamera(
-  65, window.innerWidth/window.innerHeight, 0.1, 1200
-);
-camera.position.set(0,7,13);
-
-const renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(window.innerWidth,window.innerHeight);
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,1800);
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
+renderer.shadowMap.enabled=true;
 document.getElementById("game").appendChild(renderer.domElement);
 
 scene.add(new THREE.HemisphereLight(0x8094ad,0x1a1b22,1.0));
-
-const sun = new THREE.DirectionalLight(0x8995a8,1.0);
+const sun=new THREE.DirectionalLight(0x8995a8,1);
 sun.position.set(-40,80,30);
-sun.castShadow = true;
 scene.add(sun);
 
-/* ---------- WORLD ---------- */
+/* WORLD */
 
-const ground = new THREE.Mesh(
-  new THREE.PlaneGeometry(1000,1400),
+const ground=new THREE.Mesh(
+  new THREE.PlaneGeometry(1600,2000),
   new THREE.MeshStandardMaterial({color:0x303b37,roughness:1})
 );
 ground.rotation.x=-Math.PI/2;
-ground.position.y=-0.15;
-ground.position.z=-400;
+ground.position.set(0,-.18,-300);
 ground.receiveShadow=true;
 scene.add(ground);
 
-const road = new THREE.Mesh(
-  new THREE.PlaneGeometry(13,1400),
-  new THREE.MeshStandardMaterial({color:0x252b32,roughness:1})
-);
-road.rotation.x=-Math.PI/2;
-road.position.y=0;
-road.position.z=-400;
-scene.add(road);
+const roadMat=new THREE.MeshStandardMaterial({color:0x252b32,roughness:1});
+const markingMat=new THREE.MeshBasicMaterial({color:0xb7b5a4});
 
-// Road markings
-const markings=[];
-for(let z=30;z>-1200;z-=18) {
-  const mark=new THREE.Mesh(
-    new THREE.BoxGeometry(.18,.025,7),
-    new THREE.MeshBasicMaterial({color:0xb7b5a4})
-  );
-  mark.position.set(0,.025,z);
-  scene.add(mark);
-  markings.push(mark);
+function addRoad(x,z,width,length,rotation=0){
+  const road=new THREE.Mesh(new THREE.PlaneGeometry(width,length),roadMat);
+  road.rotation.x=-Math.PI/2;
+  road.rotation.z=rotation;
+  road.position.set(x,0,z);
+  scene.add(road);
 }
 
-// Roadside grass and simple trees
-for(let i=0;i<120;i++) {
-  const side=i%2===0?-1:1;
-  const z=25-Math.floor(i/2)*19;
-  const x=side*(11+Math.random()*35);
+// A grid of roads across the open map.
+for(let x=-600;x<=600;x+=120) addRoad(x,-300,12,1800);
+for(let z=-1100;z<=500;z+=120) addRoad(0,z,1400,12,Math.PI/2);
 
+// Road markings on the main roads.
+for(let x=-600;x<=600;x+=120){
+  for(let z=-1100;z<=500;z+=35){
+    const m=new THREE.Mesh(new THREE.BoxGeometry(.15,.025,7),markingMat);
+    m.position.set(x,.025,z);
+    scene.add(m);
+  }
+}
+for(let z=-1100;z<=500;z+=120){
+  for(let x=-600;x<=600;x+=35){
+    const m=new THREE.Mesh(new THREE.BoxGeometry(7,.025,.15),markingMat);
+    m.position.set(x,.026,z);
+    scene.add(m);
+  }
+}
+
+// Trees and roadside scenery.
+const treeGroup=new THREE.Group();
+scene.add(treeGroup);
+
+for(let i=0;i<350;i++){
+  const x=(Math.random()-.5)*1300;
+  const z=(Math.random()-.5)*1650-250;
+
+  // Leave clear strips around the main roads.
+  if(Math.abs(x%120)<13 || Math.abs(z%120)<13) continue;
+
+  const tree=new THREE.Group();
   const trunk=new THREE.Mesh(
     new THREE.CylinderGeometry(.12,.2,2,5),
     new THREE.MeshStandardMaterial({color:0x40372b})
   );
-  trunk.position.set(x,1,z);
-  scene.add(trunk);
+  trunk.position.y=1;
+  tree.add(trunk);
 
   const leaves=new THREE.Mesh(
-    new THREE.ConeGeometry(1.1,3.2,6),
+    new THREE.ConeGeometry(1.3,3.4,6),
     new THREE.MeshStandardMaterial({color:0x263a35})
   );
-  leaves.position.set(x,3.1,z);
-  scene.add(leaves);
+  leaves.position.y=3.2;
+  tree.add(leaves);
+  tree.position.set(x,0,z);
+  treeGroup.add(tree);
 }
 
-/* ---------- VEHICLE ---------- */
+/* VEHICLE */
 
 const car=new THREE.Group();
 scene.add(car);
 
-const bodyMat=new THREE.MeshStandardMaterial({
-  color:0x287d9b,metalness:.45,roughness:.45
-});
+const bodyMat=new THREE.MeshStandardMaterial({color:0x287d9b,metalness:.35,roughness:.5});
 const darkMat=new THREE.MeshStandardMaterial({color:0x101820});
-const glassMat=new THREE.MeshStandardMaterial({
-  color:0x152d3e,metalness:.2,roughness:.2
-});
+const glassMat=new THREE.MeshStandardMaterial({color:0x152d3e,roughness:.2});
 
-const chassis=new THREE.Mesh(
-  new THREE.BoxGeometry(2.3,.65,4.2),bodyMat
-);
-chassis.position.y=.9;
-chassis.castShadow=true;
-car.add(chassis);
+function block(parent,w,h,d,material,x,y,z){
+  const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);
+  mesh.position.set(x,y,z);
+  mesh.castShadow=true;
+  parent.add(mesh);
+  return mesh;
+}
 
-const cabin=new THREE.Mesh(
-  new THREE.BoxGeometry(1.8,.85,1.8),glassMat
-);
-cabin.position.set(0,1.55,-.25);
-cabin.castShadow=true;
-car.add(cabin);
-
-const hood=new THREE.Mesh(
-  new THREE.BoxGeometry(2.15,.3,1.15),bodyMat
-);
-hood.position.set(0,1.1,-1.45);
-car.add(hood);
-
-const bumper=new THREE.Mesh(
-  new THREE.BoxGeometry(2.4,.25,.25),darkMat
-);
-bumper.position.set(0,.55,-2.12);
-car.add(bumper);
+block(car,2.3,.65,4.2,bodyMat,0,.9,0);
+block(car,1.8,.85,1.8,glassMat,0,1.55,-.25);
+block(car,2.15,.3,1.15,bodyMat,0,1.1,-1.45);
+block(car,2.4,.25,.25,darkMat,0,.55,-2.12);
 
 const wheels=[];
-for(const x of [-1.15,1.15]) {
-  for(const z of [-1.35,1.35]) {
+for(const x of [-1.15,1.15]){
+  for(const z of [-1.35,1.35]){
     const wheel=new THREE.Mesh(
-      new THREE.CylinderGeometry(.43,.43,.28,16),
-      darkMat
+      new THREE.CylinderGeometry(.43,.43,.28,16),darkMat
     );
     wheel.rotation.z=Math.PI/2;
     wheel.position.set(x,.48,z);
-    wheel.castShadow=true;
     car.add(wheel);
     wheels.push(wheel);
   }
 }
 
-car.position.set(0,0,8);
+car.position.set(0,0,0);
 
-/* ---------- TORNADO ---------- */
+/* TORNADO */
 
 const tornado=new THREE.Group();
-tornado.position.set(43,0,-120);
+tornado.position.set(100,0,-300);
 scene.add(tornado);
 
 let stormIntensity=2;
 let stormWind=130;
-let stormClock=0;
 
-// The funnel is rebuilt every frame so its shape can change.
-const funnelSegments=55;
-const funnelSides=32;
-const funnelPositions=new Float32Array(
-  (funnelSegments+1)*(funnelSides+1)*3
-);
-const funnelIndices=[];
+const segments=55,sides=32;
+const positions=new Float32Array((segments+1)*(sides+1)*3);
+const indices=[];
 
-for(let y=0;y<funnelSegments;y++) {
-  for(let x=0;x<funnelSides;x++) {
-    const a=y*(funnelSides+1)+x;
-    const b=a+funnelSides+1;
-    funnelIndices.push(a,b,a+1,b,b+1,a+1);
+for(let y=0;y<segments;y++){
+  for(let x=0;x<sides;x++){
+    const a=y*(sides+1)+x,b=a+sides+1;
+    indices.push(a,b,a+1,b,b+1,a+1);
   }
 }
 
 const funnelGeometry=new THREE.BufferGeometry();
-funnelGeometry.setAttribute(
-  "position",new THREE.BufferAttribute(funnelPositions,3)
+funnelGeometry.setAttribute("position",new THREE.BufferAttribute(positions,3));
+funnelGeometry.setIndex(indices);
+
+const funnel=new THREE.Mesh(
+  funnelGeometry,
+  new THREE.MeshStandardMaterial({
+    color:0x302f30,roughness:1,transparent:true,opacity:.9,
+    side:THREE.DoubleSide
+  })
 );
-funnelGeometry.setIndex(funnelIndices);
-
-const funnelMaterial=new THREE.MeshStandardMaterial({
-  color:0x302f30,
-  roughness:1,
-  transparent:true,
-  opacity:.88,
-  side:THREE.DoubleSide
-});
-
-const funnel=new THREE.Mesh(funnelGeometry,funnelMaterial);
-funnel.castShadow=true;
 tornado.add(funnel);
 
-// Rotating circulation bands
 const bands=[];
-for(let i=0;i<7;i++) {
+for(let i=0;i<7;i++){
   const band=new THREE.Mesh(
     new THREE.TorusGeometry(1,.045,5,64),
-    new THREE.MeshBasicMaterial({
-      color:i%2===0?0x77736c:0x45494a,
-      transparent:true,
-      opacity:.55
-    })
+    new THREE.MeshBasicMaterial({color:i%2?0x45494a:0x77736c,transparent:true,opacity:.5})
   );
   band.rotation.x=Math.PI/2;
   tornado.add(band);
   bands.push(band);
 }
 
-// Ground-level debris cloud
 const debrisCloud=new THREE.Mesh(
   new THREE.TorusGeometry(1.8,.48,8,48),
-  new THREE.MeshStandardMaterial({
-    color:0x514c43,
-    transparent:true,
-    opacity:.75
-  })
+  new THREE.MeshStandardMaterial({color:0x514c43,transparent:true,opacity:.8})
 );
 debrisCloud.rotation.x=Math.PI/2;
 debrisCloud.position.y=.45;
 tornado.add(debrisCloud);
 
-// Tornado cloud at top
 const topCloud=new THREE.Mesh(
   new THREE.SphereGeometry(1,16,12),
-  new THREE.MeshStandardMaterial({
-    color:0x333c48,roughness:1
-  })
+  new THREE.MeshStandardMaterial({color:0x333c48})
 );
-topCloud.position.y=18;
-topCloud.scale.set(5,1.6,4);
+topCloud.position.y=19;
+topCloud.scale.set(6,1.8,5);
 tornado.add(topCloud);
 
-/* ---------- SWIRLING DEBRIS ---------- */
-
 const debris=[];
-for(let i=0;i<95;i++) {
-  const piece=new THREE.Mesh(
-    new THREE.BoxGeometry(
-      .12+Math.random()*.35,
-      .1+Math.random()*.3,
-      .12+Math.random()*.35
-    ),
-    new THREE.MeshStandardMaterial({
-      color:[0x51483e,0x777064,0x333b42,0x8b806d][i%4]
-    })
+for(let i=0;i<100;i++){
+  const mesh=new THREE.Mesh(
+    new THREE.BoxGeometry(.15+Math.random()*.3,.12+Math.random()*.25,.15+Math.random()*.3),
+    new THREE.MeshStandardMaterial({color:[0x51483e,0x777064,0x333b42][i%3]})
   );
-  tornado.add(piece);
-  debris.push({
-    mesh:piece,
-    angle:Math.random()*Math.PI*2,
-    radius:2+Math.random()*9,
-    height:Math.random()*15,
-    speed:.5+Math.random()*2
-  });
+  tornado.add(mesh);
+  debris.push({mesh,angle:Math.random()*6.28,radius:2+Math.random()*10,height:Math.random()*16,speed:.5+Math.random()*2});
 }
 
-// Curving wind streamers
 const streamers=[];
-for(let i=0;i<32;i++) {
-  const points=[];
-  for(let j=0;j<18;j++) {
-    points.push(new THREE.Vector3(0,0,0));
-  }
-  const geometry=new THREE.BufferGeometry().setFromPoints(points);
-  const line=new THREE.Line(
-    geometry,
-    new THREE.LineBasicMaterial({
-      color:0x9eaaa9,
-      transparent:true,
-      opacity:.2
-    })
+for(let i=0;i<24;i++){
+  const geo=new THREE.BufferGeometry().setFromPoints(
+    Array.from({length:18},()=>new THREE.Vector3())
   );
+  const line=new THREE.Line(geo,new THREE.LineBasicMaterial({color:0xaab5bd,transparent:true,opacity:.23}));
   tornado.add(line);
-  streamers.push({
-    line,
-    angle:Math.random()*Math.PI*2,
-    radius:3+Math.random()*8,
-    height:Math.random()*13,
-    speed:.5+Math.random()*1.5
-  });
+  streamers.push({line,angle:Math.random()*6.28,radius:3+Math.random()*7,height:Math.random()*12,speed:.5+Math.random()*1.5});
 }
 
-/* ---------- CLOUD DECK ---------- */
+/* CLOUDS */
 
-const cloudGroup=new THREE.Group();
-scene.add(cloudGroup);
+const clouds=new THREE.Group();
+scene.add(clouds);
+const cloudMat=new THREE.MeshStandardMaterial({color:0x293747,roughness:1,transparent:true,opacity:.84});
 
-const cloudMaterial=new THREE.MeshStandardMaterial({
-  color:0x293747,
-  roughness:1,
-  transparent:true,
-  opacity:.83
-});
-
-for(let i=0;i<100;i++) {
-  const cloud=new THREE.Mesh(
-    new THREE.SphereGeometry(1,10,8),
-    cloudMaterial
-  );
-  cloud.position.set(
-    (Math.random()-.5)*260,
-    28+Math.random()*24,
-    -500+Math.random()*950
-  );
-  cloud.scale.set(
-    9+Math.random()*16,
-    3+Math.random()*5,
-    10+Math.random()*20
-  );
-  cloudGroup.add(cloud);
+for(let i=0;i<140;i++){
+  const c=new THREE.Mesh(new THREE.SphereGeometry(1,10,8),cloudMat);
+  c.position.set((Math.random()-.5)*1450,30+Math.random()*22,(Math.random()-.5)*1800-250);
+  c.scale.set(10+Math.random()*17,3+Math.random()*5,12+Math.random()*22);
+  clouds.add(c);
 }
 
-/* ---------- RAIN ---------- */
+/* RAIN AND HAIL */
 
-const rainCount=1500;
-const rainPositions=new Float32Array(rainCount*3);
-const rainSpeeds=[];
-
-for(let i=0;i<rainCount;i++) {
-  rainPositions[i*3]=(Math.random()-.5)*180;
-  rainPositions[i*3+1]=Math.random()*65;
-  rainPositions[i*3+2]=(Math.random()-.5)*180;
-  rainSpeeds.push(1+Math.random()*2.5);
+function makeParticles(count,color,size,fallSpeed){
+  const p=new Float32Array(count*3);
+  const speeds=[];
+  for(let i=0;i<count;i++){
+    p[i*3]=(Math.random()-.5)*180;
+    p[i*3+1]=Math.random()*65;
+    p[i*3+2]=(Math.random()-.5)*180;
+    speeds.push(fallSpeed*(.6+Math.random()));
+  }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute("position",new THREE.BufferAttribute(p,3));
+  const points=new THREE.Points(geo,new THREE.PointsMaterial({color,size,transparent:true,opacity:.7}));
+  scene.add(points);
+  return {points,speeds,count};
 }
 
-const rainGeometry=new THREE.BufferGeometry();
-rainGeometry.setAttribute(
-  "position",new THREE.BufferAttribute(rainPositions,3)
-);
+const rain=makeParticles(1400,0x9cb9d0,.12,1.6);
+const hail=makeParticles(140,0xe0f4ff,.2,3.2);
 
-const rain=new THREE.Points(
-  rainGeometry,
-  new THREE.PointsMaterial({
-    color:0x9cb9d0,size:.12,transparent:true,opacity:.55
-  })
-);
-scene.add(rain);
-
-/* ---------- HAIL ---------- */
-
-const hailCount=160;
-const hailPositions=new Float32Array(hailCount*3);
-const hailSpeeds=[];
-
-for(let i=0;i<hailCount;i++) {
-  hailPositions[i*3]=(Math.random()-.5)*150;
-  hailPositions[i*3+1]=Math.random()*50;
-  hailPositions[i*3+2]=(Math.random()-.5)*150;
-  hailSpeeds.push(2+Math.random()*3);
+function updateParticles(system,delta,windPush){
+  const p=system.points.geometry.attributes.position.array;
+  for(let i=0;i<system.count;i++){
+    p[i*3]+=windPush*delta;
+    p[i*3+1]-=system.speeds[i]*delta*12;
+    p[i*3+2]+=delta*1.5;
+    if(p[i*3+1]<0){
+      p[i*3+1]=55+Math.random()*10;
+      p[i*3]=(Math.random()-.5)*180;
+      p[i*3+2]=(Math.random()-.5)*180;
+    }
+  }
+  system.points.geometry.attributes.position.needsUpdate=true;
 }
 
-const hailGeometry=new THREE.BufferGeometry();
-hailGeometry.setAttribute(
-  "position",new THREE.BufferAttribute(hailPositions,3)
-);
-
-const hail=new THREE.Points(
-  hailGeometry,
-  new THREE.PointsMaterial({
-    color:0xe0f4ff,size:.2,transparent:true,opacity:.8
-  })
-);
-scene.add(hail);
-
-/* ---------- LIGHTNING ---------- */
+/* LIGHTNING */
 
 const lightningGroup=new THREE.Group();
 scene.add(lightningGroup);
-
 const lightningLight=new THREE.PointLight(0xc5dcff,0,180);
-lightningLight.position.set(0,35,-60);
 scene.add(lightningLight);
+let lightningTimer=3,lightningFlash=0;
 
-let lightningTimer=3;
-let lightningFlash=0;
-
-function createLightning() {
+function createLightning(){
   lightningGroup.clear();
-
   const points=[];
-  let x=(Math.random()-.5)*90;
-  let y=45;
-  let z=-80-Math.random()*100;
-
+  let x=(Math.random()-.5)*100,y=48,z=-100-Math.random()*150;
   points.push(new THREE.Vector3(x,y,z));
-
-  for(let i=0;i<8;i++) {
-    x+=(Math.random()-.5)*12;
-    y-=5+Math.random()*2;
+  for(let i=0;i<9;i++){
+    x+=(Math.random()-.5)*13;
+    y-=5;
     points.push(new THREE.Vector3(x,y,z));
   }
-
-  const bolt=new THREE.Line(
+  lightningGroup.add(new THREE.Line(
     new THREE.BufferGeometry().setFromPoints(points),
-    new THREE.LineBasicMaterial({
-      color:0xd9eaff,transparent:true,opacity:1
-    })
-  );
-  lightningGroup.add(bolt);
-
+    new THREE.LineBasicMaterial({color:0xd9eaff})
+  ));
   lightningLight.position.set(x,y,z);
-  lightningLight.intensity=9;
+  lightningLight.intensity=10;
   lightningFlash=.18;
 }
 
-/* ---------- CHECKPOINTS ---------- */
+/* CHECKPOINTS */
 
 const checkpoints=[];
-const checkpointObjects=[];
-let completed=0;
+const checkpointStates=[];
 
-for(let i=0;i<5;i++) {
-  const z=-35-i*40;
+for(let i=0;i<5;i++){
   const gate=new THREE.Group();
-
   const ring=new THREE.Mesh(
     new THREE.TorusGeometry(3,.12,8,32),
     new THREE.MeshBasicMaterial({color:0x52d8e8})
@@ -726,180 +424,134 @@ for(let i=0;i<5;i++) {
   ring.position.y=2.5;
   gate.add(ring);
 
-  const postMat=new THREE.MeshStandardMaterial({color:0x52d8e8});
-  for(const x of [-3,3]) {
+  for(const x of [-3,3]){
     const post=new THREE.Mesh(
-      new THREE.BoxGeometry(.15,5,.15),postMat
+      new THREE.BoxGeometry(.15,5,.15),
+      new THREE.MeshStandardMaterial({color:0x52d8e8})
     );
     post.position.set(x,2.5,0);
     gate.add(post);
   }
 
-  gate.position.set(i%2===0?-3:3,0,z);
+  // Spread checkpoints around the map.
+  gate.position.set(
+    [-120,120,240,-240,0][i],
+    0,
+    [-180,-420,-120,120,-600][i]
+  );
   scene.add(gate);
   checkpoints.push(gate);
-  checkpointObjects.push({
-    active:true,
-    position:gate.position.clone()
-  });
+  checkpointStates.push(true);
 }
 
-/* ---------- GAME STATE ---------- */
+/* GAME STATE */
 
-let credits=0;
-let speed=0;
-let condition=100;
-let engineLevel=0;
-let handlingLevel=0;
-let armorLevel=0;
-let gameOver=false;
-
-let engineCost=100;
-let handlingCost=80;
-let armorCost=120;
+let credits=0,speed=0,condition=100;
+let engineLevel=0,handlingLevel=0,armorLevel=0;
+let engineCost=100,handlingCost=80,armorCost=120;
+let completed=0,gameOver=false,flipTimer=0;
+let steering=0;
 
 const keys={};
-let touchLeft=false;
-let touchRight=false;
-let touchGas=false;
-let touchBrake=false;
+let touchLeft=false,touchRight=false,touchGas=false,touchBrake=false;
 
-let vehicleRotation=0;
-let flipTimer=0;
+function tolerance(){return 110+armorLevel*18}
 
-function tolerance() {
-  return 110+armorLevel*18;
-}
-
-function showMessage(text) {
+function showMessage(text){
   const el=document.getElementById("message");
   el.textContent=text;
   el.classList.add("show");
   setTimeout(()=>el.classList.remove("show"),1800);
 }
 
-function updateUI() {
+function updateUI(){
   document.getElementById("credits").textContent=credits;
-  document.getElementById("speed").textContent=Math.round(Math.abs(speed)*4);
+  document.getElementById("speed").textContent=Math.round(speed*45);
   document.getElementById("wind").textContent=Math.round(stormWind);
   document.getElementById("windRead").textContent=Math.round(stormWind)+" MPH";
   document.getElementById("intensity").textContent="EF"+stormIntensity;
   document.getElementById("tolerance").textContent=tolerance()+" MPH";
   document.getElementById("condition").textContent=Math.max(0,Math.round(condition))+"%";
   document.getElementById("conditionbar").style.width=Math.max(0,condition)+"%";
-  document.getElementById("conditionbar").style.background=
-    condition<35?"#ff625e":"#52d8e8";
+  document.getElementById("conditionbar").style.background=condition<35?"#ff625e":"#52d8e8";
 
   document.getElementById("engineCost").textContent=engineCost;
   document.getElementById("handlingCost").textContent=handlingCost;
   document.getElementById("armorCost").textContent=armorCost;
 
   document.getElementById("garageinfo").innerHTML=
-    "Engine level: "+engineLevel+
-    "<br>Handling level: "+handlingLevel+
-    "<br>Armor level: "+armorLevel+
-    "<br>Wind tolerance: "+tolerance()+" MPH";
+    "Engine: "+engineLevel+"<br>Handling: "+handlingLevel+
+    "<br>Armor: "+armorLevel+"<br>Wind limit: "+tolerance()+" MPH";
 }
 
-/* ---------- UPGRADES ---------- */
-
-function buyUpgrade(type) {
-  if(gameOver) return;
-
-  if(type==="engine" && credits>=engineCost) {
-    credits-=engineCost;
-    engineLevel++;
-    engineCost+=75;
-    showMessage("ENGINE UPGRADED");
-  } else if(type==="handling" && credits>=handlingCost) {
-    credits-=handlingCost;
-    handlingLevel++;
-    handlingCost+=60;
-    showMessage("HANDLING UPGRADED");
-  } else if(type==="armor" && credits>=armorCost) {
-    credits-=armorCost;
-    armorLevel++;
-    armorCost+=90;
-    showMessage("REINFORCED BODY UPGRADED");
-  } else {
-    showMessage("NOT ENOUGH CREDITS");
-  }
-
+function buyUpgrade(type){
+  if(gameOver)return;
+  if(type==="engine"&&credits>=engineCost){
+    credits-=engineCost;engineLevel++;engineCost+=75;showMessage("ENGINE UPGRADED");
+  }else if(type==="handling"&&credits>=handlingCost){
+    credits-=handlingCost;handlingLevel++;handlingCost+=60;showMessage("HANDLING UPGRADED");
+  }else if(type==="armor"&&credits>=armorCost){
+    credits-=armorCost;armorLevel++;armorCost+=90;showMessage("BODY REINFORCED");
+  }else showMessage("NOT ENOUGH CREDITS");
   updateUI();
 }
 
-function repair() {
-  if(gameOver) return;
-
-  if(credits>=40 && condition<100) {
-    credits-=40;
-    condition=Math.min(100,condition+35);
-    showMessage("VEHICLE REPAIRED");
-  } else {
-    showMessage("REPAIR UNAVAILABLE");
-  }
-
+function repair(){
+  if(gameOver)return;
+  if(credits>=40&&condition<100){
+    credits-=40;condition=Math.min(100,condition+35);showMessage("VEHICLE REPAIRED");
+  }else showMessage("REPAIR UNAVAILABLE");
   updateUI();
 }
 
-/* ---------- INPUT ---------- */
+/* INPUT */
 
 window.addEventListener("keydown",e=>{
   keys[e.key.toLowerCase()]=true;
-  if(e.code==="Space") e.preventDefault();
+  if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key))e.preventDefault();
 });
+window.addEventListener("keyup",e=>keys[e.key.toLowerCase()]=false);
+window.addEventListener("blur",()=>Object.keys(keys).forEach(k=>keys[k]=false));
 
-window.addEventListener("keyup",e=>{
-  keys[e.key.toLowerCase()]=false;
-});
-
-function bindHold(id,callback) {
+function bindHold(id,callback){
   const el=document.getElementById(id);
   el.addEventListener("pointerdown",e=>{
     e.preventDefault();
+    el.setPointerCapture(e.pointerId);
     callback(true);
   });
-  el.addEventListener("pointerup",()=>callback(false));
-  el.addEventListener("pointerleave",()=>callback(false));
+  el.addEventListener("pointerup",e=>{e.preventDefault();callback(false)});
   el.addEventListener("pointercancel",()=>callback(false));
+  el.addEventListener("lostpointercapture",()=>callback(false));
 }
-
 bindHold("left",v=>touchLeft=v);
 bindHold("right",v=>touchRight=v);
 bindHold("gas",v=>touchGas=v);
 bindHold("brake",v=>touchBrake=v);
 
-/* ---------- TORNADO SHAPE ---------- */
+/* FUNNEL ANIMATION */
 
-function updateFunnel(time) {
-  const baseRadius=1.1+stormIntensity*.2;
-  const topRadius=7+stormIntensity*.6;
+function updateFunnel(time){
+  const base=1.05+stormIntensity*.2;
+  const top=7+stormIntensity*.65;
   const height=19+stormIntensity*1.2;
 
-  for(let y=0;y<=funnelSegments;y++) {
-    const v=y/funnelSegments;
-    const taper=Math.pow(v,.72);
+  for(let y=0;y<=segments;y++){
+    const v=y/segments;
+    const radius=base+(top-base)*Math.pow(v,.72);
 
-    // Narrow lower funnel, wider upper funnel.
-    // Higher intensity creates a thicker, less uniform shape.
-    const radius=baseRadius+(topRadius-baseRadius)*taper;
-    const intensityWobble=stormIntensity*.055;
-
-    for(let x=0;x<=funnelSides;x++) {
-      const u=x/funnelSides*Math.PI*2;
-      const wave=
-        Math.sin(u*3+time*2+v*8)*intensityWobble+
-        Math.sin(u*5-time*1.3+v*15)*intensityWobble*.55;
-
-      const changingRadius=radius+wave;
+    for(let x=0;x<=sides;x++){
+      const u=x/sides*Math.PI*2;
+      const wobble=
+        Math.sin(u*3+time*2+v*8)*stormIntensity*.055+
+        Math.sin(u*5-time*1.3+v*15)*stormIntensity*.03;
+      const r=radius+wobble;
       const twist=time*.7+v*2.8;
+      const n=(y*(sides+1)+x)*3;
 
-      const index=(y*(funnelSides+1)+x)*3;
-      funnelPositions[index]=
-        Math.cos(u+twist)*changingRadius;
-      funnelPositions[index+1]=v*height;
-      funnelPositions[index+2]=
-        Math.sin(u+twist)*changingRadius;
+      positions[n]=Math.cos(u+twist)*r;
+      positions[n+1]=v*height;
+      positions[n+2]=Math.sin(u+twist)*r;
     }
   }
 
@@ -908,265 +560,185 @@ function updateFunnel(time) {
 
   bands.forEach((band,i)=>{
     const v=.08+i*.12;
-    const radius=baseRadius+(topRadius-baseRadius)*Math.pow(v,.72);
+    const r=base+(top-base)*Math.pow(v,.72);
     band.position.y=v*height;
-    band.scale.set(radius,radius,1);
+    band.scale.set(r,r,1);
     band.rotation.z=time*(1.1+i*.1);
   });
 
-  debrisCloud.scale.set(
-    1+stormIntensity*.12,
-    1+stormIntensity*.12,
-    1+stormIntensity*.12
-  );
-
+  debrisCloud.scale.setScalar(1+stormIntensity*.12);
   debrisCloud.rotation.z=time*.7;
   topCloud.rotation.y=time*.08;
 }
 
-/* ---------- DEBRIS AND WIND ---------- */
-
-function updateDebris(time) {
-  debris.forEach((item,i)=>{
-    item.angle+=.012*item.speed*(.6+stormIntensity*.12);
-    item.mesh.position.set(
-      Math.cos(item.angle)*item.radius,
-      item.height+Math.sin(time*2+i)*.6,
-      Math.sin(item.angle)*item.radius
+function updateSwirl(time){
+  debris.forEach((d,i)=>{
+    d.angle+=.012*d.speed*(.6+stormIntensity*.12);
+    d.mesh.position.set(
+      Math.cos(d.angle)*d.radius,
+      d.height+Math.sin(time*2+i)*.6,
+      Math.sin(d.angle)*d.radius
     );
-    item.mesh.rotation.x+=.04;
-    item.mesh.rotation.y+=.05;
+    d.mesh.rotation.x+=.04;
+    d.mesh.rotation.y+=.05;
   });
 
-  streamers.forEach((item,i)=>{
-    item.angle+=.006*item.speed;
-    const positions=item.line.geometry.attributes.position;
-
-    for(let j=0;j<18;j++) {
-      const t=j/17;
-      const angle=item.angle+t*2.3;
-      const radius=item.radius+t*3;
-      positions.setXYZ(
-        j,
-        Math.cos(angle)*radius,
-        item.height+t*3,
-        Math.sin(angle)*radius
-      );
+  streamers.forEach(s=>{
+    s.angle+=.006*s.speed;
+    const p=s.line.geometry.attributes.position;
+    for(let j=0;j<18;j++){
+      const t=j/17,a=s.angle+t*2.3,r=s.radius+t*3;
+      p.setXYZ(j,Math.cos(a)*r,s.height+t*3,Math.sin(a)*r);
     }
-    positions.needsUpdate=true;
+    p.needsUpdate=true;
   });
 }
 
-/* ---------- PRECIPITATION ---------- */
+/* GAME OVER */
 
-function updateParticles(delta) {
-  const rp=rain.geometry.attributes.position.array;
-
-  for(let i=0;i<rainCount;i++) {
-    rp[i*3]+=.18;
-    rp[i*3+1]-=rainSpeeds[i]*delta*13;
-    rp[i*3+2]+=speed*.025;
-
-    if(rp[i*3+1]<0) {
-      rp[i*3+1]=55+Math.random()*10;
-      rp[i*3]=(Math.random()-.5)*180;
-      rp[i*3+2]=(Math.random()-.5)*180;
-    }
-  }
-  rain.geometry.attributes.position.needsUpdate=true;
-
-  const hp=hail.geometry.attributes.position.array;
-
-  for(let i=0;i<hailCount;i++) {
-    hp[i*3]+=.1;
-    hp[i*3+1]-=hailSpeeds[i]*delta*12;
-    hp[i*3+2]+=speed*.02;
-
-    if(hp[i*3+1]<0) {
-      hp[i*3+1]=45+Math.random()*10;
-      hp[i*3]=(Math.random()-.5)*150;
-      hp[i*3+2]=(Math.random()-.5)*150;
-    }
-  }
-  hail.geometry.attributes.position.needsUpdate=true;
-}
-
-/* ---------- GAME OVER ---------- */
-
-function endGame() {
-  if(gameOver) return;
-
+function endGame(){
+  if(gameOver)return;
   gameOver=true;
-  speed=0;
-
   document.getElementById("finalstats").textContent=
-    "Checkpoints completed: "+completed+"/5 · Credits earned: "+credits;
-
+    "Checkpoints: "+completed+"/5 · Credits: "+credits;
   document.getElementById("gameover").style.display="flex";
 }
+document.getElementById("restart").onclick=()=>location.reload();
 
-document.getElementById("restart").addEventListener("click",()=>{
-  location.reload();
-});
-
-/* ---------- MAIN LOOP ---------- */
+/* MAIN LOOP */
 
 const clock=new THREE.Clock();
-let lastTime=0;
 
-function animate() {
+function animate(){
   requestAnimationFrame(animate);
-
   const delta=Math.min(clock.getDelta(),.04);
   const time=clock.elapsedTime;
 
-  if(!gameOver) {
-    stormClock+=delta;
-
-    // Intensity gradually varies during the simulation.
+  if(!gameOver){
     stormIntensity=2+Math.floor((Math.sin(time*.045)+1)*1.5);
     stormIntensity=Math.max(1,Math.min(5,stormIntensity));
-
-    stormWind=65+stormIntensity*38+
-      Math.sin(time*.8)*8;
+    stormWind=65+stormIntensity*38+Math.sin(time*.8)*8;
 
     updateFunnel(time);
-    updateDebris(time);
-    updateParticles(delta);
+    updateSwirl(time);
 
-    // Vehicle controls
+    updateParticles(rain,delta,.2);
+    updateParticles(hail,delta,.3);
+
+    // Driving inputs
     const accelerating=keys["w"]||keys["arrowup"]||touchGas;
     const braking=keys["s"]||keys["arrowdown"]||touchBrake;
     const left=keys["a"]||keys["arrowleft"]||touchLeft;
     const right=keys["d"]||keys["arrowright"]||touchRight;
     const handbrake=keys[" "]||keys["space"];
 
-    const maxSpeed=1.05+engineLevel*.13;
+    // Slow arcade vehicle. Braking only reduces speed to zero.
+    const maxSpeed=.48+engineLevel*.045;
 
-    if(accelerating) speed+=.018+engineLevel*.003;
-    else if(braking) speed-=.035;
-    else speed*=.985;
+    if(accelerating)speed+=.006+engineLevel*.001;
+    else speed*=.992;
 
-    speed=THREE.MathUtils.clamp(speed,-.35,maxSpeed);
+    if(braking)speed=Math.max(0,speed-.035);
+    if(handbrake)speed=Math.max(0,speed-.055);
 
-    const steeringPower=.045+handlingLevel*.009;
-    if(left) car.position.x-=steeringPower*(.5+Math.abs(speed));
-    if(right) car.position.x+=steeringPower*(.5+Math.abs(speed));
+    speed=THREE.MathUtils.clamp(speed,0,maxSpeed);
 
-    if(handbrake) speed*=.94;
+    // Steering rotates the car; it can turn while moving or stopped.
+    const steerPower=(.018+handlingLevel*.004)*(speed>.02?1:.65);
+    if(left)steering+=steerPower;
+    if(right)steering-=steerPower;
+    steering*=.88;
+    steering=THREE.MathUtils.clamp(steering,-.055,.055);
 
-    car.position.x=THREE.MathUtils.clamp(car.position.x,-5.5,5.5);
+    car.rotation.y+=steering;
 
-    // Drive forward through the world.
-    car.position.z-=speed*60*delta;
+    // Drive forward in the direction the vehicle faces.
+    car.position.x-=Math.sin(car.rotation.y)*speed*35*delta;
+    car.position.z-=Math.cos(car.rotation.y)*speed*35*delta;
 
-    car.rotation.y=THREE.MathUtils.lerp(
-      car.rotation.y,
-      (right?-.16:0)+(left?.16:0),
-      .12
-    );
+    // Keep the player within the open world.
+    car.position.x=THREE.MathUtils.clamp(car.position.x,-680,680);
+    car.position.z=THREE.MathUtils.clamp(car.position.z,-1180,580);
 
     wheels.forEach(w=>w.rotation.x+=speed*.12);
 
-    // Keep the road and environment moving relative to the player.
-    markings.forEach(mark=>{
-      if(mark.position.z>car.position.z+20) {
-        mark.position.z-=1400;
-      }
-    });
-
-    // Camera follows vehicle.
-    const targetCamera=new THREE.Vector3(
-      car.position.x*.6,
+    // Camera stays behind the vehicle.
+    const behind=new THREE.Vector3(
+      Math.sin(car.rotation.y)*13,
       7,
-      car.position.z+13
+      Math.cos(car.rotation.y)*13
     );
-    camera.position.lerp(targetCamera,.08);
-    camera.lookAt(
-      car.position.x*.35,
-      2,
-      car.position.z-15
-    );
+    camera.position.lerp(car.position.clone().add(behind),.08);
 
-    // Keep the cloud deck spread over the play area.
-    cloudGroup.position.z=car.position.z*.15;
+    const look=car.position.clone();
+    look.y+=2;
+    look.x-=Math.sin(car.rotation.y)*12;
+    look.z-=Math.cos(car.rotation.y)*12;
+    camera.lookAt(look);
 
-    // Checkpoint completion.
+    // Move precipitation around the player.
+    rain.points.position.set(car.position.x,0,car.position.z);
+    hail.points.position.set(car.position.x,0,car.position.z);
+
+    // Observation checkpoints.
     checkpoints.forEach((gate,i)=>{
-      if(checkpointObjects[i].active &&
-         Math.abs(car.position.z-gate.position.z)<3 &&
-         Math.abs(car.position.x-gate.position.x)<5) {
-
-        checkpointObjects[i].active=false;
+      if(!checkpointStates[i])return;
+      const distance=car.position.distanceTo(gate.position);
+      if(distance<7){
+        checkpointStates[i]=false;
         gate.visible=false;
         completed++;
         credits+=65;
-
-        document.getElementById("cp"+i).textContent=
-          "✓ Checkpoint 0"+(i+1);
+        document.getElementById("cp"+i).textContent="✓ Checkpoint 0"+(i+1);
         document.getElementById("cp"+i).className="done";
-
         showMessage("OBSERVATION COMPLETE +65 CREDITS");
       }
     });
 
-    // Wind exposure is a fictional arcade mechanic.
-    // It does not reward approaching a real storm.
+    // Fictional arcade vehicle stress system.
     const stormDistance=car.position.distanceTo(tornado.position);
-
-    if(stormDistance<82 && stormWind>tolerance()) {
-      const overload=(stormWind-tolerance())/100;
-      condition-=delta*(2+overload*5);
+    if(stormDistance<82&&stormWind>tolerance()){
+      condition-=delta*(2+(stormWind-tolerance())/100*5);
       flipTimer+=delta;
-
-      if(flipTimer>2.2) {
+      if(flipTimer>2.2){
         car.rotation.z=Math.sin(time*8)*.22;
         car.rotation.x=Math.sin(time*5)*.12;
       }
-    } else {
+    }else{
       flipTimer=Math.max(0,flipTimer-delta*.5);
       car.rotation.z=THREE.MathUtils.lerp(car.rotation.z,0,.06);
       car.rotation.x=THREE.MathUtils.lerp(car.rotation.x,0,.06);
     }
 
-    if(condition<=0) {
-      endGame();
-    }
+    if(condition<=0)endGame();
 
-    // Lightning flashes at random intervals.
+    // Lightning flashes.
     lightningTimer-=delta;
-
-    if(lightningTimer<=0) {
+    if(lightningTimer<=0){
       createLightning();
       lightningTimer=3+Math.random()*8;
     }
-
-    if(lightningFlash>0) {
+    if(lightningFlash>0){
       lightningFlash-=delta;
-      if(lightningFlash<=0) {
+      if(lightningFlash<=0){
         lightningLight.intensity=0;
         lightningGroup.clear();
       }
     }
-
-    // Subtle storm darkness pulses.
-    const darkness=.72+Math.sin(time*.12)*.035;
-    scene.fog.density=.0075+(1-darkness)*.004;
 
     updateUI();
   }
 
   renderer.render(scene,camera);
 }
-
 animate();
 
-/* ---------- RESIZE ---------- */
+/* RESIZE */
 
 window.addEventListener("resize",()=>{
-  camera.aspect=window.innerWidth/window.innerHeight;
+  camera.aspect=innerWidth/innerHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth,window.innerHeight);
+  renderer.setSize(innerWidth,innerHeight);
 });
 </script>
 </body>
