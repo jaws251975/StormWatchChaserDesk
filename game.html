@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>ChaseDesk — Open World Simulator</title>
+<title>ChaseDesk — Open World Tornado Simulator</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -23,52 +23,93 @@ canvas{display:block}
 .stats{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
 .stat{font:11px "DM Mono",monospace;color:var(--muted)}
 .stat strong{color:var(--text)}
-.panel{position:fixed;z-index:5;background:#07111fe8;border:1px solid var(--line);border-radius:11px;padding:12px;backdrop-filter:blur(8px)}
-#telemetry{top:67px;left:10px;width:175px}
-#garage{top:67px;right:10px;width:170px}
-.heading{font-size:10px;font-weight:800;letter-spacing:1.3px;color:var(--cyan);margin-bottom:10px}
-.reading{display:flex;justify-content:space-between;gap:4px;margin:8px 0;color:var(--muted);font:10px "DM Mono",monospace}
+.panel{position:fixed;z-index:5;background:#07111fe8;border:1px solid var(--line);border-radius:11px;padding:11px;backdrop-filter:blur(8px)}
+#telemetry{top:65px;left:10px;width:174px}
+#garage{top:65px;right:10px;width:185px}
+.heading{font-size:10px;font-weight:800;letter-spacing:1.3px;color:var(--cyan);margin-bottom:9px}
+.reading{display:flex;justify-content:space-between;gap:4px;margin:7px 0;color:var(--muted);font:10px "DM Mono",monospace}
 .reading strong{color:var(--text)}
 .meter{height:6px;background:#1b2b3d;border-radius:8px;overflow:hidden}
 .meter div{height:100%;width:100%;background:var(--cyan)}
 button{font-family:Manrope,sans-serif;font-weight:700;color:var(--text);background:#132a40;border:1px solid #294761;border-radius:8px;padding:9px;cursor:pointer;touch-action:none}
-button:active{transform:scale(.96)}
+button:active{transform:scale(.97)}
+button:disabled{opacity:.45;cursor:not-allowed}
 .upgrade{display:block;width:100%;text-align:left;font-size:10px;margin:5px 0}
-#garage small{font:9px "DM Mono",monospace;color:var(--muted);line-height:1.6}
+#garage small{font:9px "DM Mono",monospace;color:var(--muted);line-height:1.6;display:block;margin-top:7px}
 #checkpoints{font:10px "DM Mono",monospace;color:var(--muted);line-height:2}
 .done{color:var(--cyan)}
-#message{position:fixed;top:22%;left:50%;transform:translateX(-50%);z-index:8;background:#07111fee;border:1px solid var(--cyan);border-radius:8px;padding:10px 15px;color:var(--cyan);font:11px "DM Mono",monospace;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+#message{position:fixed;top:21%;left:50%;transform:translateX(-50%);z-index:8;background:#07111fee;border:1px solid var(--cyan);border-radius:8px;padding:10px 15px;color:var(--cyan);font:11px "DM Mono",monospace;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
 #message.show{opacity:1}
 #controls{position:fixed;left:12px;right:12px;bottom:14px;display:flex;justify-content:space-between;align-items:flex-end;z-index:7;pointer-events:none}
 .controlgroup{display:flex;gap:8px;pointer-events:auto}
-.pad{width:65px;height:62px;font-size:21px;background:#07111fee;border:2px solid #496078;border-radius:13px;touch-action:none;user-select:none;-webkit-user-select:none}
-.pad.wide{width:78px;font-size:11px}
-#hint{position:fixed;bottom:85px;left:50%;transform:translateX(-50%);z-index:4;color:#b7c8d8;font:9px "DM Mono",monospace;background:#07111fbf;padding:6px 9px;border-radius:6px;white-space:nowrap}
-#gameover{position:fixed;inset:0;z-index:10;display:none;align-items:center;justify-content:center;background:#02070edb}
-#gameover .box{width:min(340px,90vw);background:var(--panel);border:1px solid var(--red);border-radius:15px;padding:25px;text-align:center}
-#gameover h1{color:var(--red)}
-#gameover p{font-size:13px;color:var(--muted)}
+.pad{width:63px;height:60px;font-size:21px;background:#07111fee;border:2px solid #496078;border-radius:13px;touch-action:none;user-select:none;-webkit-user-select:none}
+.pad.wide{width:75px;font-size:11px}
+#hint{position:fixed;bottom:82px;left:50%;transform:translateX(-50%);z-index:4;color:#b7c8d8;font:9px "DM Mono",monospace;background:#07111fbf;padding:6px 9px;border-radius:6px;white-space:nowrap}
+#gameover{position:fixed;inset:0;z-index:15;display:none;align-items:center;justify-content:center;background:#02070edb}
+.dialog{width:min(350px,90vw);background:var(--panel);border:1px solid var(--red);border-radius:15px;padding:24px;text-align:center}
+.dialog h1{color:var(--red)}
+.dialog p{font-size:13px;color:var(--muted)}
 #restart{width:100%;border-color:var(--cyan);margin-top:10px}
+
+/* Polaroid photo event */
+#photoEvent{
+  position:fixed;inset:0;z-index:12;display:none;
+  align-items:center;justify-content:center;
+  background:rgba(2,7,14,.88);backdrop-filter:blur(7px);
+}
+.photo-wrap{
+  width:min(440px,84vw);padding:13px 13px 20px;
+  background:#f2f0e8;border-radius:5px;
+  box-shadow:0 20px 80px #000b;
+  transform:rotate(-2deg);
+  animation:photoPop .35s ease-out;
+}
+.photo-wrap img{
+  width:100%;aspect-ratio:4/3;object-fit:cover;
+  display:block;background:#273747;
+}
+.photo-caption{
+  color:#17212a;text-align:center;
+  font-family:"DM Mono",monospace;
+  font-size:19px;font-weight:700;
+  padding-top:15px;letter-spacing:1px;
+}
+.photo-sub{
+  color:#515a61;text-align:center;
+  font:10px "DM Mono",monospace;padding-top:5px;
+}
+@keyframes photoPop{
+  from{transform:scale(.7) rotate(5deg);opacity:0}
+  to{transform:scale(1) rotate(-2deg);opacity:1}
+}
+#photoCountdown{
+  position:fixed;bottom:9%;left:50%;transform:translateX(-50%);
+  color:#fff;font:11px "DM Mono",monospace;
+}
+
+/* Mobile layout */
 @media(max-width:650px){
-  #telemetry{top:61px;width:145px;padding:9px}
-  #garage{top:auto;bottom:91px;width:145px;padding:8px}
+  #telemetry{top:59px;width:145px;padding:8px}
+  #garage{top:auto;bottom:88px;width:153px;padding:8px}
   .brand{font-size:10px;padding:8px}
   .stat{font-size:9px;padding:7px}
   .reading{font-size:9px;margin:6px 0}
-  .pad{width:58px;height:56px}
-  .pad.wide{width:67px;height:56px}
-  #hint{bottom:73px;font-size:8px}
+  .pad{width:56px;height:54px}
+  .pad.wide{width:65px;height:54px}
+  #hint{bottom:72px;font-size:8px}
   .heading{font-size:9px}
+  .upgrade{font-size:9px;padding:7px}
 }
 </style>
 </head>
 <body>
+
 <div id="game"></div>
 
 <div id="topbar">
   <div class="brand">CHASE<span>DESK</span> / OPEN WORLD</div>
   <div class="stats">
-    <div class="stat">CREDITS: <strong id="credits">0</strong></div>
+    <div class="stat">POINTS: <strong id="credits">0</strong></div>
     <div class="stat">SPEED: <strong id="speed">0</strong> MPH</div>
     <div class="stat">WIND: <strong id="wind">0</strong> MPH</div>
   </div>
@@ -82,26 +123,28 @@ button:active{transform:scale(.96)}
   <div class="reading"><span>CONDITION</span><strong id="condition">100%</strong></div>
   <div class="meter"><div id="conditionbar"></div></div>
   <br>
-  <div class="heading">OBSERVATION CHECKPOINTS</div>
+  <div class="heading">PHOTO LOCATIONS</div>
   <div id="checkpoints">
-    <div id="cp0">○ Checkpoint 01</div>
-    <div id="cp1">○ Checkpoint 02</div>
-    <div id="cp2">○ Checkpoint 03</div>
-    <div id="cp3">○ Checkpoint 04</div>
-    <div id="cp4">○ Checkpoint 05</div>
+    <div id="cp0">○ Photo point 01</div>
+    <div id="cp1">○ Photo point 02</div>
+    <div id="cp2">○ Photo point 03</div>
+    <div id="cp3">○ Photo point 04</div>
+    <div id="cp4">○ Photo point 05</div>
   </div>
 </div>
 
 <div id="garage" class="panel">
   <div class="heading">VEHICLE GARAGE</div>
+  <div class="reading"><span>YOUR VEHICLE</span><strong id="carName">STARTER</strong></div>
+  <button class="upgrade" id="buyCar" onclick="buyNextCar()">BUY NEXT CAR</button>
   <button class="upgrade" onclick="buyUpgrade('engine')">ENGINE — <span id="engineCost">100</span></button>
   <button class="upgrade" onclick="buyUpgrade('handling')">HANDLING — <span id="handlingCost">80</span></button>
-  <button class="upgrade" onclick="buyUpgrade('armor')">REINFORCED BODY — <span id="armorCost">120</span></button>
+  <button class="upgrade" onclick="buyUpgrade('armor')">BODY ARMOR — <span id="armorCost">120</span></button>
   <button class="upgrade" onclick="repair()">REPAIR — 40</button>
-  <small id="garageinfo">Starter vehicle<br>Wind tolerance: 110 MPH</small>
+  <small id="garageinfo">Starter vehicle<br>Wind limit: 110 MPH</small>
 </div>
 
-<div id="message">CHECKPOINT COMPLETE</div>
+<div id="message">PHOTO POINT COMPLETE</div>
 <div id="hint">WASD / ARROWS: DRIVE · SPACE: HANDBRAKE</div>
 
 <div id="controls">
@@ -115,8 +158,17 @@ button:active{transform:scale(.96)}
   </div>
 </div>
 
+<div id="photoEvent">
+  <div class="photo-wrap">
+    <img id="photoImage" alt="Tornado observation photograph">
+    <div class="photo-caption">PHOTO TAKEN!</div>
+    <div class="photo-sub" id="photoSub">CHASEDESK FIELD OBSERVATION</div>
+  </div>
+  <div id="photoCountdown">4</div>
+</div>
+
 <div id="gameover">
-  <div class="box">
+  <div class="dialog">
     <h1>VEHICLE DISABLED</h1>
     <p>The simulated storm overwhelmed your vehicle's protection.</p>
     <p id="finalstats"></p>
@@ -126,22 +178,25 @@ button:active{transform:scale(.96)}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
 <script>
-/* =========================================
-   CHASEDESK OPEN WORLD SIMULATOR
-========================================= */
+/* =====================================
+   CHASEDESK OPEN WORLD
+===================================== */
 
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x182333);
 scene.fog=new THREE.FogExp2(0x182333,.0035);
 
 const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,1800);
-const renderer=new THREE.WebGLRenderer({antialias:true});
+const renderer=new THREE.WebGLRenderer({
+  antialias:true,
+  preserveDrawingBuffer:true
+});
 renderer.setSize(innerWidth,innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
 renderer.shadowMap.enabled=true;
 document.getElementById("game").appendChild(renderer.domElement);
 
-scene.add(new THREE.HemisphereLight(0x8094ad,0x1a1b22,1.0));
+scene.add(new THREE.HemisphereLight(0x8094ad,0x1a1b22,1));
 const sun=new THREE.DirectionalLight(0x8995a8,1);
 sun.position.set(-40,80,30);
 scene.add(sun);
@@ -158,7 +213,7 @@ ground.receiveShadow=true;
 scene.add(ground);
 
 const roadMat=new THREE.MeshStandardMaterial({color:0x252b32,roughness:1});
-const markingMat=new THREE.MeshBasicMaterial({color:0xb7b5a4});
+const markMat=new THREE.MeshBasicMaterial({color:0xb7b5a4});
 
 function addRoad(x,z,width,length,rotation=0){
   const road=new THREE.Mesh(new THREE.PlaneGeometry(width,length),roadMat);
@@ -168,56 +223,47 @@ function addRoad(x,z,width,length,rotation=0){
   scene.add(road);
 }
 
-// A grid of roads across the open map.
-for(let x=-600;x<=600;x+=120) addRoad(x,-300,12,1800);
-for(let z=-1100;z<=500;z+=120) addRoad(0,z,1400,12,Math.PI/2);
+for(let x=-600;x<=600;x+=120)addRoad(x,-300,12,1800);
+for(let z=-1100;z<=500;z+=120)addRoad(0,z,1400,12,Math.PI/2);
 
-// Road markings on the main roads.
 for(let x=-600;x<=600;x+=120){
   for(let z=-1100;z<=500;z+=35){
-    const m=new THREE.Mesh(new THREE.BoxGeometry(.15,.025,7),markingMat);
-    m.position.set(x,.025,z);
-    scene.add(m);
+    const m=new THREE.Mesh(new THREE.BoxGeometry(.15,.025,7),markMat);
+    m.position.set(x,.025,z);scene.add(m);
   }
 }
 for(let z=-1100;z<=500;z+=120){
   for(let x=-600;x<=600;x+=35){
-    const m=new THREE.Mesh(new THREE.BoxGeometry(7,.025,.15),markingMat);
-    m.position.set(x,.026,z);
-    scene.add(m);
+    const m=new THREE.Mesh(new THREE.BoxGeometry(7,.025,.15),markMat);
+    m.position.set(x,.026,z);scene.add(m);
   }
 }
 
-// Trees and roadside scenery.
+// Trees
 const treeGroup=new THREE.Group();
 scene.add(treeGroup);
 
 for(let i=0;i<350;i++){
   const x=(Math.random()-.5)*1300;
   const z=(Math.random()-.5)*1650-250;
-
-  // Leave clear strips around the main roads.
-  if(Math.abs(x%120)<13 || Math.abs(z%120)<13) continue;
+  if(Math.abs(x%120)<14||Math.abs(z%120)<14)continue;
 
   const tree=new THREE.Group();
   const trunk=new THREE.Mesh(
     new THREE.CylinderGeometry(.12,.2,2,5),
     new THREE.MeshStandardMaterial({color:0x40372b})
   );
-  trunk.position.y=1;
-  tree.add(trunk);
+  trunk.position.y=1;tree.add(trunk);
 
   const leaves=new THREE.Mesh(
     new THREE.ConeGeometry(1.3,3.4,6),
     new THREE.MeshStandardMaterial({color:0x263a35})
   );
-  leaves.position.y=3.2;
-  tree.add(leaves);
-  tree.position.set(x,0,z);
-  treeGroup.add(tree);
+  leaves.position.y=3.2;tree.add(leaves);
+  tree.position.set(x,0,z);treeGroup.add(tree);
 }
 
-/* VEHICLE */
+/* VEHICLE MODELS */
 
 const car=new THREE.Group();
 scene.add(car);
@@ -225,34 +271,171 @@ scene.add(car);
 const bodyMat=new THREE.MeshStandardMaterial({color:0x287d9b,metalness:.35,roughness:.5});
 const darkMat=new THREE.MeshStandardMaterial({color:0x101820});
 const glassMat=new THREE.MeshStandardMaterial({color:0x152d3e,roughness:.2});
+const metalMat=new THREE.MeshStandardMaterial({color:0x697987,metalness:.75,roughness:.35});
+const wheelMat=new THREE.MeshStandardMaterial({color:0x11151a,roughness:.9});
 
-function block(parent,w,h,d,material,x,y,z){
-  const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);
-  mesh.position.set(x,y,z);
-  mesh.castShadow=true;
-  parent.add(mesh);
-  return mesh;
+function box(parent,w,h,d,material,x,y,z){
+  const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);
+  m.position.set(x,y,z);m.castShadow=true;parent.add(m);return m;
 }
 
-block(car,2.3,.65,4.2,bodyMat,0,.9,0);
-block(car,1.8,.85,1.8,glassMat,0,1.55,-.25);
-block(car,2.15,.3,1.15,bodyMat,0,1.1,-1.45);
-block(car,2.4,.25,.25,darkMat,0,.55,-2.12);
+function cylinder(parent,r1,r2,h,material,x,y,z,rotationX=0,rotationZ=0){
+  const m=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,12),material);
+  m.position.set(x,y,z);m.rotation.x=rotationX;m.rotation.z=rotationZ;
+  m.castShadow=true;parent.add(m);return m;
+}
 
-const wheels=[];
-for(const x of [-1.15,1.15]){
-  for(const z of [-1.35,1.35]){
-    const wheel=new THREE.Mesh(
-      new THREE.CylinderGeometry(.43,.43,.28,16),darkMat
-    );
-    wheel.rotation.z=Math.PI/2;
-    wheel.position.set(x,.48,z);
-    car.add(wheel);
-    wheels.push(wheel);
+let wheels=[];
+let deployParts=[];
+let currentCar=0;
+
+const carDefinitions=[
+  {name:"STARTER PICKUP",price:0,color:0x287d9b,limit:110},
+  {name:"STORM PICKUP",price:250,color:0xb33e2e,limit:145},
+  {name:"ARMORED INTERCEPTOR",price:600,color:0x343d49,limit:190}
+];
+
+function clearCar(){
+  while(car.children.length)car.remove(car.children[0]);
+  wheels=[];
+  deployParts=[];
+}
+
+function buildCar(index){
+  clearCar();
+
+  const def=carDefinitions[index];
+  const paint=new THREE.MeshStandardMaterial({
+    color:def.color,metalness:.45,roughness:.45
+  });
+
+  // Main pickup body
+  box(car,2.45,.7,4.7,paint,0,.92,0);
+  box(car,2.05,.85,2.0,glassMat,0,1.65,-.5);
+  box(car,2.3,.3,1.3,paint,0,1.2,-1.65);
+
+  // Front grille and bumper
+  box(car,1.35,.32,.08,darkMat,0,.83,-2.4);
+  box(car,2.6,.24,.25,metalMat,0,.55,-2.4);
+  box(car,.32,.22,.08,glassMat,-.85,1.15,-2.35);
+  box(car,.32,.22,.08,glassMat,.85,1.15,-2.35);
+
+  // Rear bed and side panels
+  box(car,1.9,.16,1.6,darkMat,0,1.35,1.45);
+  box(car,.12,.65,1.7,paint,-1.05,1.45,1.4);
+  box(car,.12,.65,1.7,paint,1.05,1.45,1.4);
+  box(car,2.3,.22,.22,paint,0,1.35,2.25);
+
+  // Roof rack and lights
+  for(const x of [-.8,.8]){
+    cylinder(car,.055,.055,2.1,metalMat,x,2.2,-.25,Math.PI/2);
+    box(car,.25,.12,.15,0x000000?darkMat:darkMat,x,2.15,-.3);
   }
+  for(let i=0;i<4;i++){
+    const lamp=new THREE.Mesh(
+      new THREE.BoxGeometry(.24,.12,.12),
+      new THREE.MeshBasicMaterial({color:0xffe6a3})
+    );
+    lamp.position.set(-.6+i*.4,2.12,-.3);car.add(lamp);
+  }
+
+  // Mirrors
+  for(const x of [-1.25,1.25]){
+    box(car,.12,.2,.28,metalMat,x,1.55,-.85);
+  }
+
+  // Wheels
+  for(const x of [-1.25,1.25]){
+    for(const z of [-1.55,1.55]){
+      const tire=new THREE.Mesh(
+        new THREE.CylinderGeometry(.48,.48,.32,18),wheelMat
+      );
+      tire.rotation.z=Math.PI/2;
+      tire.position.set(x,.5,z);
+      car.add(tire);wheels.push(tire);
+
+      const hub=new THREE.Mesh(
+        new THREE.CylinderGeometry(.2,.2,.34,12),metalMat
+      );
+      hub.rotation.z=Math.PI/2;
+      hub.position.set(x,.5,z);
+      car.add(hub);
+    }
+  }
+
+  if(index>=1){
+    // Extra storm-science equipment on the second vehicle
+    box(car,1.4,.45,1.2,darkMat,0,1.55,1.2);
+    for(const x of [-.7,.7]){
+      cylinder(car,.035,.035,1.2,metalMat,x,2.0,1.0);
+    }
+    box(car,2.5,.12,.12,metalMat,0,1.9,2.1);
+  }
+
+  if(index>=2){
+    // Heavy armored appearance
+    box(car,2.55,.25,3.8,metalMat,0,1.3,0);
+    box(car,2.5,.4,.22,darkMat,0,1.1,-2.42);
+
+    // Side protective panels
+    for(const x of [-1.27,1.27]){
+      box(car,.12,.8,2.6,metalMat,x,1.35,0);
+      box(car,.16,.22,2.8,darkMat,x*1.04,.95,0);
+    }
+
+    // Cosmetic retractable ground-spike assemblies.
+    // These are fictional visual parts, not functional engineering.
+    for(const x of [-1.15,1.15]){
+      const spike=new THREE.Group();
+      spike.position.set(x,.8,.7);
+      const housing=box(spike,.25,.25,.35,darkMat,0,0,0);
+      const tip=cylinder(spike,.04,.14,.8,metalMat,0,-.45,0);
+      tip.visible=false;
+      car.add(spike);
+      deployParts.push({group:spike,tip});
+    }
+
+    // Lowering platform visual
+    const platform=box(car,2.8,.12,3.8,metalMat,0,.25,0);
+    deployParts.push({platform,baseY:.25});
+  }
+
+  car.position.y=0;
 }
 
+buildCar(0);
 car.position.set(0,0,0);
+
+/* ARCADE DEPLOYMENT EFFECT */
+
+let deployed=false;
+
+function toggleDeployment(){
+  if(currentCar<2){
+    showMessage("UNLOCK THE ARMORED INTERCEPTOR FIRST");
+    return;
+  }
+  deployed=!deployed;
+
+  deployParts.forEach(part=>{
+    if(part.group){
+      part.group.position.y=deployed?.35:.8;
+      part.tip.visible=deployed;
+    }
+    if(part.platform){
+      part.platform.position.y=deployed?.08:.25;
+    }
+  });
+
+  showMessage(deployed?"ARCADE DEFENSE MODE ON":"DEFENSE MODE OFF");
+}
+
+const deployButton=document.createElement("button");
+deployButton.textContent="DEPLOY";
+deployButton.className="upgrade";
+deployButton.style.display="none";
+document.getElementById("garage").appendChild(deployButton);
+deployButton.onclick=toggleDeployment;
 
 /* TORNADO */
 
@@ -260,8 +443,18 @@ const tornado=new THREE.Group();
 tornado.position.set(100,0,-300);
 scene.add(tornado);
 
-let stormIntensity=2;
-let stormWind=130;
+let stormIntensity=2,stormWind=130;
+let stormTargetIndex=0;
+let tornadoMoveTimer=0;
+
+const tornadoTargets=[
+  new THREE.Vector3(100,0,-300),
+  new THREE.Vector3(260,0,-480),
+  new THREE.Vector3(-160,0,-540),
+  new THREE.Vector3(-300,0,-180),
+  new THREE.Vector3(180,0,100),
+  new THREE.Vector3(350,0,-50)
+];
 
 const segments=55,sides=32;
 const positions=new Float32Array((segments+1)*(sides+1)*3);
@@ -293,9 +486,7 @@ for(let i=0;i<7;i++){
     new THREE.TorusGeometry(1,.045,5,64),
     new THREE.MeshBasicMaterial({color:i%2?0x45494a:0x77736c,transparent:true,opacity:.5})
   );
-  band.rotation.x=Math.PI/2;
-  tornado.add(band);
-  bands.push(band);
+  band.rotation.x=Math.PI/2;tornado.add(band);bands.push(band);
 }
 
 const debrisCloud=new THREE.Mesh(
@@ -350,8 +541,7 @@ for(let i=0;i<140;i++){
 /* RAIN AND HAIL */
 
 function makeParticles(count,color,size,fallSpeed){
-  const p=new Float32Array(count*3);
-  const speeds=[];
+  const p=new Float32Array(count*3),speeds=[];
   for(let i=0;i<count;i++){
     p[i*3]=(Math.random()-.5)*180;
     p[i*3+1]=Math.random()*65;
@@ -368,10 +558,10 @@ function makeParticles(count,color,size,fallSpeed){
 const rain=makeParticles(1400,0x9cb9d0,.12,1.6);
 const hail=makeParticles(140,0xe0f4ff,.2,3.2);
 
-function updateParticles(system,delta,windPush){
+function updateParticles(system,delta){
   const p=system.points.geometry.attributes.position.array;
   for(let i=0;i<system.count;i++){
-    p[i*3]+=windPush*delta;
+    p[i*3]+=.2*delta;
     p[i*3+1]-=system.speeds[i]*delta*12;
     p[i*3+2]+=delta*1.5;
     if(p[i*3+1]<0){
@@ -397,8 +587,7 @@ function createLightning(){
   let x=(Math.random()-.5)*100,y=48,z=-100-Math.random()*150;
   points.push(new THREE.Vector3(x,y,z));
   for(let i=0;i<9;i++){
-    x+=(Math.random()-.5)*13;
-    y-=5;
+    x+=(Math.random()-.5)*13;y-=5;
     points.push(new THREE.Vector3(x,y,z));
   }
   lightningGroup.add(new THREE.Line(
@@ -410,10 +599,14 @@ function createLightning(){
   lightningFlash=.18;
 }
 
-/* CHECKPOINTS */
+/* PHOTO LOCATIONS */
 
 const checkpoints=[];
 const checkpointStates=[];
+
+const photoLocations=[
+  [-120,-180],[120,-420],[240,-120],[-240,120],[0,-600]
+];
 
 for(let i=0;i<5;i++){
   const gate=new THREE.Group();
@@ -421,24 +614,17 @@ for(let i=0;i<5;i++){
     new THREE.TorusGeometry(3,.12,8,32),
     new THREE.MeshBasicMaterial({color:0x52d8e8})
   );
-  ring.position.y=2.5;
-  gate.add(ring);
+  ring.position.y=2.5;gate.add(ring);
 
   for(const x of [-3,3]){
     const post=new THREE.Mesh(
       new THREE.BoxGeometry(.15,5,.15),
       new THREE.MeshStandardMaterial({color:0x52d8e8})
     );
-    post.position.set(x,2.5,0);
-    gate.add(post);
+    post.position.set(x,2.5,0);gate.add(post);
   }
 
-  // Spread checkpoints around the map.
-  gate.position.set(
-    [-120,120,240,-240,0][i],
-    0,
-    [-180,-420,-120,120,-600][i]
-  );
+  gate.position.set(photoLocations[i][0],0,photoLocations[i][1]);
   scene.add(gate);
   checkpoints.push(gate);
   checkpointStates.push(true);
@@ -451,16 +637,19 @@ let engineLevel=0,handlingLevel=0,armorLevel=0;
 let engineCost=100,handlingCost=80,armorCost=120;
 let completed=0,gameOver=false,flipTimer=0;
 let steering=0;
+let photoTimer=0,pendingPhoto=false;
+let photoNumber=0;
 
 const keys={};
 let touchLeft=false,touchRight=false,touchGas=false,touchBrake=false;
 
-function tolerance(){return 110+armorLevel*18}
+function tolerance(){
+  return carDefinitions[currentCar].limit+armorLevel*12;
+}
 
 function showMessage(text){
   const el=document.getElementById("message");
-  el.textContent=text;
-  el.classList.add("show");
+  el.textContent=text;el.classList.add("show");
   setTimeout(()=>el.classList.remove("show"),1800);
 }
 
@@ -478,10 +667,38 @@ function updateUI(){
   document.getElementById("engineCost").textContent=engineCost;
   document.getElementById("handlingCost").textContent=handlingCost;
   document.getElementById("armorCost").textContent=armorCost;
+  document.getElementById("carName").textContent=carDefinitions[currentCar].name;
+
+  const next=carDefinitions[currentCar+1];
+  const buyButton=document.getElementById("buyCar");
+  if(next){
+    buyButton.textContent="BUY NEXT CAR — "+next.price+" PTS";
+    buyButton.disabled=credits<next.price;
+  }else{
+    buyButton.textContent="ALL CARS UNLOCKED";
+    buyButton.disabled=true;
+  }
 
   document.getElementById("garageinfo").innerHTML=
     "Engine: "+engineLevel+"<br>Handling: "+handlingLevel+
     "<br>Armor: "+armorLevel+"<br>Wind limit: "+tolerance()+" MPH";
+
+  deployButton.style.display=currentCar===2?"block":"none";
+}
+
+function buyNextCar(){
+  if(gameOver)return;
+  const next=carDefinitions[currentCar+1];
+  if(!next){showMessage("ALL CARS UNLOCKED");return}
+  if(credits<next.price){showMessage("NOT ENOUGH POINTS");return}
+
+  credits-=next.price;
+  currentCar++;
+  buildCar(currentCar);
+  car.position.y=0;
+  condition=100;
+  showMessage("NEW VEHICLE UNLOCKED!");
+  updateUI();
 }
 
 function buyUpgrade(type){
@@ -492,7 +709,7 @@ function buyUpgrade(type){
     credits-=handlingCost;handlingLevel++;handlingCost+=60;showMessage("HANDLING UPGRADED");
   }else if(type==="armor"&&credits>=armorCost){
     credits-=armorCost;armorLevel++;armorCost+=90;showMessage("BODY REINFORCED");
-  }else showMessage("NOT ENOUGH CREDITS");
+  }else showMessage("NOT ENOUGH POINTS");
   updateUI();
 }
 
@@ -511,14 +728,15 @@ window.addEventListener("keydown",e=>{
   if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key))e.preventDefault();
 });
 window.addEventListener("keyup",e=>keys[e.key.toLowerCase()]=false);
-window.addEventListener("blur",()=>Object.keys(keys).forEach(k=>keys[k]=false));
+window.addEventListener("blur",()=>{
+  Object.keys(keys).forEach(k=>keys[k]=false);
+  touchLeft=touchRight=touchGas=touchBrake=false;
+});
 
 function bindHold(id,callback){
   const el=document.getElementById(id);
   el.addEventListener("pointerdown",e=>{
-    e.preventDefault();
-    el.setPointerCapture(e.pointerId);
-    callback(true);
+    e.preventDefault();el.setPointerCapture(e.pointerId);callback(true);
   });
   el.addEventListener("pointerup",e=>{e.preventDefault();callback(false)});
   el.addEventListener("pointercancel",()=>callback(false));
@@ -529,7 +747,7 @@ bindHold("right",v=>touchRight=v);
 bindHold("gas",v=>touchGas=v);
 bindHold("brake",v=>touchBrake=v);
 
-/* FUNNEL ANIMATION */
+/* TORNADO ANIMATION */
 
 function updateFunnel(time){
   const base=1.05+stormIntensity*.2;
@@ -539,22 +757,17 @@ function updateFunnel(time){
   for(let y=0;y<=segments;y++){
     const v=y/segments;
     const radius=base+(top-base)*Math.pow(v,.72);
-
     for(let x=0;x<=sides;x++){
       const u=x/sides*Math.PI*2;
-      const wobble=
-        Math.sin(u*3+time*2+v*8)*stormIntensity*.055+
+      const wobble=Math.sin(u*3+time*2+v*8)*stormIntensity*.055+
         Math.sin(u*5-time*1.3+v*15)*stormIntensity*.03;
-      const r=radius+wobble;
-      const twist=time*.7+v*2.8;
+      const r=radius+wobble,twist=time*.7+v*2.8;
       const n=(y*(sides+1)+x)*3;
-
       positions[n]=Math.cos(u+twist)*r;
       positions[n+1]=v*height;
       positions[n+2]=Math.sin(u+twist)*r;
     }
   }
-
   funnelGeometry.attributes.position.needsUpdate=true;
   funnelGeometry.computeVertexNormals();
 
@@ -594,13 +807,69 @@ function updateSwirl(time){
   });
 }
 
+/* MOVING TORNADO */
+
+function moveTornado(delta,time){
+  tornadoMoveTimer-=delta;
+
+  if(tornadoMoveTimer<=0){
+    stormTargetIndex=(stormTargetIndex+1)%tornadoTargets.length;
+    tornadoMoveTimer=24+Math.random()*12;
+  }
+
+  const target=tornadoTargets[stormTargetIndex];
+  const direction=new THREE.Vector3(
+    target.x-tornado.position.x,
+    0,
+    target.z-tornado.position.z
+  );
+
+  if(direction.length()>2){
+    direction.normalize();
+    tornado.position.x+=direction.x*delta*4.2;
+    tornado.position.z+=direction.z*delta*4.2;
+  }
+  tornado.rotation.y+=delta*.04;
+}
+
+/* PHOTO EVENT */
+
+function takePhoto(index){
+  if(photoTimer>0)return;
+
+  photoNumber=index+1;
+  photoTimer=4;
+  pendingPhoto=true;
+  credits+=50;
+
+  document.getElementById("photoSub").textContent=
+    "CHASEDESK FIELD OBSERVATION · PHOTO "+String(photoNumber).padStart(2,"0");
+
+  document.getElementById("photoEvent").style.display="flex";
+  document.getElementById("photoCountdown").textContent="4";
+  showMessage("PHOTO POINT COMPLETE +50 POINTS");
+  updateUI();
+}
+
+function finishPhotoCapture(){
+  if(!pendingPhoto)return;
+  pendingPhoto=false;
+
+  try{
+    document.getElementById("photoImage").src=
+      renderer.domElement.toDataURL("image/png");
+  }catch(e){
+    document.getElementById("photoImage").src="";
+  }
+}
+
 /* GAME OVER */
 
 function endGame(){
   if(gameOver)return;
   gameOver=true;
   document.getElementById("finalstats").textContent=
-    "Checkpoints: "+completed+"/5 · Credits: "+credits;
+    "Photos: "+completed+"/5 · Points: "+credits;
   document.getElementById("gameover").style.display="flex";
 }
 document.getElementById("restart").onclick=()=>location.reload();
@@ -621,98 +890,103 @@ function animate(){
 
     updateFunnel(time);
     updateSwirl(time);
+    moveTornado(delta,time);
 
-    updateParticles(rain,delta,.2);
-    updateParticles(hail,delta,.3);
+    updateParticles(rain,delta);
+    updateParticles(hail,delta);
 
-    // Driving inputs
-    const accelerating=keys["w"]||keys["arrowup"]||touchGas;
-    const braking=keys["s"]||keys["arrowdown"]||touchBrake;
-    const left=keys["a"]||keys["arrowleft"]||touchLeft;
-    const right=keys["d"]||keys["arrowright"]||touchRight;
-    const handbrake=keys[" "]||keys["space"];
-
-    // Slow arcade vehicle. Braking only reduces speed to zero.
-    const maxSpeed=.48+engineLevel*.045;
-
-    if(accelerating)speed+=.006+engineLevel*.001;
-    else speed*=.992;
-
-    if(braking)speed=Math.max(0,speed-.035);
-    if(handbrake)speed=Math.max(0,speed-.055);
-
-    speed=THREE.MathUtils.clamp(speed,0,maxSpeed);
-
-    // Steering rotates the car; it can turn while moving or stopped.
-    const steerPower=(.018+handlingLevel*.004)*(speed>.02?1:.65);
-    if(left)steering+=steerPower;
-    if(right)steering-=steerPower;
-    steering*=.88;
-    steering=THREE.MathUtils.clamp(steering,-.055,.055);
-
-    car.rotation.y+=steering;
-
-    // Drive forward in the direction the vehicle faces.
-    car.position.x-=Math.sin(car.rotation.y)*speed*35*delta;
-    car.position.z-=Math.cos(car.rotation.y)*speed*35*delta;
-
-    // Keep the player within the open world.
-    car.position.x=THREE.MathUtils.clamp(car.position.x,-680,680);
-    car.position.z=THREE.MathUtils.clamp(car.position.z,-1180,580);
-
-    wheels.forEach(w=>w.rotation.x+=speed*.12);
-
-    // Camera stays behind the vehicle.
-    const behind=new THREE.Vector3(
-      Math.sin(car.rotation.y)*13,
-      7,
-      Math.cos(car.rotation.y)*13
-    );
-    camera.position.lerp(car.position.clone().add(behind),.08);
-
-    const look=car.position.clone();
-    look.y+=2;
-    look.x-=Math.sin(car.rotation.y)*12;
-    look.z-=Math.cos(car.rotation.y)*12;
-    camera.lookAt(look);
-
-    // Move precipitation around the player.
-    rain.points.position.set(car.position.x,0,car.position.z);
-    hail.points.position.set(car.position.x,0,car.position.z);
-
-    // Observation checkpoints.
-    checkpoints.forEach((gate,i)=>{
-      if(!checkpointStates[i])return;
-      const distance=car.position.distanceTo(gate.position);
-      if(distance<7){
-        checkpointStates[i]=false;
-        gate.visible=false;
-        completed++;
-        credits+=65;
-        document.getElementById("cp"+i).textContent="✓ Checkpoint 0"+(i+1);
-        document.getElementById("cp"+i).className="done";
-        showMessage("OBSERVATION COMPLETE +65 CREDITS");
-      }
-    });
-
-    // Fictional arcade vehicle stress system.
-    const stormDistance=car.position.distanceTo(tornado.position);
-    if(stormDistance<82&&stormWind>tolerance()){
-      condition-=delta*(2+(stormWind-tolerance())/100*5);
-      flipTimer+=delta;
-      if(flipTimer>2.2){
-        car.rotation.z=Math.sin(time*8)*.22;
-        car.rotation.x=Math.sin(time*5)*.12;
+    // Photo event pauses driving for four seconds.
+    if(photoTimer>0){
+      photoTimer=Math.max(0,photoTimer-delta);
+      document.getElementById("photoCountdown").textContent=
+        Math.ceil(photoTimer);
+      if(photoTimer===0){
+        document.getElementById("photoEvent").style.display="none";
       }
     }else{
-      flipTimer=Math.max(0,flipTimer-delta*.5);
-      car.rotation.z=THREE.MathUtils.lerp(car.rotation.z,0,.06);
-      car.rotation.x=THREE.MathUtils.lerp(car.rotation.x,0,.06);
+      // Driving
+      const accelerating=keys["w"]||keys["arrowup"]||touchGas;
+      const braking=keys["s"]||keys["arrowdown"]||touchBrake;
+      const left=keys["a"]||keys["arrowleft"]||touchLeft;
+      const right=keys["d"]||keys["arrowright"]||touchRight;
+      const handbrake=keys[" "]||keys["space"];
+
+      const maxSpeed=.48+engineLevel*.045;
+
+      if(accelerating)speed+=.006+engineLevel*.001;
+      else speed*=.992;
+
+      // Brake never reverses the car.
+      if(braking)speed=Math.max(0,speed-.035);
+      if(handbrake)speed=Math.max(0,speed-.055);
+      speed=THREE.MathUtils.clamp(speed,0,maxSpeed);
+
+      // Slightly less sensitive steering.
+      const steerPower=(.014+handlingLevel*.003)*(speed>.02?1:.65);
+      if(left)steering+=steerPower;
+      if(right)steering-=steerPower;
+      steering*=.88;
+      steering=THREE.MathUtils.clamp(steering,-.045,.045);
+
+      car.rotation.y+=steering;
+
+      car.position.x-=Math.sin(car.rotation.y)*speed*35*delta;
+      car.position.z-=Math.cos(car.rotation.y)*speed*35*delta;
+
+      car.position.x=THREE.MathUtils.clamp(car.position.x,-680,680);
+      car.position.z=THREE.MathUtils.clamp(car.position.z,-1180,580);
+
+      wheels.forEach(w=>w.rotation.x+=speed*.12);
+
+      // Camera follows behind the car.
+      const behind=new THREE.Vector3(
+        Math.sin(car.rotation.y)*13,7,
+        Math.cos(car.rotation.y)*13
+      );
+      camera.position.lerp(car.position.clone().add(behind),.08);
+
+      const look=car.position.clone();
+      look.y+=2;
+      look.x-=Math.sin(car.rotation.y)*12;
+      look.z-=Math.cos(car.rotation.y)*12;
+      camera.lookAt(look);
+
+      // Center precipitation around the player.
+      rain.points.position.set(car.position.x,0,car.position.z);
+      hail.points.position.set(car.position.x,0,car.position.z);
+
+      // Photo locations.
+      checkpoints.forEach((gate,i)=>{
+        if(!checkpointStates[i])return;
+        if(car.position.distanceTo(gate.position)<8){
+          checkpointStates[i]=false;
+          gate.visible=false;
+          completed++;
+          document.getElementById("cp"+i).textContent="✓ Photo point 0"+(i+1);
+          document.getElementById("cp"+i).className="done";
+          takePhoto(i);
+        }
+      });
+
+      // Fictional arcade vehicle stress mechanic.
+      const stormDistance=car.position.distanceTo(tornado.position);
+      if(stormDistance<82&&stormWind>tolerance()){
+        condition-=delta*(2+(stormWind-tolerance())/100*5);
+        flipTimer+=delta;
+        if(flipTimer>2.2){
+          car.rotation.z=Math.sin(time*8)*.22;
+          car.rotation.x=Math.sin(time*5)*.12;
+        }
+      }else{
+        flipTimer=Math.max(0,flipTimer-delta*.5);
+        car.rotation.z=THREE.MathUtils.lerp(car.rotation.z,0,.06);
+        car.rotation.x=THREE.MathUtils.lerp(car.rotation.x,0,.06);
+      }
+
+      if(condition<=0)endGame();
     }
 
-    if(condition<=0)endGame();
-
-    // Lightning flashes.
+    // Lightning
     lightningTimer-=delta;
     if(lightningTimer<=0){
       createLightning();
@@ -730,7 +1004,9 @@ function animate(){
   }
 
   renderer.render(scene,camera);
+  finishPhotoCapture();
 }
+
 animate();
 
 /* RESIZE */
