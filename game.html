@@ -4,1018 +4,807 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>ChaseDesk — Open World Tornado Simulator</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>ChaseDesk — Tornado Intercept Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root {
+:root{
   --bg:#07111f;--panel:#0d1c2d;--line:#20344a;
   --text:#edf5ff;--muted:#9db0c5;--cyan:#52d8e8;
-  --red:#ff625e;--yellow:#ffd166;
+  --blue:#55b8ff;--red:#ff555f;--gold:#ffd166;
 }
 *{box-sizing:border-box}
-body{margin:0;overflow:hidden;background:var(--bg);color:var(--text);font-family:Manrope,sans-serif;touch-action:none}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Manrope,Arial;overflow:hidden}
+button{font-family:inherit;color:var(--text);background:#142a40;border:1px solid var(--line);border-radius:8px;padding:10px 13px;font-weight:800;cursor:pointer}
+button:hover{border-color:var(--cyan)}
+button:disabled{opacity:.4}
 #game{position:fixed;inset:0}
-canvas{display:block}
-#topbar{position:fixed;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;gap:6px;z-index:5;pointer-events:none}
-.brand,.stat{background:#07111fe8;border:1px solid var(--line);border-radius:9px;padding:9px 11px;backdrop-filter:blur(8px)}
-.brand{font-weight:800;letter-spacing:1px;font-size:13px}
-.brand span{color:var(--cyan)}
-.stats{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
-.stat{font:11px "DM Mono",monospace;color:var(--muted)}
-.stat strong{color:var(--text)}
-.panel{position:fixed;z-index:5;background:#07111fe8;border:1px solid var(--line);border-radius:11px;padding:11px;backdrop-filter:blur(8px)}
-#telemetry{top:65px;left:10px;width:174px}
-#garage{top:65px;right:10px;width:185px}
-.heading{font-size:10px;font-weight:800;letter-spacing:1.3px;color:var(--cyan);margin-bottom:9px}
-.reading{display:flex;justify-content:space-between;gap:4px;margin:7px 0;color:var(--muted);font:10px "DM Mono",monospace}
-.reading strong{color:var(--text)}
-.meter{height:6px;background:#1b2b3d;border-radius:8px;overflow:hidden}
-.meter div{height:100%;width:100%;background:var(--cyan)}
-button{font-family:Manrope,sans-serif;font-weight:700;color:var(--text);background:#132a40;border:1px solid #294761;border-radius:8px;padding:9px;cursor:pointer;touch-action:none}
-button:active{transform:scale(.97)}
-button:disabled{opacity:.45;cursor:not-allowed}
-.upgrade{display:block;width:100%;text-align:left;font-size:10px;margin:5px 0}
-#garage small{font:9px "DM Mono",monospace;color:var(--muted);line-height:1.6;display:block;margin-top:7px}
-#checkpoints{font:10px "DM Mono",monospace;color:var(--muted);line-height:2}
-.done{color:var(--cyan)}
-#message{position:fixed;top:21%;left:50%;transform:translateX(-50%);z-index:8;background:#07111fee;border:1px solid var(--cyan);border-radius:8px;padding:10px 15px;color:var(--cyan);font:11px "DM Mono",monospace;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+#hud{position:fixed;inset:0;pointer-events:none}
+.panel{background:#081522e8;border:1px solid var(--line);border-radius:10px;padding:11px;backdrop-filter:blur(8px)}
+#topbar{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.brand{font-size:14px;font-weight:900;letter-spacing:1px}
+.mono{font-family:"DM Mono",monospace;font-size:11px;color:var(--muted)}
+.stat{font-family:"DM Mono",monospace;font-size:13px;margin-top:4px}
+#stormBox{position:absolute;top:75px;left:10px;width:175px}
+#vehicleBox{position:absolute;top:75px;right:10px;width:175px;text-align:right}
+#actions{position:absolute;top:160px;right:10px;display:flex;flex-direction:column;gap:6px;pointer-events:auto}
+#actions button{font-size:11px}
+#message{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:900;font-size:20px;text-align:center;text-shadow:0 2px 12px #000;opacity:0;transition:opacity .3s;pointer-events:none}
 #message.show{opacity:1}
-#controls{position:fixed;left:12px;right:12px;bottom:14px;display:flex;justify-content:space-between;align-items:flex-end;z-index:7;pointer-events:none}
-.controlgroup{display:flex;gap:8px;pointer-events:auto}
-.pad{width:63px;height:60px;font-size:21px;background:#07111fee;border:2px solid #496078;border-radius:13px;touch-action:none;user-select:none;-webkit-user-select:none}
-.pad.wide{width:75px;font-size:11px}
-#hint{position:fixed;bottom:82px;left:50%;transform:translateX(-50%);z-index:4;color:#b7c8d8;font:9px "DM Mono",monospace;background:#07111fbf;padding:6px 9px;border-radius:6px;white-space:nowrap}
-#gameover{position:fixed;inset:0;z-index:15;display:none;align-items:center;justify-content:center;background:#02070edb}
-.dialog{width:min(350px,90vw);background:var(--panel);border:1px solid var(--red);border-radius:15px;padding:24px;text-align:center}
-.dialog h1{color:var(--red)}
-.dialog p{font-size:13px;color:var(--muted)}
-#restart{width:100%;border-color:var(--cyan);margin-top:10px}
-
-/* Polaroid photo event */
-#photoEvent{
-  position:fixed;inset:0;z-index:12;display:none;
-  align-items:center;justify-content:center;
-  background:rgba(2,7,14,.88);backdrop-filter:blur(7px);
-}
-.photo-wrap{
-  width:min(440px,84vw);padding:13px 13px 20px;
-  background:#f2f0e8;border-radius:5px;
-  box-shadow:0 20px 80px #000b;
-  transform:rotate(-2deg);
-  animation:photoPop .35s ease-out;
-}
-.photo-wrap img{
-  width:100%;aspect-ratio:4/3;object-fit:cover;
-  display:block;background:#273747;
-}
-.photo-caption{
-  color:#17212a;text-align:center;
-  font-family:"DM Mono",monospace;
-  font-size:19px;font-weight:700;
-  padding-top:15px;letter-spacing:1px;
-}
-.photo-sub{
-  color:#515a61;text-align:center;
-  font:10px "DM Mono",monospace;padding-top:5px;
-}
-@keyframes photoPop{
-  from{transform:scale(.7) rotate(5deg);opacity:0}
-  to{transform:scale(1) rotate(-2deg);opacity:1}
-}
-#photoCountdown{
-  position:fixed;bottom:9%;left:50%;transform:translateX(-50%);
-  color:#fff;font:11px "DM Mono",monospace;
-}
-
-/* Mobile layout */
+#bottom{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap}
+#bottom .panel{padding:7px 12px}
+#controls{position:absolute;bottom:15px;left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none}
+.pad{display:grid;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(2,43px);gap:5px;pointer-events:auto}
+.pad button{padding:3px;font-size:17px;background:#0a1b2bd9;touch-action:none}
+.pad .wide{grid-column:2}
+#rightControls{display:flex;gap:6px;align-items:flex-end;pointer-events:auto}
+#rightControls button{touch-action:none}
+#garage{position:fixed;z-index:5;right:10px;bottom:100px;width:240px;max-height:55vh;overflow:auto;display:none}
+#garage h3{margin:0 0 8px}
+#garage button{width:100%;margin:3px 0;text-align:left;font-size:11px}
+#intro,#gameover{position:fixed;inset:0;z-index:10;background:#030914;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px}
+#introContent,#overContent{max-width:500px}
+#intro h1{font-size:clamp(30px,7vw,54px);margin:0;color:var(--cyan)}
+#intro p{color:var(--muted);line-height:1.6}
+#startBtn{background:#12384b;border-color:var(--cyan);font-size:16px;padding:14px 24px}
+#formation{width:min(90vw,420px);height:180px;margin:20px auto;position:relative;overflow:hidden;background:linear-gradient(#182b40,#111b28 65%,#080e17);border-radius:12px;border:1px solid #29435c}
+.formCloud{position:absolute;background:#68788b;border-radius:50%;filter:blur(7px);opacity:.8}
+#form1{width:250px;height:65px;top:35px;left:80px;animation:cloudmove 4s infinite alternate}
+#form2{width:170px;height:55px;top:53px;left:20px;animation:cloudmove 5s infinite alternate-reverse}
+#formWall{position:absolute;top:88px;left:150px;width:120px;height:28px;background:#46596b;border-radius:50%;filter:blur(5px)}
+#formFunnel{position:absolute;top:96px;left:185px;width:48px;height:0;background:linear-gradient(#7c8995,#394858);clip-path:polygon(25% 0,75% 0,100% 100%,0 100%);animation:formdown 5s forwards}
+#formDust{position:absolute;bottom:15px;left:165px;width:90px;height:20px;background:#6b655b;border-radius:50%;filter:blur(7px);opacity:0;animation:dust 5s forwards}
+@keyframes formdown{0%,25%{height:0}75%,100%{height:75px}}
+@keyframes dust{0%,70%{opacity:0}100%{opacity:.9}}
+@keyframes cloudmove{to{transform:translateX(35px)}}
+#photo{position:fixed;z-index:8;inset:0;background:#020812d9;display:none;align-items:center;justify-content:center}
+.polaroid{background:#f5f1e8;color:#111;padding:12px 12px 35px;transform:rotate(-2deg);width:min(85vw,380px);box-shadow:0 15px 60px #000}
+.polaroid img{width:100%;display:block;aspect-ratio:16/9;object-fit:cover;background:#222}
+.polaroid strong{display:block;text-align:center;margin-top:12px;font-family:"DM Mono";letter-spacing:2px}
+#toast{position:fixed;z-index:20;bottom:20%;left:50%;transform:translateX(-50%);background:#071522ed;border:1px solid var(--cyan);padding:10px 16px;border-radius:8px;display:none;font-weight:800}
 @media(max-width:650px){
-  #telemetry{top:59px;width:145px;padding:8px}
-  #garage{top:auto;bottom:88px;width:153px;padding:8px}
-  .brand{font-size:10px;padding:8px}
-  .stat{font-size:9px;padding:7px}
-  .reading{font-size:9px;margin:6px 0}
-  .pad{width:56px;height:54px}
-  .pad.wide{width:65px;height:54px}
-  #hint{bottom:72px;font-size:8px}
-  .heading{font-size:9px}
-  .upgrade{font-size:9px;padding:7px}
+ #stormBox,#vehicleBox{top:70px;width:145px;padding:8px}
+ #actions{top:160px}
+ #actions button{padding:8px;font-size:10px}
+ #controls{bottom:12px}
+ .pad{grid-template-columns:repeat(3,42px);grid-template-rows:repeat(2,38px)}
+ #rightControls{flex-direction:column}
+ #bottom{bottom:125px}
+ #garage{bottom:170px;width:210px}
 }
 </style>
 </head>
 <body>
-
 <div id="game"></div>
 
-<div id="topbar">
-  <div class="brand">CHASE<span>DESK</span> / OPEN WORLD</div>
-  <div class="stats">
-    <div class="stat">POINTS: <strong id="credits">0</strong></div>
-    <div class="stat">SPEED: <strong id="speed">0</strong> MPH</div>
-    <div class="stat">WIND: <strong id="wind">0</strong> MPH</div>
+<div id="intro">
+ <div id="introContent">
+  <div class="mono">CHASEDESK // FIELD SIMULATOR</div>
+  <h1>TORNADO INTERCEPT</h1>
+  <div id="formation">
+   <div class="formCloud" id="form1"></div>
+   <div class="formCloud" id="form2"></div>
+   <div id="formWall"></div>
+   <div id="formFunnel"></div>
+   <div id="formDust"></div>
   </div>
+  <p>A supercell develops. A wall cloud forms. A funnel reaches the ground.</p>
+  <p>Explore the world, photograph storms, place research probes, and upgrade your vehicles.</p>
+  <button id="startBtn">START GAME</button>
+  <div class="mono" style="margin-top:12px">FICTIONAL ARCADE WEATHER SIMULATION</div>
+ </div>
 </div>
 
-<div id="telemetry" class="panel">
-  <div class="heading">STORM TELEMETRY</div>
-  <div class="reading"><span>INTENSITY</span><strong id="intensity">EF2</strong></div>
-  <div class="reading"><span>TORNADO WIND</span><strong id="windRead">130 MPH</strong></div>
-  <div class="reading"><span>VEHICLE LIMIT</span><strong id="tolerance">110 MPH</strong></div>
-  <div class="reading"><span>CONDITION</span><strong id="condition">100%</strong></div>
-  <div class="meter"><div id="conditionbar"></div></div>
-  <br>
-  <div class="heading">PHOTO LOCATIONS</div>
-  <div id="checkpoints">
-    <div id="cp0">○ Photo point 01</div>
-    <div id="cp1">○ Photo point 02</div>
-    <div id="cp2">○ Photo point 03</div>
-    <div id="cp3">○ Photo point 04</div>
-    <div id="cp4">○ Photo point 05</div>
+<div id="hud">
+ <div id="topbar">
+  <div class="panel">
+   <div class="brand">🌪 CHASEDESK</div>
+   <div class="mono">TORNADO FIELD OPERATIONS</div>
   </div>
+  <div class="panel" style="text-align:right">
+   <div class="mono">TOKENS</div>
+   <div class="stat" id="tokens">100</div>
+  </div>
+ </div>
+
+ <div class="panel" id="stormBox">
+  <div class="mono">ACTIVE TORNADO</div>
+  <div class="stat" id="ef">EF3</div>
+  <div class="stat" id="wind">WIND: 165 MPH</div>
+  <div class="mono" id="substatus">SUB-VORTICES: 0</div>
+  <div class="mono" id="stormStatus">MOVING</div>
+ </div>
+
+ <div class="panel" id="vehicleBox">
+  <div class="mono" id="vehicleName">STARTER PICKUP</div>
+  <div class="stat" id="speed">0 MPH</div>
+  <div class="mono" id="fuel">FUEL: 100%</div>
+  <div class="mono" id="mode">IN VEHICLE</div>
+ </div>
+
+ <div id="actions">
+  <button id="newTornado">🌪 MAKE NEW TORNADO</button>
+  <button id="photoBtn">📷 TAKE PHOTO</button>
+  <button id="probeBtn">📡 PLACE PROBE</button>
+  <button id="garageBtn">🚙 GARAGE</button>
+  <button id="enterBtn">🚶 EXIT / ENTER</button>
+ </div>
+
+ <div id="message"></div>
+
+ <div id="bottom">
+  <div class="panel mono" id="hint">WASD / ARROWS TO DRIVE · SPACE TO BRAKE · E TO EXIT / ENTER</div>
+ </div>
+
+ <div id="controls">
+  <div class="pad">
+   <button data-key="ArrowUp" class="wide">▲</button>
+   <button data-key="ArrowLeft">◀</button>
+   <button data-key="ArrowDown">▼</button>
+   <button data-key="ArrowRight">▶</button>
+  </div>
+  <div id="rightControls">
+   <button data-key="Space">BRAKE</button>
+   <button id="mobilePhoto">PHOTO</button>
+  </div>
+ </div>
 </div>
 
 <div id="garage" class="panel">
-  <div class="heading">VEHICLE GARAGE</div>
-  <div class="reading"><span>YOUR VEHICLE</span><strong id="carName">STARTER</strong></div>
-  <button class="upgrade" id="buyCar" onclick="buyNextCar()">BUY NEXT CAR</button>
-  <button class="upgrade" onclick="buyUpgrade('engine')">ENGINE — <span id="engineCost">100</span></button>
-  <button class="upgrade" onclick="buyUpgrade('handling')">HANDLING — <span id="handlingCost">80</span></button>
-  <button class="upgrade" onclick="buyUpgrade('armor')">BODY ARMOR — <span id="armorCost">120</span></button>
-  <button class="upgrade" onclick="repair()">REPAIR — 40</button>
-  <small id="garageinfo">Starter vehicle<br>Wind limit: 110 MPH</small>
+ <h3>VEHICLE GARAGE</h3>
+ <div class="mono" id="garageInfo">CURRENT VEHICLE</div>
+ <button id="buyStorm">BUY NEXT CAR — STORM PICKUP · 250 TOKENS</button>
+ <button id="buyArmor">BUY NEXT CAR — ARMORED INTERCEPTOR · 600 TOKENS</button>
+ <button id="upgradeEngine">UPGRADE ENGINE · 100 TOKENS</button>
+ <button id="upgradeArmor">UPGRADE WIND TOLERANCE · 100 TOKENS</button>
+ <button id="repair">REPAIR VEHICLE · 40 TOKENS</button>
+ <button id="closeGarage">CLOSE GARAGE</button>
 </div>
 
-<div id="message">PHOTO POINT COMPLETE</div>
-<div id="hint">WASD / ARROWS: DRIVE · SPACE: HANDBRAKE</div>
-
-<div id="controls">
-  <div class="controlgroup">
-    <button class="pad" id="left">◀</button>
-    <button class="pad" id="right">▶</button>
-  </div>
-  <div class="controlgroup">
-    <button class="pad wide" id="brake">BRAKE</button>
-    <button class="pad wide" id="gas">GAS</button>
-  </div>
+<div id="photo">
+ <div class="polaroid">
+  <img id="photoImage" alt="Storm photograph">
+  <strong id="photoCaption">PHOTO TAKEN!</strong>
+ </div>
 </div>
 
-<div id="photoEvent">
-  <div class="photo-wrap">
-    <img id="photoImage" alt="Tornado observation photograph">
-    <div class="photo-caption">PHOTO TAKEN!</div>
-    <div class="photo-sub" id="photoSub">CHASEDESK FIELD OBSERVATION</div>
-  </div>
-  <div id="photoCountdown">4</div>
+<div id="toast"></div>
+
+<div id="gameover" style="display:none">
+ <div id="overContent">
+  <div class="mono">CHASEDESK // VEHICLE STATUS</div>
+  <h1>VEHICLE DISABLED</h1>
+  <p>Your vehicle was overwhelmed by the simulated storm environment.</p>
+  <button id="restart">RESTART GAME</button>
+ </div>
 </div>
 
-<div id="gameover">
-  <div class="dialog">
-    <h1>VEHICLE DISABLED</h1>
-    <p>The simulated storm overwhelmed your vehicle's protection.</p>
-    <p id="finalstats"></p>
-    <button id="restart">RESTART SIMULATION</button>
-  </div>
-</div>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
-<script>
-/* =====================================
-   CHASEDESK OPEN WORLD
-===================================== */
-
+const $=id=>document.getElementById(id);
 const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x182333);
-scene.fog=new THREE.FogExp2(0x182333,.0035);
+scene.background=new THREE.Color(0x17283a);
+scene.fog=new THREE.FogExp2(0x253447,0.0025);
 
 const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,1800);
-const renderer=new THREE.WebGLRenderer({
-  antialias:true,
-  preserveDrawingBuffer:true
-});
+camera.position.set(0,8,16);
+
+const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
 renderer.setSize(innerWidth,innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
 renderer.shadowMap.enabled=true;
-document.getElementById("game").appendChild(renderer.domElement);
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+$('game').appendChild(renderer.domElement);
 
-scene.add(new THREE.HemisphereLight(0x8094ad,0x1a1b22,1));
-const sun=new THREE.DirectionalLight(0x8995a8,1);
-sun.position.set(-40,80,30);
+scene.add(new THREE.HemisphereLight(0x9dbbd7,0x343c36,1.4));
+const sun=new THREE.DirectionalLight(0xd4e2ef,1.2);
+sun.position.set(-100,150,80);
+sun.castShadow=true;
 scene.add(sun);
 
-/* WORLD */
+const mat=(color,roughness=.9)=>new THREE.MeshStandardMaterial({color,roughness});
+const groundMat=mat(0x52614d);
+const roadMat=mat(0x252d34);
+const whiteMat=mat(0xdce3df);
+const darkMat=mat(0x111a24);
+const treeMat=mat(0x284d34);
+const trunkMat=mat(0x594333);
+const houseMats=[0x9b8c7b,0x9a6658,0x7c8d99,0xb1a18a,0x777b83].map(c=>mat(c));
+const debrisMat=mat(0x81796b);
+const cloudMat=new THREE.MeshStandardMaterial({color:0x5e6b79,transparent:true,opacity:.45,roughness:1});
+const funnelMat=new THREE.MeshStandardMaterial({color:0x777d82,roughness:1,transparent:true,opacity:.87});
+const ringMat=new THREE.MeshBasicMaterial({color:0xb5bec4,transparent:true,opacity:.35,side:THREE.DoubleSide});
 
-const ground=new THREE.Mesh(
-  new THREE.PlaneGeometry(1600,2000),
-  new THREE.MeshStandardMaterial({color:0x303b37,roughness:1})
-);
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(1800,1800),groundMat);
 ground.rotation.x=-Math.PI/2;
-ground.position.set(0,-.18,-300);
 ground.receiveShadow=true;
 scene.add(ground);
 
-const roadMat=new THREE.MeshStandardMaterial({color:0x252b32,roughness:1});
-const markMat=new THREE.MeshBasicMaterial({color:0xb7b5a4});
+function box(parent,w,h,d,color,x,y,z){
+ const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),typeof color==='number'?mat(color):color);
+ mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;
+ parent.add(mesh);return mesh;
+}
+function road(x,z,w,d){
+ const r=new THREE.Mesh(new THREE.PlaneGeometry(w,d),roadMat);
+ r.rotation.x=-Math.PI/2;r.position.set(x,.025,z);scene.add(r);
+ for(let i=-Math.floor(w/12);i<Math.floor(w/12);i++){
+  const line=new THREE.Mesh(new THREE.PlaneGeometry(3,.22),whiteMat);
+  line.rotation.x=-Math.PI/2;line.position.set(x+i*12,.04,z);scene.add(line);
+ }
+}
+road(0,0,1600,12);
+road(0,0,12,1600);
+road(-170,-190,240,9);
+road(-170,-190,9,220);
+road(210,220,350,12);
+road(210,220,12,340);
 
-function addRoad(x,z,width,length,rotation=0){
-  const road=new THREE.Mesh(new THREE.PlaneGeometry(width,length),roadMat);
-  road.rotation.x=-Math.PI/2;
-  road.rotation.z=rotation;
-  road.position.set(x,0,z);
-  scene.add(road);
+const trees=[];
+function makeTree(x,z,s=1){
+ const g=new THREE.Group();
+ const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.18*s,.28*s,2.5*s,6),trunkMat);
+ trunk.position.y=1.25*s;trunk.castShadow=true;g.add(trunk);
+ const crown=new THREE.Mesh(new THREE.ConeGeometry(1.1*s,3*s,7),treeMat);
+ crown.position.y=3*s;crown.castShadow=true;g.add(crown);
+ g.position.set(x,0,z);scene.add(g);trees.push({group:g,trunk,crown,fallen:false});
+}
+for(let i=0;i<220;i++){
+ let x=(Math.random()-.5)*950,z=(Math.random()-.5)*950;
+ if(Math.abs(x)<35||Math.abs(z)<35)continue;
+ makeTree(x,z,.7+Math.random()*.8);
 }
 
-for(let x=-600;x<=600;x+=120)addRoad(x,-300,12,1800);
-for(let z=-1100;z<=500;z+=120)addRoad(0,z,1400,12,Math.PI/2);
-
-for(let x=-600;x<=600;x+=120){
-  for(let z=-1100;z<=500;z+=35){
-    const m=new THREE.Mesh(new THREE.BoxGeometry(.15,.025,7),markMat);
-    m.position.set(x,.025,z);scene.add(m);
+const buildings=[];
+function makeBuilding(x,z,scale=1){
+ const g=new THREE.Group();
+ const w=(8+Math.random()*5)*scale,h=(5+Math.random()*4)*scale,d=(7+Math.random()*5)*scale;
+ const body=box(g,w,h,d,houseMats[Math.floor(Math.random()*houseMats.length)],0,h/2,0);
+ const roof=box(g,w*1.12,.8*scale,d*1.12,0x3e4853,0,h+.4*scale,0);
+ const door=box(g,1.2*scale,2.4*scale,.15,0x493a30,0,1.2*scale,d/2+.09);
+ g.position.set(x,0,z);scene.add(g);
+ buildings.push({group:g,parts:[body,roof,door],destroyed:false,hp:1,homeX:x,homeZ:z});
+ return g;
+}
+function makeTown(cx,cz,count,spacing,large=false){
+ for(let i=0;i<count;i++){
+  for(let j=0;j<count;j++){
+   if(Math.random()<.19)continue;
+   const x=cx+(i-count/2)*spacing;
+   const z=cz+(j-count/2)*spacing;
+   if(Math.abs(x-cx)<spacing*.45||Math.abs(z-cz)<spacing*.45)continue;
+   makeBuilding(x,z,large?1.25:.9);
+   if(Math.random()<.55)makeTree(x+8,z+6,.8);
   }
+ }
 }
-for(let z=-1100;z<=500;z+=120){
-  for(let x=-600;x<=600;x+=35){
-    const m=new THREE.Mesh(new THREE.BoxGeometry(7,.025,.15),markMat);
-    m.position.set(x,.026,z);scene.add(m);
-  }
+makeTown(-170,-190,5,27,false);
+makeTown(210,220,9,29,true);
+
+// Small town gas station
+const gasStation=new THREE.Group();
+box(gasStation,19,7,13,0xc3c5bd,0,3.5,0);
+box(gasStation,20,1,14,0xb84e43,0,7.3,0);
+box(gasStation,8,2,.2,0x29475c,0,4,6.61);
+const canopy=box(gasStation,24,.7,9,0xd8dce0,0,5,-13);
+for(let x of [-8,8])for(let z of [-16,-10]){
+ box(gasStation,.5,5,.5,0xb8c5ce,x,2.5,z);
+}
+for(let x of [-5,5]){
+ box(gasStation,1.4,2,1.3,0xe6e9e8,x,1,-8);
+ box(gasStation,.9,.5,.2,0x202b34,x,2,-7.3);
+}
+gasStation.position.set(-170,0,-190);
+scene.add(gasStation);
+
+// Town 2 landmark buildings
+for(let i=0;i<5;i++){
+ const x=210+(i-2)*43;
+ const g=new THREE.Group();
+ box(g,18,15,16,0x7d8792,0,7.5,0);
+ box(g,18.5,1,16.5,0x394653,0,15.5,0);
+ for(let y=4;y<13;y+=4)for(let xx=-6;xx<=6;xx+=6)
+  box(g,2,2,.12,0x344e62,xx,y,8.08);
+ g.position.set(x,0,220+(i%2)*25);scene.add(g);
+ buildings.push({group:g,parts:g.children.slice(),destroyed:false,hp:2,homeX:g.position.x,homeZ:g.position.z});
 }
 
-// Trees
-const treeGroup=new THREE.Group();
-scene.add(treeGroup);
-
-for(let i=0;i<350;i++){
-  const x=(Math.random()-.5)*1300;
-  const z=(Math.random()-.5)*1650-250;
-  if(Math.abs(x%120)<14||Math.abs(z%120)<14)continue;
-
-  const tree=new THREE.Group();
-  const trunk=new THREE.Mesh(
-    new THREE.CylinderGeometry(.12,.2,2,5),
-    new THREE.MeshStandardMaterial({color:0x40372b})
-  );
-  trunk.position.y=1;tree.add(trunk);
-
-  const leaves=new THREE.Mesh(
-    new THREE.ConeGeometry(1.3,3.4,6),
-    new THREE.MeshStandardMaterial({color:0x263a35})
-  );
-  leaves.position.y=3.2;tree.add(leaves);
-  tree.position.set(x,0,z);treeGroup.add(tree);
-}
-
-/* VEHICLE MODELS */
-
+// Player vehicles
+const vehicles=[
+ {name:'STARTER PICKUP',cost:0,color:0x397eaa,speed:24,tolerance:100},
+ {name:'STORM PICKUP',cost:250,color:0xd4a447,speed:28,tolerance:145},
+ {name:'ARMORED INTERCEPTOR',cost:600,color:0x536777,speed:31,tolerance:210}
+];
+let owned=[true,false,false],vehicleIndex=0;
+let tokens=100,engineLevel=0,armorLevel=0,fuel=100,health=100;
 const car=new THREE.Group();
 scene.add(car);
-
-const bodyMat=new THREE.MeshStandardMaterial({color:0x287d9b,metalness:.35,roughness:.5});
-const darkMat=new THREE.MeshStandardMaterial({color:0x101820});
-const glassMat=new THREE.MeshStandardMaterial({color:0x152d3e,roughness:.2});
-const metalMat=new THREE.MeshStandardMaterial({color:0x697987,metalness:.75,roughness:.35});
-const wheelMat=new THREE.MeshStandardMaterial({color:0x11151a,roughness:.9});
-
-function box(parent,w,h,d,material,x,y,z){
-  const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);
-  m.position.set(x,y,z);m.castShadow=true;parent.add(m);return m;
+function buildCar(){
+ while(car.children.length)car.remove(car.children[0]);
+ const v=vehicles[vehicleIndex],bodyMat=mat(v.color);
+ box(car,3.2,1.1,6,bodyMat,0,1.15,0);
+ box(car,2.8,1.2,2.6,0x344e60,0,2.15,-.8);
+ box(car,2.7,.35,2.5,0x172a39,0,2.85,-.8);
+ box(car,2.6,.6,2.3,bodyMat,0,1.9,-2.1);
+ box(car,3.25,.25,1.4,0x293743,0,1.6,3.4);
+ for(let x of [-1.65,1.65])for(let z of [-2,2]){
+  const tire=new THREE.Mesh(new THREE.CylinderGeometry(.65,.65,.38,12),darkMat);
+  tire.rotation.z=Math.PI/2;tire.position.set(x,.7,z);tire.castShadow=true;car.add(tire);
+ }
+ for(let x of [-1.15,1.15]){
+  box(car,.55,.3,.3,0xe5e8c7,x,1.5,-3.05);
+  box(car,.5,.25,.25,0xb52c2c,x,1.5,3.05);
+  box(car,.13,.4,1.2,0x283b4b,x*1.35,1.3,0);
+ }
+ box(car,2.8,.12,.4,0x1b2835,0,2.95,-.5);
+ for(let x of [-.8,.8])box(car,.35,.12,.15,0xdce4e8,x,3.03,-.5);
+ if(vehicleIndex===2){
+  box(car,3.5,.25,6.5,0x34434d,0,.65,0);
+  box(car,3.4,.2,.3,0x1b242d,0,.35,2.9);
+  // Cosmetic fictional armor panels and retractable stabilizer look
+  for(let x of [-1.7,1.7]){
+   box(car,.18,.55,3.5,0x697782,x,1.15,0);
+   box(car,.16,.8,.18,0x9aa5ac,x,1.2,2.5);
+  }
+ }
 }
-
-function cylinder(parent,r1,r2,h,material,x,y,z,rotationX=0,rotationZ=0){
-  const m=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,12),material);
-  m.position.set(x,y,z);m.rotation.x=rotationX;m.rotation.z=rotationZ;
-  m.castShadow=true;parent.add(m);return m;
-}
-
-let wheels=[];
-let deployParts=[];
-let currentCar=0;
-
-const carDefinitions=[
-  {name:"STARTER PICKUP",price:0,color:0x287d9b,limit:110},
-  {name:"STORM PICKUP",price:250,color:0xb33e2e,limit:145},
-  {name:"ARMORED INTERCEPTOR",price:600,color:0x343d49,limit:190}
-];
-
-function clearCar(){
-  while(car.children.length)car.remove(car.children[0]);
-  wheels=[];
-  deployParts=[];
-}
-
-function buildCar(index){
-  clearCar();
-
-  const def=carDefinitions[index];
-  const paint=new THREE.MeshStandardMaterial({
-    color:def.color,metalness:.45,roughness:.45
-  });
-
-  // Main pickup body
-  box(car,2.45,.7,4.7,paint,0,.92,0);
-  box(car,2.05,.85,2.0,glassMat,0,1.65,-.5);
-  box(car,2.3,.3,1.3,paint,0,1.2,-1.65);
-
-  // Front grille and bumper
-  box(car,1.35,.32,.08,darkMat,0,.83,-2.4);
-  box(car,2.6,.24,.25,metalMat,0,.55,-2.4);
-  box(car,.32,.22,.08,glassMat,-.85,1.15,-2.35);
-  box(car,.32,.22,.08,glassMat,.85,1.15,-2.35);
-
-  // Rear bed and side panels
-  box(car,1.9,.16,1.6,darkMat,0,1.35,1.45);
-  box(car,.12,.65,1.7,paint,-1.05,1.45,1.4);
-  box(car,.12,.65,1.7,paint,1.05,1.45,1.4);
-  box(car,2.3,.22,.22,paint,0,1.35,2.25);
-
-  // Roof rack and lights
-  for(const x of [-.8,.8]){
-    cylinder(car,.055,.055,2.1,metalMat,x,2.2,-.25,Math.PI/2);
-    box(car,.25,.12,.15,0x000000?darkMat:darkMat,x,2.15,-.3);
-  }
-  for(let i=0;i<4;i++){
-    const lamp=new THREE.Mesh(
-      new THREE.BoxGeometry(.24,.12,.12),
-      new THREE.MeshBasicMaterial({color:0xffe6a3})
-    );
-    lamp.position.set(-.6+i*.4,2.12,-.3);car.add(lamp);
-  }
-
-  // Mirrors
-  for(const x of [-1.25,1.25]){
-    box(car,.12,.2,.28,metalMat,x,1.55,-.85);
-  }
-
-  // Wheels
-  for(const x of [-1.25,1.25]){
-    for(const z of [-1.55,1.55]){
-      const tire=new THREE.Mesh(
-        new THREE.CylinderGeometry(.48,.48,.32,18),wheelMat
-      );
-      tire.rotation.z=Math.PI/2;
-      tire.position.set(x,.5,z);
-      car.add(tire);wheels.push(tire);
-
-      const hub=new THREE.Mesh(
-        new THREE.CylinderGeometry(.2,.2,.34,12),metalMat
-      );
-      hub.rotation.z=Math.PI/2;
-      hub.position.set(x,.5,z);
-      car.add(hub);
-    }
-  }
-
-  if(index>=1){
-    // Extra storm-science equipment on the second vehicle
-    box(car,1.4,.45,1.2,darkMat,0,1.55,1.2);
-    for(const x of [-.7,.7]){
-      cylinder(car,.035,.035,1.2,metalMat,x,2.0,1.0);
-    }
-    box(car,2.5,.12,.12,metalMat,0,1.9,2.1);
-  }
-
-  if(index>=2){
-    // Heavy armored appearance
-    box(car,2.55,.25,3.8,metalMat,0,1.3,0);
-    box(car,2.5,.4,.22,darkMat,0,1.1,-2.42);
-
-    // Side protective panels
-    for(const x of [-1.27,1.27]){
-      box(car,.12,.8,2.6,metalMat,x,1.35,0);
-      box(car,.16,.22,2.8,darkMat,x*1.04,.95,0);
-    }
-
-    // Cosmetic retractable ground-spike assemblies.
-    // These are fictional visual parts, not functional engineering.
-    for(const x of [-1.15,1.15]){
-      const spike=new THREE.Group();
-      spike.position.set(x,.8,.7);
-      const housing=box(spike,.25,.25,.35,darkMat,0,0,0);
-      const tip=cylinder(spike,.04,.14,.8,metalMat,0,-.45,0);
-      tip.visible=false;
-      car.add(spike);
-      deployParts.push({group:spike,tip});
-    }
-
-    // Lowering platform visual
-    const platform=box(car,2.8,.12,3.8,metalMat,0,.25,0);
-    deployParts.push({platform,baseY:.25});
-  }
-
-  car.position.y=0;
-}
-
-buildCar(0);
+buildCar();
 car.position.set(0,0,0);
 
-/* ARCADE DEPLOYMENT EFFECT */
-
-let deployed=false;
-
-function toggleDeployment(){
-  if(currentCar<2){
-    showMessage("UNLOCK THE ARMORED INTERCEPTOR FIRST");
-    return;
-  }
-  deployed=!deployed;
-
-  deployParts.forEach(part=>{
-    if(part.group){
-      part.group.position.y=deployed?.35:.8;
-      part.tip.visible=deployed;
-    }
-    if(part.platform){
-      part.platform.position.y=deployed?.08:.25;
-    }
-  });
-
-  showMessage(deployed?"ARCADE DEFENSE MODE ON":"DEFENSE MODE OFF");
+// Walking character
+const player=new THREE.Group();
+const skin=mat(0xc99a78),shirt=mat(0x397da0),pants=mat(0x28374a);
+const torso=box(player,.8,1.1,.45,shirt,0,1.55,0);
+const head=new THREE.Mesh(new THREE.SphereGeometry(.32,7,6),skin);
+head.position.y=2.35;player.add(head);
+for(let x of [-.22,.22]){
+ box(player,.25,.85,.28,pants,x,.55,0);
+ box(player,.22,.75,.22,skin,x*.0,1.6,0); // simple arm detail
 }
+player.visible=false;scene.add(player);
 
-const deployButton=document.createElement("button");
-deployButton.textContent="DEPLOY";
-deployButton.className="upgrade";
-deployButton.style.display="none";
-document.getElementById("garage").appendChild(deployButton);
-deployButton.onclick=toggleDeployment;
-
-/* TORNADO */
-
-const tornado=new THREE.Group();
-tornado.position.set(100,0,-300);
-scene.add(tornado);
-
-let stormIntensity=2,stormWind=130;
-let stormTargetIndex=0;
-let tornadoMoveTimer=0;
-
-const tornadoTargets=[
-  new THREE.Vector3(100,0,-300),
-  new THREE.Vector3(260,0,-480),
-  new THREE.Vector3(-160,0,-540),
-  new THREE.Vector3(-300,0,-180),
-  new THREE.Vector3(180,0,100),
-  new THREE.Vector3(350,0,-50)
-];
-
-const segments=55,sides=32;
-const positions=new Float32Array((segments+1)*(sides+1)*3);
-const indices=[];
-
-for(let y=0;y<segments;y++){
-  for(let x=0;x<sides;x++){
-    const a=y*(sides+1)+x,b=a+sides+1;
-    indices.push(a,b,a+1,b,b+1,a+1);
-  }
-}
-
-const funnelGeometry=new THREE.BufferGeometry();
-funnelGeometry.setAttribute("position",new THREE.BufferAttribute(positions,3));
-funnelGeometry.setIndex(indices);
-
-const funnel=new THREE.Mesh(
-  funnelGeometry,
-  new THREE.MeshStandardMaterial({
-    color:0x302f30,roughness:1,transparent:true,opacity:.9,
-    side:THREE.DoubleSide
-  })
-);
-tornado.add(funnel);
-
-const bands=[];
-for(let i=0;i<7;i++){
-  const band=new THREE.Mesh(
-    new THREE.TorusGeometry(1,.045,5,64),
-    new THREE.MeshBasicMaterial({color:i%2?0x45494a:0x77736c,transparent:true,opacity:.5})
-  );
-  band.rotation.x=Math.PI/2;tornado.add(band);bands.push(band);
-}
-
-const debrisCloud=new THREE.Mesh(
-  new THREE.TorusGeometry(1.8,.48,8,48),
-  new THREE.MeshStandardMaterial({color:0x514c43,transparent:true,opacity:.8})
-);
-debrisCloud.rotation.x=Math.PI/2;
-debrisCloud.position.y=.45;
-tornado.add(debrisCloud);
-
-const topCloud=new THREE.Mesh(
-  new THREE.SphereGeometry(1,16,12),
-  new THREE.MeshStandardMaterial({color:0x333c48})
-);
-topCloud.position.y=19;
-topCloud.scale.set(6,1.8,5);
-tornado.add(topCloud);
-
-const debris=[];
-for(let i=0;i<100;i++){
-  const mesh=new THREE.Mesh(
-    new THREE.BoxGeometry(.15+Math.random()*.3,.12+Math.random()*.25,.15+Math.random()*.3),
-    new THREE.MeshStandardMaterial({color:[0x51483e,0x777064,0x333b42][i%3]})
-  );
-  tornado.add(mesh);
-  debris.push({mesh,angle:Math.random()*6.28,radius:2+Math.random()*10,height:Math.random()*16,speed:.5+Math.random()*2});
-}
-
-const streamers=[];
-for(let i=0;i<24;i++){
-  const geo=new THREE.BufferGeometry().setFromPoints(
-    Array.from({length:18},()=>new THREE.Vector3())
-  );
-  const line=new THREE.Line(geo,new THREE.LineBasicMaterial({color:0xaab5bd,transparent:true,opacity:.23}));
-  tornado.add(line);
-  streamers.push({line,angle:Math.random()*6.28,radius:3+Math.random()*7,height:Math.random()*12,speed:.5+Math.random()*1.5});
-}
-
-/* CLOUDS */
-
-const clouds=new THREE.Group();
-scene.add(clouds);
-const cloudMat=new THREE.MeshStandardMaterial({color:0x293747,roughness:1,transparent:true,opacity:.84});
-
-for(let i=0;i<140;i++){
-  const c=new THREE.Mesh(new THREE.SphereGeometry(1,10,8),cloudMat);
-  c.position.set((Math.random()-.5)*1450,30+Math.random()*22,(Math.random()-.5)*1800-250);
-  c.scale.set(10+Math.random()*17,3+Math.random()*5,12+Math.random()*22);
-  clouds.add(c);
-}
-
-/* RAIN AND HAIL */
-
-function makeParticles(count,color,size,fallSpeed){
-  const p=new Float32Array(count*3),speeds=[];
-  for(let i=0;i<count;i++){
-    p[i*3]=(Math.random()-.5)*180;
-    p[i*3+1]=Math.random()*65;
-    p[i*3+2]=(Math.random()-.5)*180;
-    speeds.push(fallSpeed*(.6+Math.random()));
-  }
-  const geo=new THREE.BufferGeometry();
-  geo.setAttribute("position",new THREE.BufferAttribute(p,3));
-  const points=new THREE.Points(geo,new THREE.PointsMaterial({color,size,transparent:true,opacity:.7}));
-  scene.add(points);
-  return {points,speeds,count};
-}
-
-const rain=makeParticles(1400,0x9cb9d0,.12,1.6);
-const hail=makeParticles(140,0xe0f4ff,.2,3.2);
-
-function updateParticles(system,delta){
-  const p=system.points.geometry.attributes.position.array;
-  for(let i=0;i<system.count;i++){
-    p[i*3]+=.2*delta;
-    p[i*3+1]-=system.speeds[i]*delta*12;
-    p[i*3+2]+=delta*1.5;
-    if(p[i*3+1]<0){
-      p[i*3+1]=55+Math.random()*10;
-      p[i*3]=(Math.random()-.5)*180;
-      p[i*3+2]=(Math.random()-.5)*180;
-    }
-  }
-  system.points.geometry.attributes.position.needsUpdate=true;
-}
-
-/* LIGHTNING */
-
-const lightningGroup=new THREE.Group();
-scene.add(lightningGroup);
-const lightningLight=new THREE.PointLight(0xc5dcff,0,180);
-scene.add(lightningLight);
-let lightningTimer=3,lightningFlash=0;
-
-function createLightning(){
-  lightningGroup.clear();
-  const points=[];
-  let x=(Math.random()-.5)*100,y=48,z=-100-Math.random()*150;
-  points.push(new THREE.Vector3(x,y,z));
-  for(let i=0;i<9;i++){
-    x+=(Math.random()-.5)*13;y-=5;
-    points.push(new THREE.Vector3(x,y,z));
-  }
-  lightningGroup.add(new THREE.Line(
-    new THREE.BufferGeometry().setFromPoints(points),
-    new THREE.LineBasicMaterial({color:0xd9eaff})
-  ));
-  lightningLight.position.set(x,y,z);
-  lightningLight.intensity=10;
-  lightningFlash=.18;
-}
-
-/* PHOTO LOCATIONS */
-
-const checkpoints=[];
-const checkpointStates=[];
-
-const photoLocations=[
-  [-120,-180],[120,-420],[240,-120],[-240,120],[0,-600]
-];
-
-for(let i=0;i<5;i++){
-  const gate=new THREE.Group();
-  const ring=new THREE.Mesh(
-    new THREE.TorusGeometry(3,.12,8,32),
-    new THREE.MeshBasicMaterial({color:0x52d8e8})
-  );
-  ring.position.y=2.5;gate.add(ring);
-
-  for(const x of [-3,3]){
-    const post=new THREE.Mesh(
-      new THREE.BoxGeometry(.15,5,.15),
-      new THREE.MeshStandardMaterial({color:0x52d8e8})
-    );
-    post.position.set(x,2.5,0);gate.add(post);
-  }
-
-  gate.position.set(photoLocations[i][0],0,photoLocations[i][1]);
-  scene.add(gate);
-  checkpoints.push(gate);
-  checkpointStates.push(true);
-}
-
-/* GAME STATE */
-
-let credits=0,speed=0,condition=100;
-let engineLevel=0,handlingLevel=0,armorLevel=0;
-let engineCost=100,handlingCost=80,armorCost=120;
-let completed=0,gameOver=false,flipTimer=0;
-let steering=0;
-let photoTimer=0,pendingPhoto=false;
-let photoNumber=0;
-
+let inCar=true;
+let carSpeed=0,heading=0;
+let gameStarted=false,gameOver=false;
 const keys={};
-let touchLeft=false,touchRight=false,touchGas=false,touchBrake=false;
-
-function tolerance(){
-  return carDefinitions[currentCar].limit+armorLevel*12;
+let toastTimer;
+function toast(t){
+ $('toast').textContent=t;$('toast').style.display='block';
+ clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').style.display='none',2200);
+}
+function message(t){
+ $('message').textContent=t;$('message').classList.add('show');
+ setTimeout(()=>$('message').classList.remove('show'),2200);
 }
 
-function showMessage(text){
-  const el=document.getElementById("message");
-  el.textContent=text;el.classList.add("show");
-  setTimeout(()=>el.classList.remove("show"),1800);
+// Tornado
+const tornado=new THREE.Group();
+scene.add(tornado);
+const funnel=new THREE.Group();tornado.add(funnel);
+const funnelParts=[];
+for(let i=0;i<9;i++){
+ const y=i*2.4;
+ const radius=.6+i*.42;
+ const m=new THREE.Mesh(new THREE.CylinderGeometry(radius*.82,radius,2.8,12,1,true),funnelMat);
+ m.position.y=y+1.2;m.castShadow=true;funnel.add(m);funnelParts.push(m);
+}
+const wallCloud=new THREE.Group();tornado.add(wallCloud);
+for(let i=0;i<13;i++){
+ const c=new THREE.Mesh(new THREE.SphereGeometry(7+Math.random()*4,9,7),cloudMat);
+ const a=i/13*Math.PI*2;
+ c.position.set(Math.cos(a)*12,22+Math.random()*3,Math.sin(a)*12);
+ c.scale.set(1.8,.55,1.25);wallCloud.add(c);
+}
+const cloudDeck=new THREE.Group();scene.add(cloudDeck);
+for(let i=0;i<35;i++){
+ const c=new THREE.Mesh(new THREE.SphereGeometry(24+Math.random()*22,8,7),cloudMat);
+ c.position.set((Math.random()-.5)*500,75+Math.random()*35,(Math.random()-.5)*500);
+ c.scale.set(1.8,.35,1.3);cloudDeck.add(c);
+}
+const circulation=[];
+for(let i=0;i<5;i++){
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(4+i*2,.1,4,40),ringMat);
+ ring.rotation.x=Math.PI/2;ring.position.y=3+i*3;funnel.add(ring);circulation.push(ring);
+}
+const subVortices=[];
+function makeSubVortex(){
+ const g=new THREE.Group();
+ const m=new THREE.Mesh(new THREE.CylinderGeometry(.2,.8,8,8,1,true),funnelMat);
+ m.position.y=4;g.add(m);
+ const dust=new THREE.Mesh(new THREE.TorusGeometry(1.6,.25,5,16),ringMat);
+ dust.rotation.x=Math.PI/2;dust.position.y=.5;g.add(dust);
+ tornado.add(g);subVortices.push(g);
+}
+for(let i=0;i<3;i++)makeSubVortex();
+
+let storm={ef:3,wind:165,subCount:2};
+let stormTarget=new THREE.Vector3(130,0,-100);
+let stormTimer=0;
+const debris=[];
+function makeDebris(x,y,z){
+ const d=new THREE.Mesh(new THREE.BoxGeometry(.4+Math.random(),.3+Math.random(),.4+Math.random()),debrisMat);
+ d.position.set(x,y,z);scene.add(d);
+ debris.push({mesh:d,life:3+Math.random()*4,vel:new THREE.Vector3((Math.random()-.5)*12,Math.random()*10,(Math.random()-.5)*12)});
+}
+function setNewTornado(){
+ tornado.position.set((Math.random()-.5)*420,0,(Math.random()-.5)*420);
+ stormTarget.set((Math.random()-.5)*500,0,(Math.random()-.5)*500);
+ storm.ef=1+Math.floor(Math.random()*5);
+ storm.wind=[90,115,145,175,215][storm.ef-1]+Math.floor(Math.random()*20);
+ storm.subCount=Math.random()<.65?1+Math.floor(Math.random()*3):0;
+ subVortices.forEach((v,i)=>v.visible=i<storm.subCount);
+ stormTimer=0;
+ funnel.scale.y=.01;
+ message('NEW TORNADO GENERATED');
+ updateHud();
+}
+setNewTornado();
+
+const probes=[];
+function placeProbe(){
+ if(tokens<5){toast('You need 5 tokens to place a probe');return;}
+ tokens-=5;
+ const g=new THREE.Group();
+ const base=box(g,.8,.25,.8,0x374b59,0,.15,0);
+ box(g,.25,1.5,.25,0x8999a5,0,.95,0);
+ box(g,.65,.25,.65,0x283b4c,0,1.75,0);
+ for(let x of [-.3,.3])box(g,.08,.6,.08,0xbac4c9,x,.8,0);
+ const forward=new THREE.Mesh(new THREE.ConeGeometry(.18,.4,6),mat(0xe3aa4e));
+ forward.rotation.x=Math.PI/2;forward.position.set(0,1.9,.2);g.add(forward);
+ const p=new THREE.Vector3();
+ if(inCar)car.getWorldPosition(p);else player.getWorldPosition(p);
+ const dir=new THREE.Vector3(Math.sin(heading),0,Math.cos(heading));
+ g.position.copy(p).add(dir.multiplyScalar(5));g.position.y=0;
+ scene.add(g);probes.push({group:g,hit:false});
+ toast('PROBE PLACED');
+ updateHud();
 }
 
-function updateUI(){
-  document.getElementById("credits").textContent=credits;
-  document.getElementById("speed").textContent=Math.round(speed*45);
-  document.getElementById("wind").textContent=Math.round(stormWind);
-  document.getElementById("windRead").textContent=Math.round(stormWind)+" MPH";
-  document.getElementById("intensity").textContent="EF"+stormIntensity;
-  document.getElementById("tolerance").textContent=tolerance()+" MPH";
-  document.getElementById("condition").textContent=Math.max(0,Math.round(condition))+"%";
-  document.getElementById("conditionbar").style.width=Math.max(0,condition)+"%";
-  document.getElementById("conditionbar").style.background=condition<35?"#ff625e":"#52d8e8";
-
-  document.getElementById("engineCost").textContent=engineCost;
-  document.getElementById("handlingCost").textContent=handlingCost;
-  document.getElementById("armorCost").textContent=armorCost;
-  document.getElementById("carName").textContent=carDefinitions[currentCar].name;
-
-  const next=carDefinitions[currentCar+1];
-  const buyButton=document.getElementById("buyCar");
-  if(next){
-    buyButton.textContent="BUY NEXT CAR — "+next.price+" PTS";
-    buyButton.disabled=credits<next.price;
-  }else{
-    buyButton.textContent="ALL CARS UNLOCKED";
-    buyButton.disabled=true;
-  }
-
-  document.getElementById("garageinfo").innerHTML=
-    "Engine: "+engineLevel+"<br>Handling: "+handlingLevel+
-    "<br>Armor: "+armorLevel+"<br>Wind limit: "+tolerance()+" MPH";
-
-  deployButton.style.display=currentCar===2?"block":"none";
+// Observation checkpoints
+const checkpoints=[];
+for(let i=0;i<7;i++){
+ const g=new THREE.Group();
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(2,.15,6,24),new THREE.MeshBasicMaterial({color:0x52d8e8}));
+ ring.rotation.x=Math.PI/2;g.add(ring);
+ const beam=new THREE.Mesh(new THREE.CylinderGeometry(.08,.08,4,6),new THREE.MeshBasicMaterial({color:0x52d8e8,transparent:true,opacity:.25}));
+ beam.position.y=2;g.add(beam);
+ g.position.set((Math.random()-.5)*550,0,(Math.random()-.5)*550);
+ scene.add(g);checkpoints.push({group:g,active:true,timer:0});
 }
 
-function buyNextCar(){
-  if(gameOver)return;
-  const next=carDefinitions[currentCar+1];
-  if(!next){showMessage("ALL CARS UNLOCKED");return}
-  if(credits<next.price){showMessage("NOT ENOUGH POINTS");return}
-
-  credits-=next.price;
-  currentCar++;
-  buildCar(currentCar);
-  car.position.y=0;
-  condition=100;
-  showMessage("NEW VEHICLE UNLOCKED!");
-  updateUI();
+let photoCooldown=0;
+function takePhoto(){
+ if(!gameStarted||photoCooldown>0)return;
+ const p=new THREE.Vector3();
+ if(inCar)car.getWorldPosition(p);else player.getWorldPosition(p);
+ const toStorm=tornado.position.clone().sub(p);
+ const dist=toStorm.length();
+ const projected=tornado.position.clone().add(new THREE.Vector3(0,18,0)).project(camera);
+ const visible=dist<420&&projected.z>-1&&Math.abs(projected.x)<1.25&&Math.abs(projected.y)<1.25;
+ if(!visible){toast('NO TORNADO IN FRAME — NO TOKENS');photoCooldown=1;return;}
+ tokens+=15;updateHud();
+ try{$('photoImage').src=renderer.domElement.toDataURL('image/png');}catch(e){}
+ $('photoCaption').textContent='PHOTO TAKEN!  +15 TOKENS';
+ $('photo').style.display='flex';
+ setTimeout(()=>$('photo').style.display='none',3000);
+ photoCooldown=4;
 }
+$('photo').addEventListener('click',()=>$('photo').style.display='none');
 
-function buyUpgrade(type){
-  if(gameOver)return;
-  if(type==="engine"&&credits>=engineCost){
-    credits-=engineCost;engineLevel++;engineCost+=75;showMessage("ENGINE UPGRADED");
-  }else if(type==="handling"&&credits>=handlingCost){
-    credits-=handlingCost;handlingLevel++;handlingCost+=60;showMessage("HANDLING UPGRADED");
-  }else if(type==="armor"&&credits>=armorCost){
-    credits-=armorCost;armorLevel++;armorCost+=90;showMessage("BODY REINFORCED");
-  }else showMessage("NOT ENOUGH POINTS");
-  updateUI();
-}
-
-function repair(){
-  if(gameOver)return;
-  if(credits>=40&&condition<100){
-    credits-=40;condition=Math.min(100,condition+35);showMessage("VEHICLE REPAIRED");
-  }else showMessage("REPAIR UNAVAILABLE");
-  updateUI();
-}
-
-/* INPUT */
-
-window.addEventListener("keydown",e=>{
-  keys[e.key.toLowerCase()]=true;
-  if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key))e.preventDefault();
+// Basic controls
+window.addEventListener('keydown',e=>{
+ keys[e.code]=true;
+ if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
+ if(e.code==='KeyE')toggleVehicle();
+ if(e.code==='KeyP')placeProbe();
+ if(e.code==='KeyF')takePhoto();
+ if(e.code==='KeyG')toggleGarage();
 });
-window.addEventListener("keyup",e=>keys[e.key.toLowerCase()]=false);
-window.addEventListener("blur",()=>{
-  Object.keys(keys).forEach(k=>keys[k]=false);
-  touchLeft=touchRight=touchGas=touchBrake=false;
+window.addEventListener('keyup',e=>keys[e.code]=false);
+document.querySelectorAll('[data-key]').forEach(b=>{
+ const k=b.dataset.key;
+ b.addEventListener('pointerdown',e=>{e.preventDefault();keys[k]=true;});
+ ['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,()=>keys[k]=false));
 });
+$('mobilePhoto').onclick=takePhoto;
+$('photoBtn').onclick=takePhoto;
+$('probeBtn').onclick=placeProbe;
+$('newTornado').onclick=setNewTornado;
+$('enterBtn').onclick=toggleVehicle;
+$('garageBtn').onclick=toggleGarage;
+$('closeGarage').onclick=toggleGarage;
 
-function bindHold(id,callback){
-  const el=document.getElementById(id);
-  el.addEventListener("pointerdown",e=>{
-    e.preventDefault();el.setPointerCapture(e.pointerId);callback(true);
-  });
-  el.addEventListener("pointerup",e=>{e.preventDefault();callback(false)});
-  el.addEventListener("pointercancel",()=>callback(false));
-  el.addEventListener("lostpointercapture",()=>callback(false));
+function toggleVehicle(){
+ if(!gameStarted)return;
+ if(inCar){
+  player.position.copy(car.position);
+  player.position.x+=Math.sin(heading+Math.PI/2)*3;
+  player.position.z+=Math.cos(heading+Math.PI/2)*3;
+  player.visible=true;car.visible=false;inCar=false;carSpeed=0;
+  toast('ON FOOT — EXPLORE THE AREA');
+ }else{
+  if(player.position.distanceTo(car.position)>9){toast('MOVE CLOSER TO YOUR VEHICLE');return;}
+  player.visible=false;car.visible=true;inCar=true;
+  toast('BACK IN VEHICLE');
+ }
+ updateHud();
 }
-bindHold("left",v=>touchLeft=v);
-bindHold("right",v=>touchRight=v);
-bindHold("gas",v=>touchGas=v);
-bindHold("brake",v=>touchBrake=v);
+function toggleGarage(){
+ $('garage').style.display=$('garage').style.display==='block'?'none':'block';
+}
+$('buyStorm').onclick=()=>buyVehicle(1);
+$('buyArmor').onclick=()=>buyVehicle(2);
+function buyVehicle(i){
+ if(owned[i]){vehicleIndex=i;buildCar();toast('VEHICLE SELECTED');}
+ else if(tokens>=vehicles[i].cost){
+  tokens-=vehicles[i].cost;owned[i]=true;vehicleIndex=i;buildCar();toast('NEW VEHICLE PURCHASED');
+ }else toast('NOT ENOUGH TOKENS');
+ updateHud();
+}
+$('upgradeEngine').onclick=()=>{
+ if(tokens>=100&&engineLevel<3){tokens-=100;engineLevel++;toast('ENGINE UPGRADED');updateHud();}
+ else toast('NOT ENOUGH TOKENS OR MAX LEVEL');
+};
+$('upgradeArmor').onclick=()=>{
+ if(tokens>=100&&armorLevel<3){tokens-=100;armorLevel++;toast('WIND TOLERANCE UPGRADED');updateHud();}
+ else toast('NOT ENOUGH TOKENS OR MAX LEVEL');
+};
+$('repair').onclick=()=>{
+ if(tokens>=40){tokens-=40;health=100;toast('VEHICLE REPAIRED');updateHud();}
+ else toast('NOT ENOUGH TOKENS');
+};
 
-/* TORNADO ANIMATION */
+function updateHud(){
+ $('tokens').textContent=tokens;
+ $('ef').textContent='EF'+storm.ef;
+ $('wind').textContent='WIND: '+storm.wind+' MPH';
+ $('substatus').textContent='SUB-VORTICES: '+storm.subCount;
+ $('vehicleName').textContent=vehicles[vehicleIndex].name;
+ $('fuel').textContent='FUEL: '+Math.round(fuel)+'%';
+ $('mode').textContent=inCar?'IN VEHICLE':'ON FOOT';
+ $('garageInfo').textContent=vehicles[vehicleIndex].name+' · HEALTH '+Math.round(health)+'%';
+ $('upgradeEngine').textContent='UPGRADE ENGINE · '+engineLevel+'/3 · 100 TOKENS';
+ $('upgradeArmor').textContent='UPGRADE WIND TOLERANCE · '+armorLevel+'/3 · 100 TOKENS';
+}
+function getWindTolerance(){return vehicles[vehicleIndex].tolerance+armorLevel*45;}
+function showGameOver(){
+ gameOver=true;$('gameover').style.display='flex';
+}
+$('restart').onclick=()=>{
+ $('gameover').style.display='none';gameOver=false;
+ health=100;fuel=100;carSpeed=0;car.position.set(0,0,0);
+ inCar=true;car.visible=true;player.visible=false;
+ setNewTornado();updateHud();
+};
 
-function updateFunnel(time){
-  const base=1.05+stormIntensity*.2;
-  const top=7+stormIntensity*.65;
-  const height=19+stormIntensity*1.2;
+// Gas station interaction
+function nearGas(){
+ const p=inCar?car.position:player.position;
+ return p.distanceTo(gasStation.position)<24;
+}
+function refuel(){
+ if(!nearGas()){toast('GO TO THE GAS STATION TO REFUEL');return;}
+ if(tokens<5){toast('REFUELING COSTS 5 TOKENS');return;}
+ tokens-=5;fuel=100;updateHud();toast('TANK FULL — 5 TOKENS');
+}
+const gasButton=document.createElement('button');
+gasButton.textContent='⛽ REFUEL · 5 TOKENS';
+gasButton.style.cssText='position:fixed;z-index:6;left:50%;bottom:165px;transform:translateX(-50%);display:none';
+document.body.appendChild(gasButton);gasButton.onclick=refuel;
 
-  for(let y=0;y<=segments;y++){
-    const v=y/segments;
-    const radius=base+(top-base)*Math.pow(v,.72);
-    for(let x=0;x<=sides;x++){
-      const u=x/sides*Math.PI*2;
-      const wobble=Math.sin(u*3+time*2+v*8)*stormIntensity*.055+
-        Math.sin(u*5-time*1.3+v*15)*stormIntensity*.03;
-      const r=radius+wobble,twist=time*.7+v*2.8;
-      const n=(y*(sides+1)+x)*3;
-      positions[n]=Math.cos(u+twist)*r;
-      positions[n+1]=v*height;
-      positions[n+2]=Math.sin(u+twist)*r;
-    }
+// Trees and destruction
+function destroyBuilding(b){
+ if(b.destroyed)return;
+ b.destroyed=true;
+ b.parts.forEach(part=>{
+  const world=new THREE.Vector3();part.getWorldPosition(world);
+  const d=new THREE.Mesh(new THREE.BoxGeometry(1+Math.random()*2,.5+Math.random()*2,1+Math.random()*2),debrisMat);
+  d.position.copy(world);scene.add(d);
+  debris.push({mesh:d,life:5+Math.random()*5,vel:new THREE.Vector3((Math.random()-.5)*25,Math.random()*18,(Math.random()-.5)*25)});
+ });
+ b.group.visible=false;
+}
+function updateDestruction(dt){
+ for(const b of buildings){
+  if(b.destroyed)continue;
+  const d=b.group.position.distanceTo(tornado.position);
+  const radius=storm.ef*5+12;
+  if(d<radius&&Math.random()<dt*(storm.ef*.2))destroyBuilding(b);
+ }
+ for(const t of trees){
+  if(t.fallen)continue;
+  const d=t.group.position.distanceTo(tornado.position);
+  if(d<storm.ef*8+18){
+   t.group.rotation.z+=(t.group.position.x<tornado.position.x?1:-1)*dt*1.5;
+   if(Math.random()<dt*.12){
+    t.fallen=true;
+    for(let i=0;i<3;i++)makeDebris(t.group.position.x,1,t.group.position.z);
+   }
   }
-  funnelGeometry.attributes.position.needsUpdate=true;
-  funnelGeometry.computeVertexNormals();
-
-  bands.forEach((band,i)=>{
-    const v=.08+i*.12;
-    const r=base+(top-base)*Math.pow(v,.72);
-    band.position.y=v*height;
-    band.scale.set(r,r,1);
-    band.rotation.z=time*(1.1+i*.1);
-  });
-
-  debrisCloud.scale.setScalar(1+stormIntensity*.12);
-  debrisCloud.rotation.z=time*.7;
-  topCloud.rotation.y=time*.08;
+ }
 }
 
-function updateSwirl(time){
-  debris.forEach((d,i)=>{
-    d.angle+=.012*d.speed*(.6+stormIntensity*.12);
-    d.mesh.position.set(
-      Math.cos(d.angle)*d.radius,
-      d.height+Math.sin(time*2+i)*.6,
-      Math.sin(d.angle)*d.radius
-    );
-    d.mesh.rotation.x+=.04;
-    d.mesh.rotation.y+=.05;
-  });
-
-  streamers.forEach(s=>{
-    s.angle+=.006*s.speed;
-    const p=s.line.geometry.attributes.position;
-    for(let j=0;j<18;j++){
-      const t=j/17,a=s.angle+t*2.3,r=s.radius+t*3;
-      p.setXYZ(j,Math.cos(a)*r,s.height+t*3,Math.sin(a)*r);
-    }
-    p.needsUpdate=true;
-  });
+// Weather particles
+const rainGeo=new THREE.BufferGeometry();
+const rainCount=1100;
+const rainPos=new Float32Array(rainCount*3);
+for(let i=0;i<rainCount;i++){
+ rainPos[i*3]=(Math.random()-.5)*250;
+ rainPos[i*3+1]=Math.random()*90;
+ rainPos[i*3+2]=(Math.random()-.5)*250;
 }
+rainGeo.setAttribute('position',new THREE.BufferAttribute(rainPos,3));
+const rain=new THREE.Points(rainGeo,new THREE.PointsMaterial({color:0x9bbbd0,size:.13,transparent:true,opacity:.45}));
+scene.add(rain);
+let lightningTimer=0;
+const lightning=new THREE.PointLight(0xb8d9ff,0,500);
+lightning.position.set(0,90,0);scene.add(lightning);
 
-/* MOVING TORNADO */
-
-function moveTornado(delta,time){
-  tornadoMoveTimer-=delta;
-
-  if(tornadoMoveTimer<=0){
-    stormTargetIndex=(stormTargetIndex+1)%tornadoTargets.length;
-    tornadoMoveTimer=24+Math.random()*12;
-  }
-
-  const target=tornadoTargets[stormTargetIndex];
-  const direction=new THREE.Vector3(
-    target.x-tornado.position.x,
-    0,
-    target.z-tornado.position.z
-  );
-
-  if(direction.length()>2){
-    direction.normalize();
-    tornado.position.x+=direction.x*delta*4.2;
-    tornado.position.z+=direction.z*delta*4.2;
-  }
-  tornado.rotation.y+=delta*.04;
-}
-
-/* PHOTO EVENT */
-
-function takePhoto(index){
-  if(photoTimer>0)return;
-
-  photoNumber=index+1;
-  photoTimer=4;
-  pendingPhoto=true;
-  credits+=50;
-
-  document.getElementById("photoSub").textContent=
-    "CHASEDESK FIELD OBSERVATION · PHOTO "+String(photoNumber).padStart(2,"0");
-
-  document.getElementById("photoEvent").style.display="flex";
-  document.getElementById("photoCountdown").textContent="4";
-  showMessage("PHOTO POINT COMPLETE +50 POINTS");
-  updateUI();
-}
-
-function finishPhotoCapture(){
-  if(!pendingPhoto)return;
-  pendingPhoto=false;
-
-  try{
-    document.getElementById("photoImage").src=
-      renderer.domElement.toDataURL("image/png");
-  }catch(e){
-    document.getElementById("photoImage").src="";
-  }
-}
-
-/* GAME OVER */
-
-function endGame(){
-  if(gameOver)return;
-  gameOver=true;
-  document.getElementById("finalstats").textContent=
-    "Photos: "+completed+"/5 · Points: "+credits;
-  document.getElementById("gameover").style.display="flex";
-}
-document.getElementById("restart").onclick=()=>location.reload();
-
-/* MAIN LOOP */
-
+// Game loop
 const clock=new THREE.Clock();
+let elapsed=0;
+function update(dt){
+ elapsed+=dt;
+ if(!gameStarted||gameOver)return;
+ if(photoCooldown>0)photoCooldown-=dt;
+
+ const forward=keys.KeyW||keys.ArrowUp;
+ const backward=keys.KeyS||keys.ArrowDown;
+ const left=keys.KeyA||keys.ArrowLeft;
+ const right=keys.KeyD||keys.ArrowRight;
+ const brake=keys.Space;
+
+ if(inCar){
+  if(fuel>0){
+   if(forward)carSpeed=Math.min(carSpeed+(13+engineLevel*3)*dt,vehicles[vehicleIndex].speed+engineLevel*5);
+   if(backward)carSpeed=Math.max(carSpeed-8*dt,-8);
+  }else carSpeed*=.97;
+  if(brake)carSpeed*=Math.max(0,1-dt*5);
+  if(!forward&&!backward&&!brake)carSpeed*=Math.pow(.94,dt*60);
+  const steering=(left?1:0)-(right?1:0);
+  heading+=steering*dt*(.9+Math.min(Math.abs(carSpeed)/30,.5))*(carSpeed<0?-1:1);
+  car.rotation.y=heading;
+  car.position.x+=Math.sin(heading)*carSpeed*dt;
+  car.position.z+=Math.cos(heading)*carSpeed*dt;
+  if(Math.abs(carSpeed)>1)fuel=Math.max(0,fuel-dt*.045);
+  $('speed').textContent=Math.round(Math.abs(carSpeed)*2.1)+' MPH';
+ }else{
+  const move=(forward?1:0)-(backward?1:0);
+  const turn=(left?1:0)-(right?1:0);
+  heading+=turn*dt*1.8;
+  player.rotation.y=heading;
+  player.position.x+=Math.sin(heading)*move*dt*8;
+  player.position.z+=Math.cos(heading)*move*dt*8;
+  $('speed').textContent='ON FOOT';
+ }
+ gasButton.style.display=nearGas()?'block':'none';
+
+ // Tornado movement
+ stormTimer+=dt;
+ if(tornado.position.distanceTo(stormTarget)<12||stormTimer>35){
+  stormTarget.set((Math.random()-.5)*500,0,(Math.random()-.5)*500);
+  stormTimer=0;
+ }
+ const direction=stormTarget.clone().sub(tornado.position).normalize();
+ tornado.position.add(direction.multiplyScalar(dt*(3+storm.ef*.5)));
+ tornado.rotation.y+=dt*.25;
+ funnel.scale.y=Math.min(1,funnel.scale.y+dt*.5);
+ circulation.forEach((r,i)=>{r.rotation.z+=dt*(1+i*.15);});
+ wallCloud.rotation.y+=dt*.08;
+
+ subVortices.forEach((v,i)=>{
+  if(!v.visible)return;
+  const a=elapsed*(.8+i*.2)+i*2.1;
+  v.position.set(Math.cos(a)*(7+i*2),0,Math.sin(a)*(7+i*2));
+  v.rotation.y-=dt*2;
+ });
+
+ // Probe hits
+ for(const p of probes){
+  if(p.hit)continue;
+  if(p.group.position.distanceTo(tornado.position)<storm.ef*3+5){
+   p.hit=true;p.group.visible=false;tokens+=20;updateHud();
+   toast('PROBE HIT BY TORNADO +20 TOKENS');
+  }
+ }
+
+ // Photo checkpoints respawn
+ for(const c of checkpoints){
+  if(!c.active){
+   c.timer-=dt;
+   if(c.timer<=0){
+    c.active=true;
+    c.group.position.set((Math.random()-.5)*550,0,(Math.random()-.5)*550);
+    c.group.visible=true;
+   }
+  }else{
+   c.group.rotation.y+=dt;
+   const p=inCar?car.position:player.position;
+   if(p.distanceTo(c.group.position)<5){
+    c.active=false;c.timer=10;c.group.visible=false;
+    tokens+=25;updateHud();toast('OBSERVATION COMPLETE +25 TOKENS');
+   }
+  }
+ }
+
+ // Simulated environmental damage to vehicle only
+ if(inCar){
+  const dist=car.position.distanceTo(tornado.position);
+  const danger=storm.wind/Math.max(getWindTolerance(),1);
+  if(dist<storm.ef*5+18&&danger>1){
+   health-=dt*(danger*4);
+   car.rotation.z=Math.sin(elapsed*8)*.08;
+   if(health<=0)showGameOver();
+  }
+ }
+
+ updateDestruction(dt);
+ for(let i=debris.length-1;i>=0;i--){
+  const d=debris[i];d.life-=dt;
+  d.mesh.position.addScaledVector(d.vel,dt);
+  d.vel.y-=9.8*dt;d.mesh.rotation.x+=dt*2;d.mesh.rotation.z+=dt;
+  if(d.mesh.position.y<.3){d.mesh.position.y=.3;d.vel.y=Math.abs(d.vel.y)*.2;d.vel.x*=.8;d.vel.z*=.8;}
+  if(d.life<=0){scene.remove(d.mesh);debris.splice(i,1);}
+ }
+ const positions=rainGeo.attributes.position.array;
+ for(let i=0;i<rainCount;i++){
+  positions[i*3+1]-=dt*65;
+  positions[i*3]+=(Math.random()-.5)*dt*3;
+  if(positions[i*3+1]<0){
+   positions[i*3+1]=90;
+   positions[i*3]=camera.position.x+(Math.random()-.5)*250;
+   positions[i*3+2]=camera.position.z+(Math.random()-.5)*250;
+  }
+ }
+ rainGeo.attributes.position.needsUpdate=true;
+ lightningTimer-=dt;
+ if(lightningTimer<=0){
+  lightning.intensity=7+Math.random()*7;lightningTimer=.12;
+ }else if(lightningTimer<.07)lightning.intensity=0;
+
+ // Camera follows whichever character is active
+ const target=inCar?car:player;
+ const behind=new THREE.Vector3(Math.sin(heading)*-13,8,Math.cos(heading)*-13);
+ const desired=target.position.clone().add(behind);
+ camera.position.lerp(desired,.075);
+ const look=target.position.clone().add(new THREE.Vector3(0,2,0));
+ camera.lookAt(look);
+ cloudDeck.position.x=target.position.x*.15;
+ cloudDeck.position.z=target.position.z*.15;
+ rain.position.copy(target.position);
+ updateHud();
+}
 
 function animate(){
-  requestAnimationFrame(animate);
-  const delta=Math.min(clock.getDelta(),.04);
-  const time=clock.elapsedTime;
-
-  if(!gameOver){
-    stormIntensity=2+Math.floor((Math.sin(time*.045)+1)*1.5);
-    stormIntensity=Math.max(1,Math.min(5,stormIntensity));
-    stormWind=65+stormIntensity*38+Math.sin(time*.8)*8;
-
-    updateFunnel(time);
-    updateSwirl(time);
-    moveTornado(delta,time);
-
-    updateParticles(rain,delta);
-    updateParticles(hail,delta);
-
-    // Photo event pauses driving for four seconds.
-    if(photoTimer>0){
-      photoTimer=Math.max(0,photoTimer-delta);
-      document.getElementById("photoCountdown").textContent=
-        Math.ceil(photoTimer);
-      if(photoTimer===0){
-        document.getElementById("photoEvent").style.display="none";
-      }
-    }else{
-      // Driving
-      const accelerating=keys["w"]||keys["arrowup"]||touchGas;
-      const braking=keys["s"]||keys["arrowdown"]||touchBrake;
-      const left=keys["a"]||keys["arrowleft"]||touchLeft;
-      const right=keys["d"]||keys["arrowright"]||touchRight;
-      const handbrake=keys[" "]||keys["space"];
-
-      const maxSpeed=.48+engineLevel*.045;
-
-      if(accelerating)speed+=.006+engineLevel*.001;
-      else speed*=.992;
-
-      // Brake never reverses the car.
-      if(braking)speed=Math.max(0,speed-.035);
-      if(handbrake)speed=Math.max(0,speed-.055);
-      speed=THREE.MathUtils.clamp(speed,0,maxSpeed);
-
-      // Slightly less sensitive steering.
-      const steerPower=(.014+handlingLevel*.003)*(speed>.02?1:.65);
-      if(left)steering+=steerPower;
-      if(right)steering-=steerPower;
-      steering*=.88;
-      steering=THREE.MathUtils.clamp(steering,-.045,.045);
-
-      car.rotation.y+=steering;
-
-      car.position.x-=Math.sin(car.rotation.y)*speed*35*delta;
-      car.position.z-=Math.cos(car.rotation.y)*speed*35*delta;
-
-      car.position.x=THREE.MathUtils.clamp(car.position.x,-680,680);
-      car.position.z=THREE.MathUtils.clamp(car.position.z,-1180,580);
-
-      wheels.forEach(w=>w.rotation.x+=speed*.12);
-
-      // Camera follows behind the car.
-      const behind=new THREE.Vector3(
-        Math.sin(car.rotation.y)*13,7,
-        Math.cos(car.rotation.y)*13
-      );
-      camera.position.lerp(car.position.clone().add(behind),.08);
-
-      const look=car.position.clone();
-      look.y+=2;
-      look.x-=Math.sin(car.rotation.y)*12;
-      look.z-=Math.cos(car.rotation.y)*12;
-      camera.lookAt(look);
-
-      // Center precipitation around the player.
-      rain.points.position.set(car.position.x,0,car.position.z);
-      hail.points.position.set(car.position.x,0,car.position.z);
-
-      // Photo locations.
-      checkpoints.forEach((gate,i)=>{
-        if(!checkpointStates[i])return;
-        if(car.position.distanceTo(gate.position)<8){
-          checkpointStates[i]=false;
-          gate.visible=false;
-          completed++;
-          document.getElementById("cp"+i).textContent="✓ Photo point 0"+(i+1);
-          document.getElementById("cp"+i).className="done";
-          takePhoto(i);
-        }
-      });
-
-      // Fictional arcade vehicle stress mechanic.
-      const stormDistance=car.position.distanceTo(tornado.position);
-      if(stormDistance<82&&stormWind>tolerance()){
-        condition-=delta*(2+(stormWind-tolerance())/100*5);
-        flipTimer+=delta;
-        if(flipTimer>2.2){
-          car.rotation.z=Math.sin(time*8)*.22;
-          car.rotation.x=Math.sin(time*5)*.12;
-        }
-      }else{
-        flipTimer=Math.max(0,flipTimer-delta*.5);
-        car.rotation.z=THREE.MathUtils.lerp(car.rotation.z,0,.06);
-        car.rotation.x=THREE.MathUtils.lerp(car.rotation.x,0,.06);
-      }
-
-      if(condition<=0)endGame();
-    }
-
-    // Lightning
-    lightningTimer-=delta;
-    if(lightningTimer<=0){
-      createLightning();
-      lightningTimer=3+Math.random()*8;
-    }
-    if(lightningFlash>0){
-      lightningFlash-=delta;
-      if(lightningFlash<=0){
-        lightningLight.intensity=0;
-        lightningGroup.clear();
-      }
-    }
-
-    updateUI();
-  }
-
-  renderer.render(scene,camera);
-  finishPhotoCapture();
+ requestAnimationFrame(animate);
+ const dt=Math.min(clock.getDelta(),.04);
+ update(dt);
+ renderer.render(scene,camera);
 }
-
 animate();
 
-/* RESIZE */
+function startGame(){
+ $('intro').style.display='none';
+ gameStarted=true;
+ // Opening cinematic: the funnel grows from the wall cloud
+ funnel.scale.y=.01;
+ let t=0;
+ const introInterval=setInterval(()=>{
+  t+=.025;
+  funnel.scale.y=Math.min(1,t);
+  if(t>=1)clearInterval(introInterval);
+ },50);
+ message('TORNADO FORMED — FIELD SIMULATION ACTIVE');
+}
+$('startBtn').onclick=startGame;
 
-window.addEventListener("resize",()=>{
-  camera.aspect=innerWidth/innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth,innerHeight);
-});
+function resize(){
+ camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
+ renderer.setSize(innerWidth,innerHeight);
+}
+window.addEventListener('resize',resize);
+updateHud();
 </script>
 </body>
 </html>
